@@ -10,11 +10,11 @@ namespace TwitchBot.src
   {
     public static async Task StartRefreshingTokens()
     {
-      await Task.Run(() =>
+      await Task.Run(async () =>
       {
         while (true)
         {
-          Task.Run(RefreshAccessToken);
+          await Task.Run(RefreshAccessToken);
           Thread.Sleep(TimeSpan.FromHours(1));
         }
       });
@@ -30,12 +30,20 @@ namespace TwitchBot.src
       request.AddParameter("grant_type", "refresh_token");
       request.AddParameter("refresh_token", Config.Credentials.RefreshToken);
       request.AddParameter("client_id", Config.Credentials.ClientID);
-      request.AddParameter("client_secret", Config.Credentials.Secret);
+      request.AddParameter("client_secret", "lul");
 
       var response = await client.ExecuteAsync(request);
-      JObject jsonResponse = JObject.Parse(response.Content);
-      AuthResponse tokens = jsonResponse.ToObject<AuthResponse>();
-      Config.SetTokens(tokens);
+      if (response.IsSuccessful)
+      {
+        JObject jsonResponse = JObject.Parse(response.Content);
+        AuthResponse tokens = jsonResponse.ToObject<AuthResponse>();
+        Config.SetTokens(tokens);
+      }
+      else
+      {
+        Console.WriteLine("NEED NEW ACCESS TOKEN"); //todo: log to file 
+        Config.SetConfig();
+      }
     }
   }
 }

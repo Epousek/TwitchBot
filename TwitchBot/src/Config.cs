@@ -15,7 +15,10 @@ namespace TwitchBot.src
 
     public static void SetConfig()
     {
-      Credentials = JObject.Parse(File.ReadAllText(path)).ToObject<Credentials>();
+      if (File.Exists(path))
+        Credentials = JObject.Parse(File.ReadAllText(path)).ToObject<Credentials>();
+      else
+        throw new FileNotFoundException("NO CONFIG FILE!!");
     }
 
     public static void SetTokens(AuthResponse tokens)

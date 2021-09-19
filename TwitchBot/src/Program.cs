@@ -10,6 +10,8 @@ namespace TwitchBot.src
       Config.SetConfig();
       Console.WriteLine(Config.Credentials.Username);
       Task.Run(Authentication.StartRefreshingTokens);
+
+      Console.Read();
     }
   }
 }
