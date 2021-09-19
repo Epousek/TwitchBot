@@ -7,25 +7,20 @@ using TwitchBot.src.Models;
 
 namespace TwitchBot.src
 {
-  class Config
+  static class Config
   {
     [JsonProperty("Credentials")]
-    public Credentials Credentials { get; set; }
+    public static Credentials Credentials { get; set; }
 
-    public Config()
-    {
-      SetConfig();
-    }
-
-    public void SetConfig()
+    public static void SetConfig()
     {
       string path = Path.Combine(Directory.GetCurrentDirectory(), "config.txt");
       Credentials = JObject.Parse(File.ReadAllText(path)).ToObject<Credentials>();
     }
 
-    public override string ToString()
+    public static void SetRefreshToken(string token)
     {
-      return $"Username: {Credentials.Username}; ClientID: {Credentials.ClientID}";
+      Credentials.RefreshToken = token;
     }
   }
 }
