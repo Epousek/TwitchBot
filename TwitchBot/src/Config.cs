@@ -11,16 +11,23 @@ namespace TwitchBot.src
   {
     [JsonProperty("Credentials")]
     public static Credentials Credentials { get; set; }
+    static readonly string path = Path.Combine(Directory.GetCurrentDirectory(), "config.txt");
 
     public static void SetConfig()
     {
-      string path = Path.Combine(Directory.GetCurrentDirectory(), "config.txt");
       Credentials = JObject.Parse(File.ReadAllText(path)).ToObject<Credentials>();
     }
 
-    public static void SetRefreshToken(string token)
+    public static void SetTokens(AuthResponse tokens)
     {
-      Credentials.RefreshToken = token;
+      Credentials.AccessToken = tokens.AccessToken;
+      Credentials.RefreshToken = tokens.RefreshToken;
+      UpdateFile();
+    }
+
+    private static void UpdateFile()
+    {
+      File.WriteAllText(path, JsonConvert.SerializeObject(Credentials));
     }
   }
 }

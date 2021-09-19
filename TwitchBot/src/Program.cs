@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace TwitchBot.src
 {
@@ -6,8 +7,9 @@ namespace TwitchBot.src
   {
     static void Main(string[] args)
     {
-      Config config = new();
-      Console.WriteLine(config.ToString());
+      Config.SetConfig();
+      Console.WriteLine(Config.Credentials.Username);
+      Task.Run(Authentication.StartRefreshingTokens);
     }
   }
 }
