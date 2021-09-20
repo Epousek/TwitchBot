@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Npgsql;
 
 namespace TwitchBot.src
 {
@@ -11,7 +12,8 @@ namespace TwitchBot.src
       Console.WriteLine(Config.Credentials.Username);
       Task.Run(Authentication.StartRefreshingTokens);
 
-      Console.Read();
+      Bot bot = new("epousek");
+      Console.ReadLine();
     }
   }
 }

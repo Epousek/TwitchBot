@@ -18,5 +18,8 @@ namespace TwitchBot.src.Models
 
     [JsonProperty("RefreshToken")]
     public string RefreshToken { get; set; }
+
+    [JsonProperty("ConnectionString")]
+    public string ConnectionString { get; set; }
   }
 }
