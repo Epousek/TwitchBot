@@ -1,0 +1,1 @@
+[Analýza](/Documentation/Analýzy.md)
