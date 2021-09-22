@@ -1,1 +1,1 @@
-[Analýza](/Documentation/Analýzy.md)
+[Analýza](/Documentation/Analýza.md)
