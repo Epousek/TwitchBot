@@ -64,8 +64,6 @@ Plakát, a případnou další grafiku, budu vytvářet pomocí stánky photopea
    - LibreOffice - žádná zkušenost     - zdarma\
 Ke tvorbě závěrečné práce budu používat Word, vzledem k tomu že ho už mám a používám, a nemá cenu stahovat i LibreOffice.
 
-## Výběr variant řešení a postupu
-
 ## Dílčí úkoly
 
 Program bude rozdělen na dvě verze: main a dev. Main je verze co poběží na serveru, dev je verze na které budu pracovat. Jakmile bude nová funkce hotová na dev, tak bude dev spojen s mainem, a program na serveru se vypne, aktualizuje a zase spustí.
