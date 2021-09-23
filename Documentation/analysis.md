@@ -73,7 +73,7 @@ Program bude rozdělen na dvě verze: main a dev. Main je verze co poběží na 
 1. příprava a základy
    Nejdříve musím připravit půdu pro tvorbu samotné práce. Pod to spadá:
    - vytvoření vlastního serveru ze starého PC, ne kterém program poběží;
-   - vytvoření databáze se systémem tabulek, do kterých se budou ukládat data která bude bot sbírat.\ 
+   - vytvoření databáze se systémem tabulek, do kterých se budou ukládat data která bude bot sbírat.\
    Součástí přípravy je také založení samotného projektu a naprogramování/nastavení věcí potřebných k napojení na Twitch (zejména obnovování autentifikačního klíče) a databázi.
    Po prvním výstupu by měla program být připravená pro konstantní běh na serveru.
 2. nasazení na server a první uživatelské funkce
@@ -84,7 +84,7 @@ Program bude rozdělen na dvě verze: main a dev. Main je verze co poběží na 
    - Základní jednoduché příkazy\
    Na konci druhého výstupu budou hotové nebo rozdělané (ale funkční) tyto systémy:
    - Komunikace s databází
-   - Framework pro příkazy\
+   - Framework pro příkazy
 3. příkazy
    V rámci třetího výstupu vytvořím co nejvíce různých příkazů a funkcí. Nelze přesně určit počet nových příkazů, vzhledem k tomu, že přesně nevím složitost implementace každého z nich, ale mým cílem je alespoň 15.
    Mezi příkazy které bych rád přidal patří např. vypsání náhodné zprávy z nějakého zpravodajského serveru, vypsání počasí v dané lokaci, vypsání náhodné zprávy kterou daný uživatel napsal
