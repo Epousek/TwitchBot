@@ -16,8 +16,8 @@ Událostí může být např. zapnutí streamu nebo změna právě hrané hry.
 
 ## Popis stávajícího stavu
 
-Jak jsem již uvedl, podobní boté existují v zahraničí, a budou zdrojem inspirace, zejména co se týče příkazů. Zároveň bych ale rád využil to, že bot bude v češtině, a používal i různé české API, vytvářejíc originální příkazy. 
-Většina botů je napsána v jazyku JavaScript, zatímco já budu používat C#, což je u takovéto práce vcelku nezvyklé. V JavaScriptu je také většina dokumentace, takže je možné, že ne vždy najdu řešení problému, se kterým si nebudu vědět rady.
+Jak jsem již uvedl, podobní boté existují v zahraničí, a budou pro mě zdrojem inspirace, zejména co se táče příkazů. Budu se ale snažitvyužít i co nejvíce českých API, a vytvářet tak originální příkazy.
+Velká většina podobných botů je napsána v JavaScriptu, zatímco já budu používat C#, ke kterému není zdaleka tolik dokumentace a zdrojů na internetu pro tento konkrétní úkol. To znamená, že budu možná budu mít problém najít řešení na každý problém který nastane, a budu se s tím muset vypořádat sám.
 
 ## Popis výběru prostředků
 
@@ -33,17 +33,15 @@ Budu programovat v jazyku C#, protože jsem v něm zkušenější, a zároveň v
     - Visual Studio Code - průměrná zkušenost - méně funkcí        - free
     - Rider              - žádná zkušenost    - hodně funkcí       - 360kč/m
     - MonoDevelop        - žádná zkušenost    - téměř žádné funkce - free\
-Používat budu převážně Visual Studio, občas možná Visual Studio Code např. na úpravu json souborů.
+Na programování budu používat čistě Visual Studio. Na úpravu např. json souborů budu používat Visual Studio Code.
 
  - Databáze:
-    - MySQL      - pomalejší - větší komunita
-    - PostgreSQL - rychlejší - menší komunita\
+    - MySQL      - rychlejší - Méně funkcí - větší komunita
+    - PostgreSQL - pomalejší - více funkcí - menší komunita\
 Vybral jsem si PostgreSQL hlavně kvůli rychlosti. Od databáze nepotřebuji nic složitého/náročného, takže mi nevadí, že toho o ní tolik nenajdu na internetu.
 
  - Správa databáze:
-    - PGAdmin 4 - velice pomalý - více funkcí - neintuitivní UI
-    - OmniDB    - rychlý        - méně funkcí - lepší UI\
-Na správu databáze jsem vybral OmniDB vzhledem k rychlosti a jednoduchosti, kterou nabízí. 
+Na správu databáze budu používat MySQL Workbench, protože je dělaný přímo pro MySQL, a navíc nepotřebuji od toho programu nic složitého, a nemá tak cenu používat jiný program.
 
  - Git hosting
     - GitHub
@@ -57,14 +55,14 @@ Na ukládání mé práce budu používat službu github.com, protože na ní m�
     - Photoshop - 24,2€/měsíc - nejvíce funkcí  - žádná zkušenost, ale podobné photopee
     - Paint.net - zdarma      - dostatek funkcí - žádná zkušenost
     - Photopea  - zdarma      - dostatek funkcí - velká zkušenost\
-Na tvorbu plakátu (a další případnou grafiku) budu používat photopeu. Mám s ní dobré zkušenosti, a i normálně ji využívám na veškerou práci s 2D grafikou.
+Plakát, a případnou další grafiku, budu vytvářet pomocí stánky photopea.com. Mám s ní dobré zkušenosti a běžně ji využívám na veškerou práci s 2D grafikou.
 
 ### Závěrečná zpráva
 
  - Textový editor:
    - Word        - průměrné zkušenosti - zdarma license od školy
    - LibreOffice - žádná zkušenost     - zdarma\
-Na tvorbu závěrečné práce a analýzy budu používat Word, protože ho na rozdíl od LibreOfficu mám nainstalovaný.
+Ke tvorbě závěrečné práce budu používat Word, vzledem k tomu že ho už mám a používám, a nemá cenu stahovat i LibreOffice.
 
 ## Výběr variant řešení a postupu
 
@@ -91,6 +89,6 @@ Program bude rozdělen na dvě verze: main a dev. Main je verze co poběží na 
    V rámci třetího výstupu vytvořím co nejvíce různých příkazů a funkcí. Nelze přesně určit počet nových příkazů, vzhledem k tomu, že přesně nevím složitost implementace každého z nich, ale mým cílem je alespoň 15.
    Mezi příkazy které bych rád přidal patří např. vypsání náhodné zprávy z nějakého zpravodajského serveru, vypsání počasí v dané lokaci, vypsání náhodné zprávy kterou daný uživatel napsal
 4. polish
-   Poslední výstup bude zejména o opravách a vylepšování stávajících funkcí a systému. Zároveň ale pravděpodobně přidám ještě nějaké příkazy, které jsem buď přidat nestihl, které mě napadly později, popřípadě které napadly nějakého uživatele.
+   Poslední výstup mám rezervovaný zejména pro opravy, úpravy a vylepšování stávajících funkcí a systémů. Zároveň ještě budu přidávat nové příkazy, které jsem buď přidat nestihl, které mě napadli později, poopřípadě které napadly nějakého uživatele. U tohoto výstupu lze ještě hůře určit počet nových příkazů, vzledem k tomu že netuším kolik času mi zaberou opravy a vylepšování.
 
-Součástí každého výstupu jsou opravy, zejména akutních problémů, které nepříjemně ovlivňují funkci programu.
+Součástí každého výstupu jsou opravy akutních problémů, díky kterým bot nefunguje nebo je méně stabilní.
