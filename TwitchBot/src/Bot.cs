@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
@@ -10,7 +11,7 @@ namespace TwitchBot.src
   {
     TwitchClient client;
 
-    public Bot(string channelToConnectTo)
+    public Bot(List<string> channelsToConnectTo)
     {
       ConnectionCredentials creds = new(Config.Credentials.Username, Config.Credentials.AccessToken);
       var clientOptions = new ClientOptions
@@ -20,9 +21,9 @@ namespace TwitchBot.src
       };
       WebSocketClient wsClient = new(clientOptions);
       client = new(wsClient);
-      client.Initialize(creds, channelToConnectTo);
+      client.Initialize(creds, channelsToConnectTo);
 
-      client.OnLog += Client_OnLog;
+      //client.OnLog += Client_OnLog;
       client.OnConnected += Client_OnConnected;
       client.OnMessageReceived += Client_OnMessageReceived;
       client.OnJoinedChannel += Client_OnJoinedChannel;
@@ -42,12 +43,12 @@ namespace TwitchBot.src
 
     private void Client_OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)
     {
-      Console.WriteLine(e.ChatMessage.Message);
+      Console.WriteLine($"{e.ChatMessage.Channel} - {e.ChatMessage.DisplayName}: {e.ChatMessage.Message}");
     }
 
-    private void Client_OnLog(object sender, TwitchLib.Client.Events.OnLogArgs e)
-    {
-      Console.WriteLine(e.DateTime.ToString() + " " + e.Data);
-    }
+    //private void Client_OnLog(object sender, TwitchLib.Client.Events.OnLogArgs e)
+    //{
+    //  Console.WriteLine(e.DateTime.ToString() + " " + e.Data);
+    //}
   }
 }

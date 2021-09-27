@@ -8,14 +8,16 @@ namespace TwitchBot.src
 {
   static class Authentication
   {
-    public static async Task StartRefreshingTokens()
+    public static async Task StartRefreshingTokensAsync()
     {
       await Task.Run(async () =>
       {
         while (true)
         {
           await Task.Run(RefreshAccessToken).ConfigureAwait(false);
+          Console.WriteLine(DateTime.Now + " - sleeping");
           Thread.Sleep(TimeSpan.FromHours(1));
+          Console.WriteLine(DateTime.Now + " - woke up");
         }
       }).ConfigureAwait(false);
     }
