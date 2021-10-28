@@ -2,12 +2,13 @@
 
 ## Specifikace požadavků 
 
-verze 0.1, 20.10.2021  
+verze 0.2, 28.10.2021  
 Jan Bezouška, janbezouska@outlook.com
 
 ### Konvence
 
 chat = 
+u vlastností: *kurziva* = nepovinný argument
 
 ### Odkazy na ostatní dokumenty
 
@@ -53,9 +54,296 @@ Vzhledem k tomu, že program poběží pouze na serveru, tak nejsou žádné př
 
 Uživatel musí mít přístup k chatu. Nezáleží na tom skrze jaký operační systém a webový prohlížeč či program k tomu používá.
 
-### Vlastnosti
+### Vlastnosti - události
 
-1. 
+#### Změna hry
+ - *Spouštěč:* změna kategorie hry
+ - *Podmínky:* uživatel(é) se musí nejprve přihlásit k této události
+ - *Úspěšný scénář:*
+   1. Změní se hra
+   2. Program získá z databáze seznam přihlášených uživatelů
+   3. Přihlášení uživatelé budou označeni v chatu s tím, že se změnila hra, a co za hru se nyní hraje
+ - *Alternativní scénář:* pokud se hra již změnila během posledních 10 minut, uživatelé upozorněni nebudou
+
+#### Zapnutí streamu
+ - *Spouštěč:* zapnutí streamu
+ - *Podmínky:* uživatel(é) se musí nejprve přihlásit k této události
+ - *Úspěšný scénář:*
+   1. Streamer zapne stream
+   2. Program získá z databáze přihlášené uživatele
+   3. Přihlášení uživatelé budou označeni v chatu s tím, že začal stream
+  
+### Vlastnosti - příkazy
+  
+#### $added
+
+ - *Alias*: emotes, emotikony
+ - *Spouštěč:* uživatel napíše do chatu příkaz
+ - *Podmínky:* žádné
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program získá z databáze list emotikonů pro daný kanál
+   3. Program list seřadí podle data přidání, a vybere prvních 8
+   4. Program vypíše uživateli vybrané emoty
+
+#### $removed
+ - *Alias:* 
+ - *Spouštěč:* uživatel napíše do chatu příkaz
+ - *Podmínky:* žádné
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program získá z databáze list emotikonů pro daný kanál
+   3. Program list seřadí podle data odebrání, a vybere prvních 6
+   4. Program vypíše uživateli vybrané emotikony
+
+#### $remind
+ - *Alias:* 
+ - *Argumenty:*
+   - uživatel
+   - *za jak dlouho upozornit* 
+     - pro specifikaci času potřeba napsat "in" - např. $remind uživatel in 30m
+     - pokud neupřesněno, uživatel bude upozorněn až napíše do chatu
+   - *zpráva*
+ - *Spouštěč:* uživatel napíše příkaz
+ - *Podmínky:* cílový uživatel nevypnul možnost ho upozornit
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program si upozornění uloží
+   3. Cílový uživatel napíše do chatu
+   4. Program vypíše cílovému uživateli upozornění (od koho je, zprávu, a před jak ldouhou dobou bylo vytvořeno)
+ - *Alternativní scénář:*
+   1. Uživatel napíše příkaz s časovou specifikací
+   2. Za danou dobu bude cílový uživatel upozorněn v chatu, nehledě na to, jestli je aktivní
+
+#### $gn
+ - *Alias:*
+ - *Argumenty:*
+   - *zpráva*
+ - *Spouštěč:* uživatel napíše příkaz
+ - *Podmínky:*
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program napíše do chatu, že jde uživatel spát (se zprávou, pokud jí uživatel zadal)
+   3. Program si uloží uživatele do listu
+   4. Uživatel napíše do chatu
+   5. Program napíše, že už uživatel nespí (se zprávou a časem)
+
+#### $afk
+ - *Alias:*
+ - *Argumenty:*
+   - *zpráva*
+ - *Spouštěč:* uživatel napíše příkaz
+ - *Podmínky:*
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program napíše do chatu, že uživatel nebude přítomen (se zprávou, pokud jí uživatel zadal)
+   3. Program si uloží uživatele do listu
+   4. Uživatel napíše do chatu
+   5. Program napíše, že je uživatel opět aktivní (se zprávou a časem)
+
+#### $translate
+ - *Alias:* přelož
+ - *Argumenty:*
+   - text
+     - musí být v uvozovkách
+   - *jazyk*
+     - pokud není uveden, přeloží se buď z češtiny do angličtiny, nebo naopak (podle jazyku textu)
+ - *Spouštěč:* uživatel napíše příkaz
+ - *Podmínky:*
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program zformátuje argumenty a pošle žádost DeepL API
+   3. Program získá z odpovědi přeložený text
+   4. Program uživateli vypíše přeložený text
+
+#### $firstfollowed
+ - *Alias:*
+ - *Argumenty:*
+   - *uživatel*
+     - pokud není specifikován, použit bude uživatel, která příkaz napsal
+ - *Spouštěč:* uživatel napíše příkaz
+ - *Podmínky:* 
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program pošle žádost na DecAPI s uživatelským jménem
+   3. Program vypíše první kanál, který uživatel sledoval
+
+#### $news
+ - *Alias:* novinky
+ - *Argumenty:*
+   - *kategorie*
+ - *Spouštěč:* uživatel napíše příkaz
+ - *Podmínky:*
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program pošle žádost na NewsAPI (podle argumentů)
+   3. Program zformátuje odpověď a vybere konkrétní článěk (náhodně)
+   4. Program vypíše uživateli perex vybraného článku
+
+#### $multitwitch
+ - *Alias:*
+ - *Argumenty:*
+   - kanály (alespoň dva)
+ - *Spouštěč:* uživatel napíše příkaz
+ - *Podmínky:*
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program vytvoří link na stránku, na které lze sledovat více streamů najednou
+   3. Program uživateli pošle odkaz na danou stránku s danými kanály
+
+#### $randomline
+ - *Alias:* rl
+ - *Argumenty:*
+   - *uživatel*
+     - pokud není specifikován, použit bude uživatel, která příkaz napsal
+ - *Spouštěč:* uživatel napíše příkaz
+ - *Podmínky:* cílový uživatel nevypnul možnost na něj použít tento příkaz
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program získá z databáze náhodnou zprávu od cílového uživatele
+   3. Program danou zprávu vypíše
+
+#### $weather
+ - *Alias:* počasí
+ - *Argumenty:*
+   - lokace (město)
+ - *Spouštěč:* uživatel napíše příkaz
+ - *Podmínky:*
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program pošle žádost na OpenWeatherMap API
+   3. Program zformátuje získaná data
+   4. Program vypíše uživateli počasí v dané lokaci
+
+#### $lasttimeout
+ - *Alias:*
+ - *Argumenty:*
+   - uživatel (musí být moderátor)
+ - *Spouštěč:* uživatel napíše příkaz
+ - *Podmínky:*
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program najde v databázi, kdy dal daný uživatel naposledy timeout
+   3. Program vypíše uživateli před jakou dobou dal naposledy daný uživatel timeout
+
+#### $suggest
+ - *Alias:* návrh
+ - *Argumenty:*
+   - text
+ - *Spouštěč:* uživatel napíše příkaz
+ - *Podmínky:*
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program uloží daný návrh do databáze
+   3. Program informuje uživatele o tom, že byl návrh úspěšně uložen
+
+#### $about
+ - *Alias:* info
+ - *Argumenty:*
+   - *příkaz*
+ - *Spouštěč:* uživatel napíše příkaz
+ - *Podmínky:*
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz bez argumentů
+   2. Program uživateli vypíše základní informace o programu
+ - *Alternativní scénář:*
+   1. Uživatel napíše příkaz s argumentem
+   2. Program vypíše informace o daném příkazu
+
+#### $help
+ - *Alias:*
+ - *Argumenty:*
+   - příkaz
+ - *Spouštěč:* uživatel napíše příkaz
+ - *Podmínky:*
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program uživateli vypíše, jak použít daný příkaz
+
+#### $optout
+ - *Alias:*
+ - *Argumenty:*
+   - příkaz (např. remind) nebo all
+ - *Spouštěč:* uživatel napíše příkaz
+ - *Podmínky:* uživatel není daného příkazu odhlášený
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program uloží informaci o tom, že na tohoto uživatele nelze použít daný příkaz
+   3. Program uživatele informuje o úspěchu
+
+#### $optin
+ - *Alias:*
+ - *Argumenty:*
+   - příkaz (např. remind) nebo all
+ - *Spouštěč:* uživatel napíše příkaz
+ - *Podmínky:* uživatel je od daného příkazu odhlášený
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program uloží informaci o tom, že na tohoto uživatele opět lze použít daný příkaz
+   3. Program uživatele informuje o úspěchu
+
+#### $notify
+ - *Alias:*
+ - *Argumenty:*
+   - událost (game nebo live) nebo all
+ - *Spouštěč:* uživatel napíše příkaz
+ - *Podmínky:* uživatel není přihlášen k dané události
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program si uloží informaci o tom, že se tento uživatel přihlásil k dané události
+   3. Program informuje uživatele o úspěchu
+
+#### $dontnotify
+ - *Alias:*
+ - *Argumenty:*
+   - událost (game nebo live) nebo all
+ - *Spouštěč:* uživatel napíše příkaz
+ - *Podmínky:* uživatel je přihlášen k dané události
+ - *Úspěšný scénář:*
+   1. Uživatel napíše příkaz
+   2. Program si uloží informaci o tom, že se tento uživatel odhlásil od dané události
+   3. Program informuje uživatele o úspěchu
+
+#### $ban
+ - *Alias:*
+ - *Argumenty:*
+   - uživatel
+ - *Spouštěč:* admin napíše příkaz
+ - *Podmínky:* použitelné pouze adminem nebo vlastníkem
+ - *Úspěšný scénář:*
+   1. Admin napíše příkaz
+   2. Program si uloží informaci o tom, že daný uživatel je zabanován
+   3. Program informuje admina o úspěchu
+
+#### $unban
+ - *Alias:*
+ - *Argumenty:*
+   - uživatel
+ - *Spouštěč:* admin napíše příkaz
+ - *Podmínky:* použitelné pouze adminem nebo vlastníkem
+ - *Úspěšný scénář:*
+   1. Admin napíše příkaz
+   2. Program si uloží informaci o tom, že daný uživatel již není zabanován
+   3. Program informuje admina o úspěchu
+
+#### $admin
+ - *Alias:*
+ - *Argumenty:*
+   - uživatel
+ - *Spouštěč:* vlastník napíše příkaz
+ - *Podmínky:* použitelné pouze vlastníkem
+ - *Úspěšný scénář:*
+   1. Vlastník napíše příkaz
+   2. Program si uloží informaci o tom, že daný uživatel je zabanován
+   3. Program informuje vlastníka o úspěchu
+
+### Vlastnosti - na pozadí
+
+#### Aktualizace emotikonů
+Program bude automaticky každou minutu získávat aktivní emotikony na všech kanálech, na které bude připojený, a případně aktualizovat informace o nich v databázi.
+
+#### Určení vhodného/použitelného emotikonu
+Pokud bude program psát do chatu zprávu obsahující emotikon, tato funkce vybere nejvhodnější z listu, podle toho, který je na daném kanále aktivní.
 
 ### Výkonnost
 
@@ -69,7 +357,7 @@ Program nebude ukládat žádná citlivá data uživatelů, a ani s nimi nebude 
 ### Spolehlivost
 
 Spolehlivost, stejně jako výkonnost, bude v některých případech ovlivněna API, se kterými bude program pracovat.  
-Mimo tyto případy bude cílem (téměř) non-stop běh programu, s nutností restartu maximálně 2. týdně.  
+Mimo tyto případy bude cílem (téměř) non-stop běh programu, s nutností restartu způsobeného chybou maximálně 2. týdně.  
 Program by měl zachytávat všechny chyby, a informovat o nich uživatele, pokud jsou pro něj relevantní.
 
 ### Uživatelská dokumentace
