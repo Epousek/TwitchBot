@@ -7,7 +7,7 @@ Jan Bezouška, janbezouska@outlook.com
 
 ### Konvence
 
-chat = 
+chat = místnost, ve které komunikují sledující pomocí zpráv  
 u vlastností: *kurziva* = nepovinný argument
 
 ### Odkazy na ostatní dokumenty
