@@ -2,7 +2,7 @@
 
 ## Návrh
 
-verze 0.3, 28.10.2021  
+verze 0.4, 29.10.2021  
 Jan Bezouška, janbezouska@outlook.com
 
 ### Konvence
@@ -128,7 +128,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
 #### $added
 
  - *Alias*: emotes, emotikony
- - *Spouštěč:* uživatel napíše do chatu příkaz
+ - *Spouštěč:* uživatel napíše do chatu $added
  - *Podmínky:* žádné
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -138,7 +138,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
 
 #### $removed
  - *Alias:* 
- - *Spouštěč:* uživatel napíše do chatu příkaz
+ - *Spouštěč:* uživatel napíše do chatu $removed
  - *Podmínky:* žádné
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -154,7 +154,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
      - pro specifikaci času potřeba napsat "in" - např. $remind uživatel in 30m
      - pokud neupřesněno, uživatel bude upozorněn až napíše do chatu
    - *zpráva*
- - *Spouštěč:* uživatel napíše příkaz
+ - *Spouštěč:* uživatel napíše např. $remind user in 2h text upozornění
  - *Podmínky:* cílový uživatel nevypnul možnost ho upozornit
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -169,7 +169,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Alias:*
  - *Argumenty:*
    - *zpráva*
- - *Spouštěč:* uživatel napíše příkaz
+ - *Spouštěč:* uživatel napíše $gn
  - *Podmínky:*
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -182,7 +182,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Alias:*
  - *Argumenty:*
    - *zpráva*
- - *Spouštěč:* uživatel napíše příkaz
+ - *Spouštěč:* uživatel napíše $afk
  - *Podmínky:*
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -198,7 +198,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
      - musí být v uvozovkách
    - *jazyk*
      - pokud není uveden, přeloží se buď z češtiny do angličtiny, nebo naopak (podle jazyku textu)
- - *Spouštěč:* uživatel napíše příkaz
+ - *Spouštěč:* uživatel napíše např. "Hello, world" cz
  - *Podmínky:*
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -211,7 +211,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Argumenty:*
    - *uživatel*
      - pokud není specifikován, použit bude uživatel, která příkaz napsal
- - *Spouštěč:* uživatel napíše příkaz
+ - *Spouštěč:* uživatel napíše např. $firstfollowed user
  - *Podmínky:* 
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -222,7 +222,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Alias:* novinky
  - *Argumenty:*
    - *kategorie*
- - *Spouštěč:* uživatel napíše příkaz
+ - *Spouštěč:* uživatel napíše např. $news sport
  - *Podmínky:*
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -234,7 +234,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Alias:*
  - *Argumenty:*
    - kanály (alespoň dva)
- - *Spouštěč:* uživatel napíše příkaz
+ - *Spouštěč:* uživatel napíše např. $multitwitch kanál1, kanál2
  - *Podmínky:*
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -246,7 +246,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Argumenty:*
    - *uživatel*
      - pokud není specifikován, použit bude uživatel, která příkaz napsal
- - *Spouštěč:* uživatel napíše příkaz
+ - *Spouštěč:* uživatel napíše např. $randomline user
  - *Podmínky:* cílový uživatel nevypnul možnost na něj použít tento příkaz
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -257,7 +257,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Alias:* počasí
  - *Argumenty:*
    - lokace (město)
- - *Spouštěč:* uživatel napíše příkaz
+ - *Spouštěč:* uživatel napíše např. $weather Praha
  - *Podmínky:*
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -269,7 +269,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Alias:*
  - *Argumenty:*
    - uživatel (musí být moderátor)
- - *Spouštěč:* uživatel napíše příkaz
+ - *Spouštěč:* uživatel napíše $lasttimeout moderátor
  - *Podmínky:*
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -280,7 +280,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Alias:* návrh
  - *Argumenty:*
    - text
- - *Spouštěč:* uživatel napíše příkaz
+ - *Spouštěč:* uživatel napíše $suggest návrh
  - *Podmínky:*
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -291,7 +291,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Alias:* info
  - *Argumenty:*
    - *příkaz*
- - *Spouštěč:* uživatel napíše příkaz
+ - *Spouštěč:* uživatel napíše např. $about suggest
  - *Podmínky:*
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz bez argumentů
@@ -304,7 +304,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Alias:*
  - *Argumenty:*
    - příkaz
- - *Spouštěč:* uživatel napíše příkaz
+ - *Spouštěč:* uživatel napíše např. $help suggest
  - *Podmínky:*
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -314,7 +314,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Alias:*
  - *Argumenty:*
    - příkaz (např. remind) nebo all
- - *Spouštěč:* uživatel napíše příkaz
+ - *Spouštěč:* uživatel napíše např. $optout all
  - *Podmínky:* uživatel není daného příkazu odhlášený
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -325,7 +325,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Alias:*
  - *Argumenty:*
    - příkaz (např. remind) nebo all
- - *Spouštěč:* uživatel napíše příkaz
+ - *Spouštěč:* uživatel napíše např. $optin all
  - *Podmínky:* uživatel je od daného příkazu odhlášený
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -336,7 +336,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Alias:*
  - *Argumenty:*
    - událost (game nebo live) nebo all
- - *Spouštěč:* uživatel napíše příkaz
+ - *Spouštěč:* uživatel napíše např. $notify all
  - *Podmínky:* uživatel není přihlášen k dané události
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -347,7 +347,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Alias:*
  - *Argumenty:*
    - událost (game nebo live) nebo all
- - *Spouštěč:* uživatel napíše příkaz
+ - *Spouštěč:* uživatel napíše např. $dontnotify all
  - *Podmínky:* uživatel je přihlášen k dané události
  - *Úspěšný scénář:*
    1. Uživatel napíše příkaz
@@ -358,7 +358,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Alias:*
  - *Argumenty:*
    - uživatel
- - *Spouštěč:* admin napíše příkaz
+ - *Spouštěč:* admin napíše $ban user
  - *Podmínky:* použitelné pouze adminem nebo vlastníkem
  - *Úspěšný scénář:*
    1. Admin napíše příkaz
@@ -369,7 +369,7 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Alias:*
  - *Argumenty:*
    - uživatel
- - *Spouštěč:* admin napíše příkaz
+ - *Spouštěč:* admin napíše $unban user
  - *Podmínky:* použitelné pouze adminem nebo vlastníkem
  - *Úspěšný scénář:*
    1. Admin napíše příkaz
@@ -380,11 +380,22 @@ Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí s
  - *Alias:*
  - *Argumenty:*
    - uživatel
- - *Spouštěč:* vlastník napíše příkaz
+ - *Spouštěč:* vlastník napíše $admin user
  - *Podmínky:* použitelné pouze vlastníkem
  - *Úspěšný scénář:*
    1. Vlastník napíše příkaz
-   2. Program si uloží informaci o tom, že daný uživatel je zabanován
+   2. Program si uloží informaci o tom, že daný uživatel je nyní adminem
+   3. Program informuje vlastníka o úspěchu
+
+#### $unadmin
+ - *Alias:*
+ - *Argumenty:*
+   - uživatel
+ - *Spouštěč:* vlastník napíše $unadmin user
+ - *Podmínky:* použitelné pouze vlastníkem
+ - *Úspěšný scénář:*
+   1. Vlastník napíše příkaz
+   2. Program si uloží informaci o tom, že daný uživatel již není adminem
    3. Program informuje vlastníka o úspěchu
 
 ### Vlastnosti - na pozadí
