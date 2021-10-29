@@ -1,13 +1,14 @@
 # Twitch chat bot
 
-## Specifikace požadavků 
+## Návrh
 
-verze 0.2, 28.10.2021  
+verze 0.3, 28.10.2021  
 Jan Bezouška, janbezouska@outlook.com
 
 ### Konvence
 
 chat = místnost, ve které komunikují sledující pomocí zpráv  
+stream = živé vysílání (konkrétně na platformě Twitch.tv)  
 u vlastností: *kurziva* = nepovinný argument
 
 ### Odkazy na ostatní dokumenty
@@ -17,21 +18,38 @@ u vlastností: *kurziva* = nepovinný argument
 Účelem programu je zejména přenést funkce fungující v zahraničí na českou scénu, v češtině.  
 S programem bude uživatel interagovat skrze psaní do chatu na kanále (na platformě twitch.tv), na který bude bot připojený; konkrétně pomocí příkazů a jejich argumentů. Program bude mít předem určený prefix pro přikazy ($), který bude muset být napsán před každým příkazem.
 
+### Rizika
+
+Program bude využívat knihovnu TwitchLib, pomocí které bude napojen na Twitch. Největším rizikem je, že nebude updatována, a v budoucnu se stane nekompatibilní s API Twitche nebo nebude obsahovat její nové funkce. V takovém případě bych musel komunikovat s Twitchem sám, což je možné, ale více zdlouhavé a náročné.  
+Rizikem můžou být i další knihovny, které bude program používat - Newtonsoft, RestSharp a MySql.Data.  
+Dalším rizikem je prostředí. Program poběží na serveru, který jsem vytvořil ze starého počítače. Problém může nastat v několika případech - komponenty v PC nejsou nejnovější, a mohly by přestat fungovat; něco je špatně nastavené, a zjistí se to až za běhu.  
+
 ### Funkce
 
 Program bude mít dvě skupiny funkcí pro uživatele: příkazy a události, přičemž důraz bude kladen na příkazy, kterých bude o dost více.  
 **Příkazy** budou fungovat následovně: uživatel napíše do chatu příkaz -> program vyhodnotí, zda tento příkaz existuje, a zda ho uživatel může použít -> příkaz se provede -> program napíše uživateli do chatu informace (záleží na konkrétním příkazu).  
 Pokud se příkaz nepovede provést, bude uživateli napsána přesná chyba podle bodu, ve kterém se příkaz zasekl.  
-**Události** budou fungovat následovně: uživatel se "zaregistruje" příkazem k události -> uživatel je zapsán do databáze -> nastene událost -> program vezme všechny uživatele přihlášené k dané události z db -> program napíše do chatu, že nastala daná událost a označí dané uživatele.
+**Události** budou fungovat následovně: uživatel se "zaregistruje" příkazem k události -> uživatel je zapsán do databáze -> nastene událost -> program získá všechny uživatele přihlášené k dané události z db -> program napíše do chatu, že nastala daná událost a označí dané uživatele.
 
+### Vymezení rozsahu
 
-### Uživatelské skupiny
+Program bude obsahovat zejména informativní funkce.  
+Některé podobné programy obsahují i funkce pro moderaci chatu, což nebude součástí tohoto programu.
 
-Hlavní uživatelské skupiny budou dvě:
-a) standartní uživatel
- Věšinou člověk, který je aktivní v dané komunitě a chat používá i když momentálně neprobíhá živé vysílání. Tento typ uživatele bude program využívat zejména pro získávání informací a zábavu.
-b) admin
- Člověk, který bude mít přístup k administrátorským funkcím, např. banování uživatelů. Nejdříve jím bude pouze autor, později podle potřeby další lidé.
+### Uživatelské role
+
+Budou existovat tři uživatelské role:
+  - Vlastník - pouze autor programu; nejvyšší oprávnění, přístup ke všem funkcím  
+  - Admin - malý počet lidí, kterým vlastník důvěřuje; možnost dávat a odebírat bany běžným uživatelům  
+  - Běžný uživatel - drtivá většina uživatelů; přístup k uživatelským funkcím; většinou člověk, co je aktivní v chatu i pokud zrovna není stream
+
+### Způsoby použití
+
+Každý příkaz má trochu jiné využití, ale obecně vzato se dají rozdělit do následujících kategorií:
+  - Informace o streamu - např. jaké emotikony byly naposledy přidány
+  - Informace o konkrétním uživateli - např. jaký byl první kanál, který sledoval
+  - Obecné informace - např. jaké je počasí v dané lokalitě
+  - Mezi-uživatelské použití - např. připomínka pro jiného uživatele
 
 ### Provozní prostředí
 
@@ -39,8 +57,6 @@ Program poběži na serveru, na kterém je i databáze, se kterou bude pracovat.
  - Operační Systém: Ubuntu Server
  - Databáze: MySQL
  - Platforma: .NET
-
-### Závislosti
 
 ### Uživatelská rozhraní
 
@@ -53,6 +69,40 @@ Vzhledem k tomu, že program poběží pouze na serveru, tak nejsou žádné př
 ### Softwarová rozhraní
 
 Uživatel musí mít přístup k chatu. Nezáleží na tom skrze jaký operační systém a webový prohlížeč či program k tomu používá.
+
+### Výkonnost
+
+Maximální přijatelná doba od přijetí příkazu do jeho vykonání (pokud se má vykonat hned) jsou 4 vteřiny.  
+Délka odezvy bude v některých případech záviset na různých API, nebude tak možnost ji ovlivnit a může se stát, že se tím odezva prodlouží. Zároveň se také doba provedení příkazu bude dále lišit mezi jednotlivými příkazy tím, že některé budou např. pracovat s větší tabulkou v db, zatímco jiné s db pracovat nebudou vůbec. 4 vteřiny počítají i s těmito případy, a tak většina příkazů bude provedena o dost rychleji
+
+### Bezpečnost
+
+Program nebude ukládat žádná citlivá data uživatelů, a ani s nimi nebude pracovat.
+
+### Spolehlivost
+
+Spolehlivost, stejně jako výkonnost, bude v některých případech ovlivněna API, se kterými bude program pracovat.  
+Mimo tyto případy bude cílem (téměř) non-stop běh programu, s nutností restartu způsobeného chybou maximálně 2. týdně.  
+Program by měl zachytávat všechny chyby, a informovat o nich uživatele, pokud jsou pro něj relevantní.
+
+### Chybová hlášení
+
+Chybová hlášení budou konkrétní, a budou uživatele přesně informovat o tom, co udělal špatně.  
+Budou existovat tři hlavní skupiny chyb:
+  - Špatný argument 
+    - pokud uživatel jakožto argument příkazu pošle špatný formát  
+    - uživatel bude informován o tom, jak má argument správně vypadat
+  - Chybějící argument
+    - pokud uživatel nezadá povinný argument
+    - uživatel bude informován, jaký argument je u daného příkazu povinný
+  - Uživatel nenalezen
+    - u příkazů, které vyhledávají uživatele v databázi
+    - pokud uživatel není v databázi nalezen
+    - uživatel bude informován, že uživatel buď neexistuje, nebo není zapsán v databázi
+
+### Uživatelská dokumentace
+
+Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí seznamu budou i veškeré argumenty, které jsou s danými příkazy použitelné.
 
 ### Vlastnosti - události
 
@@ -344,22 +394,3 @@ Program bude automaticky každou minutu získávat aktivní emotikony na všech 
 
 #### Určení vhodného/použitelného emotikonu
 Pokud bude program psát do chatu zprávu obsahující emotikon, tato funkce vybere nejvhodnější z listu, podle toho, který je na daném kanále aktivní.
-
-### Výkonnost
-
-Maximální přijatelná doba od přijetí příkazu do jeho vykonání (pokud se má vykonat hned) jsou 4 vteřiny.  
-Délka odezvy bude v některých případech záviset na různých API, nebude tak možnost ji ovlivnit a může se stát, že se tím odezva prodlouží. Zároveň se také doba provedení příkazu bude dále lišit mezi jednotlivými příkazy tím, že některé budou např. pracovat s větší tabulkou v db, zatímco jiné s db pracovat nebudou vůbec. 4 vteřiny počítají i s těmito případy, a tak většina příkazů bude provedena o dost rychleji
-
-### Bezpečnost
-
-Program nebude ukládat žádná citlivá data uživatelů, a ani s nimi nebude pracovat.
-
-### Spolehlivost
-
-Spolehlivost, stejně jako výkonnost, bude v některých případech ovlivněna API, se kterými bude program pracovat.  
-Mimo tyto případy bude cílem (téměř) non-stop běh programu, s nutností restartu způsobeného chybou maximálně 2. týdně.  
-Program by měl zachytávat všechny chyby, a informovat o nich uživatele, pokud jsou pro něj relevantní.
-
-### Uživatelská dokumentace
-
-Seznam všech příkazů a událostí bude k dispozici na githubu. Součástí seznamu budou i veškeré argumenty, které jsou s danými příkazy použitelné.
