@@ -2,7 +2,7 @@
 
 ## Návrh
 
-verze 0.4, 29.10.2021  
+verze 0.5, 29.10.2021  
 Jan Bezouška, janbezouska@outlook.com
 
 ### Konvence
@@ -405,3 +405,72 @@ Program bude automaticky každou minutu získávat aktivní emotikony na všech 
 
 #### Určení vhodného/použitelného emotikonu
 Pokud bude program psát do chatu zprávu obsahující emotikon, tato funkce vybere nejvhodnější z listu, podle toho, který je na daném kanále aktivní.
+
+#### Převod uživatelského jména na uživatelské ID a naopak
+
+### Databáze
+
+ - ConnectedChannels
+   - jméno kanálu
+   - nastavení pro kanál
+   - kdy se bot na kanál připojil
+ - Chatters
+   - uživatelské jméno
+   - uživatelské ID
+   - oprávnění
+   - příkazy, které uživatel zakázal
+   - poslední zpráva
+   - kdy byla poslední zpráva poslána
+   - kde byla poslední zpráva poslána
+ - Chatters*Channel* - informace o uživatelých specifické pro každý kanál
+   - je uživatel přihlášen k události změny hry?
+   - je uživatel přihlášen k události zapnutí streamu?
+   - je uživatel zabanován na tomto kanále?
+ - Logs - historie zpráv pro každý kanál
+   - uživatelské jméno
+   - zpráva
+   - čas, kdy byla zpráva poslána
+ - Emotes - seznam momentálně aktivních, a dřívě aktivních, emotikonů pro každý kanál
+   - jméno emotikonu
+   - čas, kdy byl přidán
+   - čas, kdy byl odebrán
+   - je momentálně aktivní?
+ - Commands
+   - kolikrát byl příkaz použit
+   - kdy byl příkaz použit naposledy
+ - Suggestions - tabulka pro ukládání návrhů ($suggest)
+   - uživatelské jméno
+   - návrh
+   - čas, kdy byl navržen
+
+### Datové struktury
+
+ - ICommand
+   - cooldown
+   - popis příkazu ($about)
+   - popis, jak příkaz použít ($help)
+   - potřebná oprávnění
+   - lze příkaz použít pouze pokud není zapnutý stream?
+   - může tento příkaz používat zabanovaný uživatel? (např. pro odhlášení od události)
+   - lze z tohoto příkazu optoutnout
+ - ChatMessage
+   - kanál, na kterém byla zpráva odeslána
+   - uživatel, který zprávu odeslal
+   - text zprávy
+   - čas, kdy byla odeslána
+ - IUser
+   - uživatelské jméno
+   - uživatelské ID
+ - UserDoingSomething : IUser - při použití $afk, $gn atd.
+   - text zprávy
+   - kdy začal danou věc dělat
+ - UserToRemind : IUser - uživatel, kterému má být něco připomenuto ($remind)
+   - kdo vytvořil upozornění
+   - text upozornění
+   - kdy bylo upozornění vytvořeno
+ - Emote
+   - jméno
+   - čas, kdy byl přidán
+   - čas, kdy byl odebrán
+   - je momentálně aktivní?
+ - Pro každou API, se kterou bude program komunikovat, bude datová struktura pro uložení potřebných informací.
