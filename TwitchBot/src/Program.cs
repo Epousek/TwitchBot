@@ -16,7 +16,7 @@ namespace TwitchBot.src
       Config.SetConfig();
       Console.WriteLine(Config.Credentials.Username);
 
-      Thread authThread = new (() => Authentication.StartRefreshingTokensAsync());
+      Thread authThread = new (() => Authentication.StartValidatingTokenAsync());
       authThread.Start();
 
       await Task.Run(SetChannelsToConnectToAsync);

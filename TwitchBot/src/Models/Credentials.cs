@@ -4,22 +4,22 @@ namespace TwitchBot.src.Models
 {
   class Credentials
   {
-    [JsonProperty("Username")]
+    [JsonProperty("username")]
     public string Username { get; set; }
 
-    [JsonProperty("ClientID")]
+    [JsonProperty("client_id")]
     public string ClientID { get; set; }
 
-    [JsonProperty("Secret")]
+    [JsonProperty("secret")]
     public string Secret { get; set; }
 
-    [JsonProperty("AccessToken")]
+    [JsonProperty("access_token")]
     public string AccessToken { get; set; }
 
-    [JsonProperty("RefreshToken")]
-    public string RefreshToken { get; set; }
+    //[JsonProperty("RefreshToken")]
+    //public string RefreshToken { get; set; }
 
-    [JsonProperty("ConnectionString")]
+    [JsonProperty("connection_string")]
     public string ConnectionString { get; set; }
   }
 }

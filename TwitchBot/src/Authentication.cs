@@ -3,51 +3,88 @@ using System.Threading;
 using System.Threading.Tasks;
 using RestSharp;
 using Newtonsoft.Json.Linq;
+using TwitchBot.src.Models;
 
 namespace TwitchBot.src
 {
   static class Authentication
   {
-    public static async Task StartRefreshingTokensAsync()
+    public static async Task StartValidatingTokenAsync()
     {
       await Task.Run(async () =>
       {
         while (true)
         {
-          await Task.Run(RefreshAccessToken).ConfigureAwait(false);
-          Console.WriteLine(DateTime.Now + " - sleeping");
+          await Task.Run(ValidateAccessToken).ConfigureAwait(false);
           Thread.Sleep(TimeSpan.FromHours(1));
-          Console.WriteLine(DateTime.Now + " - woke up");
         }
       }).ConfigureAwait(false);
     }
 
-    private async static Task RefreshAccessToken()
+    private async static Task ValidateAccessToken()
     {
-      Console.WriteLine("trying to refresh access token");
-
-      RestClient client = new("https://id.twitch.tv/oauth2/token");
-      RestRequest request = new() { Method = Method.POST };
+      //log
+      RestClient client = new("https://id.twitch.tv/oauth2/validate");
+      RestRequest request = new();
 
       request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
       request.AddHeader("Accept", "application/json");
-      request.AddParameter("grant_type", "refresh_token");
-      request.AddParameter("refresh_token", Config.Credentials.RefreshToken);
-      request.AddParameter("client_id", Config.Credentials.ClientID);
-      request.AddParameter("client_secret", Config.Credentials.Secret);
+      request.AddHeader("Authorization", "Bearer " + Config.Credentials.AccessToken);
 
       var response = await client.ExecuteAsync(request).ConfigureAwait(false);
       if (response.IsSuccessful)
       {
-        Console.WriteLine("successfully refreshed access token");
-        JObject jsonResponse = JObject.Parse(response.Content);
-        AuthResponse tokens = jsonResponse.ToObject<AuthResponse>();
-        Config.SetTokens(tokens);
+        JObject responseJson = JObject.Parse(response.Content);
+        TokenValidationResponse validationResponse = responseJson.ToObject<TokenValidationResponse>();
+        if(validationResponse.ExpiresIn < 36000)
+        {
+          Console.WriteLine("token about to expire, getting new one");
+          await GetNewToken();
+          //log
+        }
+        else
+        {
+          Console.WriteLine("token still valid, expires in: {0} seconds", validationResponse.ExpiresIn);
+          //log
+        }
       }
       else
       {
-        Console.WriteLine("Failed to refresh token - NEED NEW ACCESS TOKEN"); //todo: log to file 
-        Config.SetConfig();
+        if(response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+          Console.WriteLine("invalid token, getting new one");
+          await GetNewToken();
+          //log
+        }
+        //log
+      }
+    }
+
+    private static async Task GetNewToken()
+    {
+      RestClient client = new ("https://id.twitch.tv/oauth2/token");
+      RestRequest request = new () { Method = Method.POST };
+
+      request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+      request.AddHeader("Accept", "application/json");
+      request.AddParameter("client_id", Config.Credentials.ClientID);
+      request.AddParameter("client_secret", Config.Credentials.Secret);
+      request.AddParameter("grant_type", "client_credentials");
+
+      var response = await client.ExecuteAsync(request).ConfigureAwait(false);
+      if (response.IsSuccessful)
+      {
+        Console.WriteLine("got new token");
+
+        JObject responseJson = JObject.Parse(response.Content);
+        AppAccessToken newToken = responseJson.ToObject<AppAccessToken>();
+        Config.SetToken(newToken);
+        //log
+      }
+      else
+      {
+        Console.WriteLine("failed to get new token");
+        //log
       }
     }
   }

@@ -21,10 +21,10 @@ namespace TwitchBot.src
         throw new FileNotFoundException("NO CONFIG FILE!!");
     }
 
-    public static void SetTokens(AuthResponse tokens)
+    public static void SetToken(AppAccessToken token)
     {
-      Credentials.AccessToken = tokens.AccessToken;
-      Credentials.RefreshToken = tokens.RefreshToken;
+      Credentials.AccessToken = token.AccessToken;
+      //Credentials.RefreshToken = tokens.RefreshToken;
       UpdateFile();
     }
 
