@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace TwitchBot.src
 {
-  static class Config
+  static class SecretsConfig
   {
     [JsonProperty("Credentials")]
     public static Credentials Credentials { get; set; }

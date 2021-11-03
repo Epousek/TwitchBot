@@ -10,7 +10,7 @@ namespace TwitchBot.src.Connections
   {
     public static async Task<List<string>> GetConnectedChannels()
     {
-      using (MySqlConnection connection = new MySqlConnection(Config.Credentials.ConnectionString))
+      using (MySqlConnection connection = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         connection.Open();
         using (MySqlCommand command = new MySqlCommand("sp_GetConnectedChannels", connection))

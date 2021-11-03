@@ -29,7 +29,7 @@ namespace TwitchBot.src
 
       request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
       request.AddHeader("Accept", "application/json");
-      request.AddHeader("Authorization", "Bearer " + Config.Credentials.AccessToken);
+      request.AddHeader("Authorization", "Bearer " + SecretsConfig.Credentials.AccessToken);
 
       var response = await client.ExecuteAsync(request).ConfigureAwait(false);
       if (response.IsSuccessful)
@@ -67,8 +67,8 @@ namespace TwitchBot.src
 
       request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
       request.AddHeader("Accept", "application/json");
-      request.AddParameter("client_id", Config.Credentials.ClientID);
-      request.AddParameter("client_secret", Config.Credentials.Secret);
+      request.AddParameter("client_id", SecretsConfig.Credentials.ClientID);
+      request.AddParameter("client_secret", SecretsConfig.Credentials.Secret);
       request.AddParameter("grant_type", "client_credentials");
 
       var response = await client.ExecuteAsync(request).ConfigureAwait(false);
@@ -78,7 +78,7 @@ namespace TwitchBot.src
 
         JObject responseJson = JObject.Parse(response.Content);
         AppAccessToken newToken = responseJson.ToObject<AppAccessToken>();
-        Config.SetToken(newToken);
+        SecretsConfig.SetToken(newToken);
         //log
       }
       else

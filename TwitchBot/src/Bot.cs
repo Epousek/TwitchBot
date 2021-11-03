@@ -13,7 +13,7 @@ namespace TwitchBot.src
 
     public Bot(List<string> channelsToConnectTo)
     {
-      ConnectionCredentials creds = new(Config.Credentials.Username, Config.Credentials.AccessToken);
+      ConnectionCredentials creds = new(SecretsConfig.Credentials.Username, SecretsConfig.Credentials.AccessToken);
       var clientOptions = new ClientOptions
       {
         MessagesAllowedInPeriod = 750,
