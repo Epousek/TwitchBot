@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Linq;
 using TwitchBot.src.Models;
+using System.Threading.Tasks;
 
 namespace TwitchBot.src
 {
@@ -13,7 +14,7 @@ namespace TwitchBot.src
     public static Credentials Credentials { get; set; }
     static readonly string path = Path.Combine(Directory.GetCurrentDirectory(), "config.txt");
 
-    public static void SetConfig()
+    public static async Task SetConfig()
     {
       if (File.Exists(path))
         Credentials = JObject.Parse(File.ReadAllText(path)).ToObject<Credentials>();
@@ -21,16 +22,16 @@ namespace TwitchBot.src
         throw new FileNotFoundException("NO CONFIG FILE!!");
     }
 
-    public static void SetToken(AppAccessToken token)
+    public static async Task SetToken(AppAccessToken token)
     {
       Credentials.AccessToken = token.AccessToken;
       //Credentials.RefreshToken = tokens.RefreshToken;
-      UpdateFile();
+      await UpdateFileAsync();
     }
 
-    private static void UpdateFile()
+    private static async Task UpdateFileAsync()
     {
-      File.WriteAllText(path, JsonConvert.SerializeObject(Credentials));
+      await File.WriteAllTextAsync(path, JsonConvert.SerializeObject(Credentials));
     }
   }
 }
