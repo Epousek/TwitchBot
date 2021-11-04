@@ -1,6 +1,8 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using TwitchBot.src.Connections;
 using TwitchLib.Api;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -26,7 +28,7 @@ namespace TwitchBot.src
       client.Initialize(creds, channelsToConnectTo);
 
       //client.OnLog += Client_OnLog;
-      client.OnConnected += Client_OnConnected;
+      //client.OnConnected += Client_OnConnected;
       client.OnMessageReceived += Client_OnMessageReceived;
       client.OnJoinedChannel += Client_OnJoinedChannel;
 
@@ -34,19 +36,21 @@ namespace TwitchBot.src
 
     }
 
-    private void Client_OnConnected(object sender, TwitchLib.Client.Events.OnConnectedArgs e) 
-    {
-      Log.Information("Connected to {channel}.", e.AutoJoinChannel);
-    }
+    //private void Client_OnConnected(object sender, TwitchLib.Client.Events.OnConnectedArgs e) 
+    //{
+    //  Log.Information("Connected to {channel}.", e.AutoJoinChannel);
+    //}
 
     private void Client_OnJoinedChannel(object sender, TwitchLib.Client.Events.OnJoinedChannelArgs e) 
     {
       Log.Information("Joined {channel}.", e.Channel);
     }
 
-    private void Client_OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)
+    private async void Client_OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)
     {
       Log.Debug("{channel} - {name}: {message}", e.ChatMessage.Channel, e.ChatMessage.DisplayName, e.ChatMessage.Message);
+
+      await DatabaseConnections.WriteMessage(e.ChatMessage.Channel, e.ChatMessage.Username, e.ChatMessage.Message, DateTime.Now).ConfigureAwait(false);
     }
 
     //private void Client_OnLog(object sender, TwitchLib.Client.Events.OnLogArgs e)
