@@ -40,7 +40,7 @@ namespace TwitchBot.src
         if(validationResponse.ExpiresIn < 5400)
         {
           Log.Information("Token is about to expire, refreshing.");
-          await RefreshTokens();
+          await RefreshTokens().ConfigureAwait(false);
         }
         else
         {
@@ -74,7 +74,7 @@ namespace TwitchBot.src
 
         JObject responseJson = JObject.Parse(response.Content);
         AppAccessToken newToken = responseJson.ToObject<AppAccessToken>();
-        await SecretsConfig.SetToken(newToken);
+        await SecretsConfig.SetToken(newToken).ConfigureAwait(false);
       }
       else
       {

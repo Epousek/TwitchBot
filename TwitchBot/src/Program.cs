@@ -9,16 +9,15 @@ using TwitchBot.src.Connections;
 using Serilog;
 using Serilog.Sinks.MariaDB;
 using Serilog.Sinks.MariaDB.Extensions;
+using System.Diagnostics;
 
 namespace TwitchBot.src
 {
   class Program
   {
-    static List<string> channelsToConnectTo;
-
-    static async Task Main(string[] args)
+    static async Task Main()
     {
-      SecretsConfig.SetConfig();
+      await SecretsConfig.SetConfig().ConfigureAwait(false);
 
       var builder = new ConfigurationBuilder();
       BuildSettingsConfing(builder);
@@ -39,17 +38,19 @@ namespace TwitchBot.src
         )
         .CreateLogger();
 
-      Thread authThread = new (async () => await Authentication.StartValidatingTokenAsync());
+      Log.Information($"Bot starting in {(Debugger.IsAttached ? "debug" : "production")} mode");
+
+      Thread authThread = new (async () => await Authentication.StartValidatingTokenAsync().ConfigureAwait(false));
       authThread.Start();
 
-      Bot bot = new(await Task.Run(SetChannelsToConnectToAsync));
+      Bot bot = new(await Task.Run(SetChannelsToConnectToAsync).ConfigureAwait(false));
       Console.ReadLine();
     }
 
-    static async Task<List<string>> SetChannelsToConnectToAsync()
-      => await DatabaseConnections.GetConnectedChannels();
+    private static async Task<List<string>> SetChannelsToConnectToAsync()
+      => await DatabaseConnections.GetConnectedChannels().ConfigureAwait(false);
 
-    static void BuildSettingsConfing(IConfigurationBuilder builder)
+    private static void BuildSettingsConfing(IConfigurationBuilder builder)
     {
       builder.SetBasePath(Directory.GetCurrentDirectory())
         .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);

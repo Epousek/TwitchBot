@@ -5,6 +5,7 @@ using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Linq;
 using TwitchBot.src.Models;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace TwitchBot.src
 {
@@ -12,26 +13,40 @@ namespace TwitchBot.src
   {
     [JsonProperty("Credentials")]
     public static Credentials Credentials { get; set; }
-    static readonly string path = Path.Combine(Directory.GetCurrentDirectory(), "config.txt");
+    private static readonly string path = Path.Combine(Directory.GetCurrentDirectory(), "config.txt");
 
     public static async Task SetConfig()
     {
       if (File.Exists(path))
-        Credentials = JObject.Parse(File.ReadAllText(path)).ToObject<Credentials>();
+      {
+        Credentials = JObject.Parse(await File.ReadAllTextAsync(path).ConfigureAwait(false)).ToObject<Credentials>();
+        Log.Information("Successfully obtained credentials from config.");
+      }
       else
-        throw new FileNotFoundException("NO CONFIG FILE!!");
+      {
+        Log.Fatal("Config file not found in {path}!", path);
+      }
     }
 
     public static async Task SetToken(AppAccessToken tokens)
     {
       Credentials.AccessToken = tokens.AccessToken;
       Credentials.RefreshToken = tokens.RefreshToken;
-      await UpdateFileAsync();
+      Log.Information("Tokens set.");
+      await UpdateFileAsync().ConfigureAwait(false);
     }
 
     private static async Task UpdateFileAsync()
     {
-      await File.WriteAllTextAsync(path, JsonConvert.SerializeObject(Credentials));
+      if (File.Exists(path))
+      {
+        await File.WriteAllTextAsync(path, JsonConvert.SerializeObject(Credentials)).ConfigureAwait(false);
+        Log.Information("Config file updated.");
+      }
+      else
+      {
+        Log.Fatal("Config file not found in {path}!", path);
+      }
     }
   }
 }

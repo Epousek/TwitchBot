@@ -13,7 +13,7 @@ namespace TwitchBot.src
 {
   class Bot
   {
-    TwitchClient client;
+    static TwitchClient client;
 
     public Bot(List<string> channelsToConnectTo)
     {
@@ -33,7 +33,6 @@ namespace TwitchBot.src
       client.OnJoinedChannel += Client_OnJoinedChannel;
 
       client.Connect();
-
     }
 
     //private void Client_OnConnected(object sender, TwitchLib.Client.Events.OnConnectedArgs e) 
@@ -41,7 +40,7 @@ namespace TwitchBot.src
     //  Log.Information("Connected to {channel}.", e.AutoJoinChannel);
     //}
 
-    private void Client_OnJoinedChannel(object sender, TwitchLib.Client.Events.OnJoinedChannelArgs e) 
+    private void Client_OnJoinedChannel(object sender, TwitchLib.Client.Events.OnJoinedChannelArgs e)
     {
       Log.Information("Joined {channel}.", e.Channel);
     }
