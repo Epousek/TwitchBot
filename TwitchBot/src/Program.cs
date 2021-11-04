@@ -29,20 +29,26 @@ namespace TwitchBot.src
         .Enrich.FromLogContext()
         .WriteTo.MariaDB(
         connectionString: SecretsConfig.Credentials.ConnectionString,
-        restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information)
+        restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information,
+        autoCreateTable: true,
+#if DEBUG
+        tableName: "LogsTest"
+#else
+        tableName: "Logs"
+#endif
+        )
         .CreateLogger();
 
       Thread authThread = new (async () => await Authentication.StartValidatingTokenAsync());
       authThread.Start();
 
-      await Task.Run(SetChannelsToConnectToAsync);
-      Bot bot = new(channelsToConnectTo);
+      Bot bot = new(await Task.Run(SetChannelsToConnectToAsync));
       Console.ReadLine();
     }
 
-    static async Task SetChannelsToConnectToAsync()
-      => channelsToConnectTo = await DatabaseConnections.GetConnectedChannels();
-  
+    static async Task<List<string>> SetChannelsToConnectToAsync()
+      => await DatabaseConnections.GetConnectedChannels();
+
     static void BuildSettingsConfing(IConfigurationBuilder builder)
     {
       builder.SetBasePath(Directory.GetCurrentDirectory())

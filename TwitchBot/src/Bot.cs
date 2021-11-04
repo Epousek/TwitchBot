@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
+using TwitchLib.Api;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
@@ -29,21 +31,22 @@ namespace TwitchBot.src
       client.OnJoinedChannel += Client_OnJoinedChannel;
 
       client.Connect();
+
     }
 
     private void Client_OnConnected(object sender, TwitchLib.Client.Events.OnConnectedArgs e) 
     {
-      Console.WriteLine("connected to " + e.AutoJoinChannel);
+      Log.Information("Connected to {channel}.", e.AutoJoinChannel);
     }
 
     private void Client_OnJoinedChannel(object sender, TwitchLib.Client.Events.OnJoinedChannelArgs e) 
     {
-      Console.WriteLine(e.Channel);
+      Log.Information("Joined {channel}.", e.Channel);
     }
 
     private void Client_OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)
     {
-      Console.WriteLine($"{e.ChatMessage.Channel} - {e.ChatMessage.DisplayName}: {e.ChatMessage.Message}");
+      Log.Debug("{channel} - {name}: {message}", e.ChatMessage.Channel, e.ChatMessage.DisplayName, e.ChatMessage.Message);
     }
 
     //private void Client_OnLog(object sender, TwitchLib.Client.Events.OnLogArgs e)

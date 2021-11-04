@@ -2,7 +2,7 @@
 
 namespace TwitchBot.src.Models
 {
-  public class TokenValidationResponse
+  class TokenValidationResponse
   {
     [JsonProperty("expires_in")]
     public int ExpiresIn { get; set; }

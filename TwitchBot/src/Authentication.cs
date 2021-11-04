@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using RestSharp;
 using Newtonsoft.Json.Linq;
+using Serilog;
 using TwitchBot.src.Models;
 
 namespace TwitchBot.src
@@ -23,7 +24,7 @@ namespace TwitchBot.src
 
     private async static Task ValidateAccessToken()
     {
-      //log
+      Log.Information("Trying to validate app access token");
       RestClient client = new("https://id.twitch.tv/oauth2/validate");
       RestRequest request = new();
 
@@ -36,32 +37,26 @@ namespace TwitchBot.src
       {
         JObject responseJson = JObject.Parse(response.Content);
         TokenValidationResponse validationResponse = responseJson.ToObject<TokenValidationResponse>();
-        if(validationResponse.ExpiresIn < 36000)
+        if(validationResponse.ExpiresIn < 5400)
         {
-          Console.WriteLine("token about to expire, getting new one");
-          await GetNewToken();
-          //log
+          Log.Information("Token is about to expire, refreshing.");
+          await RefreshTokens();
         }
         else
         {
-          Console.WriteLine("token still valid, expires in: {0} seconds", validationResponse.ExpiresIn);
-          //log
+          Log.Information("Token expires in about {expiresIn} hours", validationResponse.ExpiresIn / 3600);
         }
       }
       else
       {
-        if(response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-        {
-          Console.WriteLine("invalid token, getting new one");
-          await GetNewToken();
-          //log
-        }
-        //log
+        Log.Error("Couldn't validate: {statusDescription}", response.StatusDescription);
       }
     }
 
-    private static async Task GetNewToken()
+    private static async Task RefreshTokens()
     {
+      Log.Information("Trying to refresh token.");
+
       RestClient client = new ("https://id.twitch.tv/oauth2/token");
       RestRequest request = new () { Method = Method.POST };
 
@@ -69,22 +64,21 @@ namespace TwitchBot.src
       request.AddHeader("Accept", "application/json");
       request.AddParameter("client_id", SecretsConfig.Credentials.ClientID);
       request.AddParameter("client_secret", SecretsConfig.Credentials.Secret);
-      request.AddParameter("grant_type", "client_credentials");
+      request.AddParameter("grant_type", "refresh_token");
+      request.AddParameter("refresh_token", SecretsConfig.Credentials.RefreshToken);
 
       var response = await client.ExecuteAsync(request).ConfigureAwait(false);
       if (response.IsSuccessful)
       {
-        Console.WriteLine("got new token");
+        Log.Information("Refreshed tokens.");
 
         JObject responseJson = JObject.Parse(response.Content);
         AppAccessToken newToken = responseJson.ToObject<AppAccessToken>();
-        SecretsConfig.SetToken(newToken);
-        //log
+        await SecretsConfig.SetToken(newToken);
       }
       else
       {
-        Console.WriteLine("failed to get new token");
-        //log
+        Log.Error(response.ErrorException, "Failed to refresh token: {statusDescription}.", response.StatusDescription);
       }
     }
   }
