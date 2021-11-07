@@ -67,5 +67,34 @@ namespace TwitchBot.src.Connections
         }
       }
     }
+
+    public static async Task<int> GetConnectedChannelID(string channel)
+    {
+      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
+      {
+        Log.Debug("Trying to get ID for {channel}", channel);
+
+        con.Open();
+        using (MySqlCommand com = new("sp_GetIDByConnectedChannel", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("searchChannel", channel);
+
+          using(var reader = await com.ExecuteReaderAsync().ConfigureAwait(false))
+          {
+            if(reader.Read())
+            {
+              Log.Debug("Got ID for {channel}", channel);
+              return (int)reader[0];
+            }
+            else
+            {
+              Log.Error("Couldn't get ID for {channel}", channel);
+              return -1;
+            }
+          }
+        }
+      }
+    }
   }
 }
