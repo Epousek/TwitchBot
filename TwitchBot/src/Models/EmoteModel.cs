@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace TwitchBot.src.Models
 {
-  class EmoteModel
+  public class EmoteModel
   {
     [JsonProperty("name")]
     public string Name { get; set; }
