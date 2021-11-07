@@ -5,11 +5,46 @@ using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using Serilog;
 using TwitchBot.src.Models;
+using System.Data.Common;
 
 namespace TwitchBot.src.Connections
 {
   public static class DatabaseConnections
   {
+    public static async Task WriteEmotes(string channel, List<EmoteModel> emotes)
+    {
+      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
+      {
+        Log.Debug("Trying to write emote(s) to db.");
+
+        con.Open();
+        using(MySqlCommand com = new("sp_WriteEmote", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          foreach (EmoteModel emote in emotes)
+          {
+            com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(channel));
+            com.Parameters.AddWithValue("emoteName", emote.Name);
+            com.Parameters.AddWithValue("service", emote.Service);
+            com.Parameters.AddWithValue("isActive", true);
+            com.Parameters.AddWithValue("added", emote.Added);
+            com.Parameters.AddWithValue("removed", emote.Removed);
+
+            try
+            {
+              await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+              Log.Debug("Emote({emote}) write successful.", emote.Name);
+            }
+            catch (DbException e)
+            {
+              Log.Error(e, "Emote({emote}) write unsuccessful: {ex}", emote.Name, e.Message);
+            }
+            com.Parameters.Clear();
+          }
+        }
+      }
+    }
+
     public static async Task WriteMessage(ChatMessageModel msg)
     {
       using (MySqlConnection con = new (SecretsConfig.Credentials.ConnectionString))
@@ -28,11 +63,11 @@ namespace TwitchBot.src.Connections
           try
           {
             int x = await com.ExecuteNonQueryAsync().ConfigureAwait(false);
-            Log.Debug("Write successful.");
+            Log.Debug("Message write successful.");
           }
           catch (Exception e)
           {
-            Log.Error(e, "Write unsuccessful.");
+            Log.Error(e, "Message write unsuccessful: {ex}", e.Message);
           }
           con.Close();
         }
