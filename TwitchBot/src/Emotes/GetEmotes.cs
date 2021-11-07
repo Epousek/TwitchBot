@@ -24,14 +24,20 @@ namespace TwitchBot.src.Emotes
       }
       else
       {
-        string url = "https://api.betterttv.net/3/cached/users/twitch/" + id.ToString();
-        RestClient client = new(url);
+        RestClient client = new("https://api.betterttv.net/3/cached/users/twitch/" + id.ToString());
         RestRequest request = new();
-
+        
         RestResponse response = (RestResponse)await client.ExecuteAsync(request).ConfigureAwait(false);
+
+        if (!response.IsSuccessful)
+        {
+          Log.Error(response.ErrorException, "Couldn't get emotes from BTTV API: {statusDescription}", response.StatusDescription);
+          return null;
+        }
+
         string content = response.Content;
         JObject contentObject = JObject.Parse(content);
-
+        
         JArray channelEmotes = JArray.Parse(contentObject["channelEmotes"].ToString());
         JArray sharedEmotes = JArray.Parse(contentObject["sharedEmotes"].ToString());
 
@@ -59,11 +65,42 @@ namespace TwitchBot.src.Emotes
 
       return emotes;
     }
-    public static async Task<List<EmoteModel>> FfzAPIAsync()
+    public static async Task<List<EmoteModel>> FfzAPIAsync(string channel)
     {
       List<EmoteModel> emotes = new();
+      int id = await DatabaseConnections.GetConnectedChannelID(channel).ConfigureAwait(false);
 
+      if (id == -1)
+      {
+        Log.Error("Didn't get ID for {channel}", channel);
+        return null;
+      }
+      else
+      {
+        RestClient client = new("https://api.frankerfacez.com/v1/room/" + channel);
+        RestRequest request = new();
 
+        RestResponse response = (RestResponse)await client.ExecuteAsync(request).ConfigureAwait(false);
+
+        if (!response.IsSuccessful)
+        {
+          Log.Error(response.ErrorException, "Couldn't get emotes from BTTV API: {statusDescription}", response.StatusDescription);
+          return null;
+        }
+
+        string content = response.Content;
+        JObject room = JObject.Parse(content);
+        string setID = room["room"]["set"].ToString();
+        JObject set = (JObject)room["sets"][setID];
+
+        JArray emoticons = JArray.Parse(set["emoticons"].ToString());
+        foreach (JObject item in emoticons)
+        {
+          EmoteModel emote = item.ToObject<EmoteModel>();
+          emote.Service = "ffz";
+          emotes.Add(emote);
+        }
+      }
 
       return emotes;
     }
