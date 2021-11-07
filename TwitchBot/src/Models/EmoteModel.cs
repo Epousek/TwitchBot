@@ -11,8 +11,8 @@ namespace TwitchBot.src.Models
     [JsonProperty("code")]
     private string Code { set { Name = value; } }
     public string Service { get; set; }
-    public DateTime Added { get; set; }
-    public DateTime Removed { get; set; }
+    public DateTime? Added { get; set; }
+    public DateTime? Removed { get; set; }
     public bool IsActive { get; set; }
   }
 }
