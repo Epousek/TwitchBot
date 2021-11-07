@@ -4,10 +4,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using MySql.Data.MySqlClient;
 using TwitchBot.src.Connections;
 using Serilog;
-using Serilog.Sinks.MariaDB;
 using Serilog.Sinks.MariaDB.Extensions;
 using System.Diagnostics;
 
@@ -30,11 +28,7 @@ namespace TwitchBot.src
         connectionString: SecretsConfig.Credentials.ConnectionString,
         restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information,
         autoCreateTable: true,
-#if DEBUG
-        tableName: "LogsTest"
-#else
         tableName: "Logs"
-#endif
         )
         .CreateLogger();
 

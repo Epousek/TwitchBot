@@ -4,25 +4,26 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using Serilog;
+using TwitchBot.src.Models;
 
 namespace TwitchBot.src.Connections
 {
   public static class DatabaseConnections
   {
-    public static async Task WriteMessage(string channel, string username, string message, DateTime timeStamp)
+    public static async Task WriteMessage(ChatMessageModel msg)
     {
       using (MySqlConnection con = new (SecretsConfig.Credentials.ConnectionString))
       {
-        Log.Debug("Writing \"{message}\" to db.", message);
+        Log.Debug("Writing \"{message}\" to db.", msg.Message);
 
         con.Open();
         using (MySqlCommand com = new ("sp_WriteMessage", con))
         {
           com.CommandType = CommandType.StoredProcedure;
-          com.Parameters.AddWithValue("tableName", char.ToUpper(channel[0]) + channel[1..]);
-          com.Parameters.AddWithValue(nameof(username), username);
-          com.Parameters.AddWithValue(nameof(message), message);
-          com.Parameters.AddWithValue("messageTimeStamp", timeStamp);
+          com.Parameters.AddWithValue("tableName", char.ToUpper(msg.Channel[0]) + msg.Channel[1..]);
+          com.Parameters.AddWithValue("username", msg.Username);
+          com.Parameters.AddWithValue("message", msg.Message);
+          com.Parameters.AddWithValue("messageTimeStamp", msg.TimeStamp);
 
           try
           {
