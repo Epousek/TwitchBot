@@ -37,17 +37,14 @@ namespace TwitchBot.src.Emotes
 
         string content = response.Content;
         JObject contentObject = JObject.Parse(content);
-        
-        JArray channelEmotes = JArray.Parse(contentObject["channelEmotes"].ToString());
-        JArray sharedEmotes = JArray.Parse(contentObject["sharedEmotes"].ToString());
 
-        foreach (JObject item in channelEmotes)
+        foreach (JObject item in JArray.Parse(contentObject["channelEmotes"].ToString()))
         {
           EmoteModel emote = item.ToObject<EmoteModel>();
           emote.Service = "bttv";
           emotes.Add(emote);
         }
-        foreach (JObject item in sharedEmotes)
+        foreach (JObject item in JArray.Parse(contentObject["sharedEmotes"].ToString()))
         {
           EmoteModel emote = item.ToObject<EmoteModel>();
           emote.Service = "bttv";
@@ -68,38 +65,28 @@ namespace TwitchBot.src.Emotes
     public static async Task<List<EmoteModel>> FfzAPIAsync(string channel)
     {
       List<EmoteModel> emotes = new();
-      int id = await DatabaseConnections.GetConnectedChannelID(channel).ConfigureAwait(false);
 
-      if (id == -1)
+      RestClient client = new("https://api.frankerfacez.com/v1/room/" + channel);
+      RestRequest request = new();
+
+      RestResponse response = (RestResponse)await client.ExecuteAsync(request).ConfigureAwait(false);
+
+      if (!response.IsSuccessful)
       {
-        Log.Error("Didn't get ID for {channel}", channel);
+        Log.Error(response.ErrorException, "Couldn't get emotes from BTTV API: {statusDescription}", response.StatusDescription);
         return null;
       }
-      else
+
+      string content = response.Content;
+      JObject room = JObject.Parse(content);
+      string setID = room["room"]["set"].ToString();
+      JObject set = (JObject)room["sets"][setID];
+
+      foreach (JObject item in JArray.Parse(set["emoticons"].ToString()))
       {
-        RestClient client = new("https://api.frankerfacez.com/v1/room/" + channel);
-        RestRequest request = new();
-
-        RestResponse response = (RestResponse)await client.ExecuteAsync(request).ConfigureAwait(false);
-
-        if (!response.IsSuccessful)
-        {
-          Log.Error(response.ErrorException, "Couldn't get emotes from BTTV API: {statusDescription}", response.StatusDescription);
-          return null;
-        }
-
-        string content = response.Content;
-        JObject room = JObject.Parse(content);
-        string setID = room["room"]["set"].ToString();
-        JObject set = (JObject)room["sets"][setID];
-
-        JArray emoticons = JArray.Parse(set["emoticons"].ToString());
-        foreach (JObject item in emoticons)
-        {
-          EmoteModel emote = item.ToObject<EmoteModel>();
-          emote.Service = "ffz";
-          emotes.Add(emote);
-        }
+        EmoteModel emote = item.ToObject<EmoteModel>();
+        emote.Service = "ffz";
+        emotes.Add(emote);
       }
 
       return emotes;
@@ -112,11 +99,27 @@ namespace TwitchBot.src.Emotes
 
       return emotes;
     }
-    public static async Task<List<EmoteModel>> SeventvAPIAsync()
+    public static async Task<List<EmoteModel>> SeventvAPIAsync(string channel)
     {
       List<EmoteModel> emotes = new();
 
+      RestClient client = new($"https://api.7tv.app/v2/users/{channel}/emotes");
+      RestRequest request = new();
 
+      RestResponse response = (RestResponse)await client.ExecuteAsync(request).ConfigureAwait(false);
+      if (!response.IsSuccessful)
+      {
+        Log.Error(response.ErrorException, "Couldn't get emotes from BTTV API: {statusDescription}", response.StatusDescription);
+        return null;
+      }
+
+      string content = response.Content;
+      foreach (JObject item in JArray.Parse(content))
+      {
+        EmoteModel emote = item.ToObject<EmoteModel>();
+        emote.Service = "7tv";
+        emotes.Add(emote);
+      }
 
       return emotes;
     }
