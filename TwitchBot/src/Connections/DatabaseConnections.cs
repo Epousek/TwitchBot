@@ -20,7 +20,7 @@ namespace TwitchBot.src.Connections
         using (MySqlCommand com = new ("sp_WriteMessage", con))
         {
           com.CommandType = CommandType.StoredProcedure;
-          com.Parameters.AddWithValue("tableName", char.ToUpper(msg.Channel[0]) + msg.Channel[1..]);
+          com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(msg.Channel));
           com.Parameters.AddWithValue("username", msg.Username);
           com.Parameters.AddWithValue("message", msg.Message);
           com.Parameters.AddWithValue("messageTimeStamp", msg.TimeStamp);
@@ -78,7 +78,7 @@ namespace TwitchBot.src.Connections
         using (MySqlCommand com = new("sp_GetIDByConnectedChannel", con))
         {
           com.CommandType = CommandType.StoredProcedure;
-          com.Parameters.AddWithValue("searchChannel", channel);
+          com.Parameters.AddWithValue("searchChannel", Helpers.FirstToUpper(channel));
 
           using(var reader = await com.ExecuteReaderAsync().ConfigureAwait(false))
           {
