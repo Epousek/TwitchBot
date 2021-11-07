@@ -30,11 +30,7 @@ namespace TwitchBot.src
         connectionString: SecretsConfig.Credentials.ConnectionString,
         restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information,
         autoCreateTable: true,
-#if DEBUG
-        tableName: "LogsTest"
-#else
         tableName: "Logs"
-#endif
         )
         .CreateLogger();
 
