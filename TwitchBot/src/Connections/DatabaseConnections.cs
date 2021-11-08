@@ -45,6 +45,45 @@ namespace TwitchBot.src.Connections
       }
     }
 
+    public static async Task UpdateEmotes(string channel, List<EmoteModel> emotes)
+    {
+      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using(MySqlCommand com = new("sp_UpdateEmote", con))
+        {
+          foreach (EmoteModel emote in emotes)
+          {
+            if((emote.IsActive && emote.Added == null) || (!emote.IsActive && emote.Removed == null))
+            {
+              Log.Error("{emote} is {isActive}, but doesn't have a time stamp. Skipping.", emote.Name, emote.IsActive);
+            }
+            else
+            {
+              Log.Debug("Updating {emote} to {isActive} ({timeStamp}).", emote.Name, emote.IsActive, emote.IsActive ? emote.Added : emote.Removed);
+
+              com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(channel));
+              com.Parameters.AddWithValue("emoteName", emote.Name);
+              com.Parameters.AddWithValue("isActive", emote.IsActive);
+              com.Parameters.AddWithValue("added", emote.Added);
+              com.Parameters.AddWithValue("removed", emote.Removed);
+              try
+              {
+                await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+                Log.Debug("Updated {emote} to {isActive}.", emote.Name, emote.IsActive);
+              }
+              catch (DbException e)
+              {
+                Log.Error(e, "Couldn't update {emote}: {ex}", emote.Name, e.Message);
+              }
+
+              com.Parameters.Clear();
+            }
+          }
+        }
+      }
+    }
+
     public static async Task<List<EmoteModel>> GetEmotes(string channel)
     {
       List<EmoteModel> emotes = new();
