@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TwitchBot.src.Connections;
+using TwitchBot.src.Models;
 using TwitchLib.Api;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -47,9 +48,15 @@ namespace TwitchBot.src
 
     private async void Client_OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)
     {
-      Log.Debug("{channel} - {name}: {message}", e.ChatMessage.Channel, e.ChatMessage.DisplayName, e.ChatMessage.Message);
+      ChatMessageModel msg = new() {
+        Channel = e.ChatMessage.Channel,
+        Username = e.ChatMessage.Username,
+        Message = e.ChatMessage.Message,
+        TimeStamp = DateTime.Now
+      };
+      Log.Debug("{channel} - {name}: {message}", msg.Channel, msg.Username, msg.Message);
 
-      await DatabaseConnections.WriteMessage(e.ChatMessage.Channel, e.ChatMessage.Username, e.ChatMessage.Message, DateTime.Now).ConfigureAwait(false);
+      await DatabaseConnections.WriteMessage(msg).ConfigureAwait(false);
     }
 
     //private void Client_OnLog(object sender, TwitchLib.Client.Events.OnLogArgs e)
