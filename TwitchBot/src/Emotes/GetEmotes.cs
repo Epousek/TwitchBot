@@ -59,7 +59,7 @@ namespace TwitchBot.src.Emotes
     {
       List<EmoteModel> emotes = new();
 
-      RestClient client = new("https://api.frankerfacez.com/v1/room/" + channel);
+      RestClient client = new("https://api.frankerfacez.com/v1/room/" + channel.ToLower());
       RestRequest request = new();
 
       RestResponse response = (RestResponse)await client.ExecuteAsync(request).ConfigureAwait(false);
