@@ -52,6 +52,8 @@ namespace TwitchBot.src.Connections
         con.Open();
         using(MySqlCommand com = new("sp_UpdateEmote", con))
         {
+          com.CommandType = CommandType.StoredProcedure;
+
           foreach (EmoteModel emote in emotes)
           {
             if((emote.IsActive && emote.Added == null) || (!emote.IsActive && emote.Removed == null))
@@ -67,6 +69,7 @@ namespace TwitchBot.src.Connections
               com.Parameters.AddWithValue("isActive", emote.IsActive);
               com.Parameters.AddWithValue("added", emote.Added);
               com.Parameters.AddWithValue("removed", emote.Removed);
+
               try
               {
                 await com.ExecuteNonQueryAsync().ConfigureAwait(false);
@@ -102,7 +105,7 @@ namespace TwitchBot.src.Connections
             if (!reader.HasRows)
             {
               Log.Warning("{table} has no rows.", Helpers.FirstToUpper(channel) + "Emotes");
-              return null;
+              return new List<EmoteModel>() { };
             }
             while (reader.Read())
             {
