@@ -45,6 +45,45 @@ namespace TwitchBot.src.Connections
       }
     }
 
+    public static async Task<List<EmoteModel>> GetEmotes(string channel)
+    {
+      List<EmoteModel> emotes = new();
+      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
+      {
+        Log.Debug("Getting emotes from db.");
+
+        con.Open();
+        using (MySqlCommand com = new("sp_GetEmotes", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(channel));
+          
+          using (var reader = await com.ExecuteReaderAsync().ConfigureAwait(false))
+          {
+            if (!reader.HasRows)
+            {
+              Log.Warning("{table} has no rows.", Helpers.FirstToUpper(channel) + "Emotes");
+              return null;
+            }
+            while (reader.Read())
+            {
+              emotes.Add(new EmoteModel
+              {
+                Name = reader.GetString(0),
+                Service = reader.GetString(1),
+                Added = await reader.IsDBNullAsync(2).ConfigureAwait(false) ? null : reader.GetDateTime(2),
+                Removed = await reader.IsDBNullAsync(3).ConfigureAwait(false) ? null : reader.GetDateTime(3),
+                IsActive = reader.GetBoolean(4)
+              });
+            }
+
+            Log.Debug("Successfully got emotes from db.");
+            return emotes;
+          }
+        }
+      }
+    }
+
     public static async Task WriteMessage(ChatMessageModel msg)
     {
       using (MySqlConnection con = new (SecretsConfig.Credentials.ConnectionString))
@@ -62,7 +101,7 @@ namespace TwitchBot.src.Connections
 
           try
           {
-            int x = await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+            await com.ExecuteNonQueryAsync().ConfigureAwait(false);
             Log.Debug("Message write successful.");
           }
           catch (Exception e)
