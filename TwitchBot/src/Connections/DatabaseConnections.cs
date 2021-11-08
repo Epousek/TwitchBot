@@ -128,10 +128,7 @@ namespace TwitchBot.src.Connections
             List<string> channels = new();
             while (reader.Read())
             {
-              for (int i = 0; i < reader.FieldCount; i++)
-              {
-                channels.Add((string)reader[i]);
-              }
+              channels.Add(reader.GetString(0));
             }
 
             con.Close();
