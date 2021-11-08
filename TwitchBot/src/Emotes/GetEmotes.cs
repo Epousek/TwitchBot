@@ -54,14 +54,7 @@ namespace TwitchBot.src.Emotes
         return emotes;
       }
     }
-    public static async Task<List<EmoteModel>> BttvDBAsync()
-    {
-      List<EmoteModel> emotes = new();
 
-
-
-      return emotes;
-    }
     public static async Task<List<EmoteModel>> FfzAPIAsync(string channel)
     {
       List<EmoteModel> emotes = new();
@@ -91,14 +84,7 @@ namespace TwitchBot.src.Emotes
 
       return emotes;
     }
-    public static async Task<List<EmoteModel>> FfzDBAsync()
-    {
-      List<EmoteModel> emotes = new();
 
-
-
-      return emotes;
-    }
     public static async Task<List<EmoteModel>> SeventvAPIAsync(string channel)
     {
       List<EmoteModel> emotes = new();
@@ -123,13 +109,8 @@ namespace TwitchBot.src.Emotes
 
       return emotes;
     }
-    public static async Task<List<EmoteModel>> SeventvDBAsync()
-    {
-      List<EmoteModel> emotes = new();
 
-
-
-      return emotes;
-    }
+    public static async Task<List<EmoteModel>> EmotesFromDB(string channel)
+      => await DatabaseConnections.GetEmotes(channel).ConfigureAwait(false);
   }
 }
