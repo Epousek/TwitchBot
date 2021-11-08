@@ -13,6 +13,8 @@ namespace TwitchBot.src
 {
   class Program
   {
+    static List<string> channelsToConnectTo;
+
     static async Task Main()
     {
       await SecretsConfig.SetConfig().ConfigureAwait(false);
@@ -34,10 +36,14 @@ namespace TwitchBot.src
 
       Log.Information($"Bot starting in {(Debugger.IsAttached ? "debug" : "production")} mode");
 
+      channelsToConnectTo = await SetChannelsToConnectToAsync().ConfigureAwait(false);
+
+      Thread emotesThread = new(async () => await Emotes.UpdateEmotes.StartUpdatingEmotes(channelsToConnectTo).ConfigureAwait(false));
       Thread authThread = new (async () => await Authentication.StartValidatingTokenAsync().ConfigureAwait(false));
+      emotesThread.Start();
       authThread.Start();
 
-      Bot bot = new(await Task.Run(SetChannelsToConnectToAsync).ConfigureAwait(false));
+      Bot bot = new(channelsToConnectTo);
       Console.ReadLine();
     }
 
