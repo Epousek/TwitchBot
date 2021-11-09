@@ -26,9 +26,14 @@ namespace TwitchBot.src.Emotes
       {
         RestClient client = new("https://api.betterttv.net/3/cached/users/twitch/" + id.ToString());
         RestRequest request = new();
-        
+
         RestResponse response = (RestResponse)await client.ExecuteAsync(request).ConfigureAwait(false);
 
+        if(response == null)
+        {
+          Log.Error("BTTV API currently unavailable.");
+          return null;
+        }
         if (!response.IsSuccessful)
         {
           Log.Error(response.ErrorException, "Couldn't get emotes from BTTV API: {statusDescription}", response.StatusDescription);
@@ -64,6 +69,11 @@ namespace TwitchBot.src.Emotes
 
       RestResponse response = (RestResponse)await client.ExecuteAsync(request).ConfigureAwait(false);
 
+      if (response == null)
+      {
+        Log.Error("FFZ API currently unavailable.");
+        return null;
+      }
       if (!response.IsSuccessful)
       {
         Log.Error(response.ErrorException, "Couldn't get emotes from BTTV API: {statusDescription}", response.StatusDescription);
@@ -93,6 +103,12 @@ namespace TwitchBot.src.Emotes
       RestRequest request = new();
 
       RestResponse response = (RestResponse)await client.ExecuteAsync(request).ConfigureAwait(false);
+
+      if (response == null)
+      {
+        Log.Error("7tv API currently unavailable.");
+        return null;
+      }
       if (!response.IsSuccessful)
       {
         Log.Error(response.ErrorException, "Couldn't get emotes from BTTV API: {statusDescription}", response.StatusDescription);
