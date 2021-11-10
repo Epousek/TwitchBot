@@ -8,10 +8,10 @@ Jakožto mojí práci jsem si vybral vytvoření Twitch Chat bota v češtině.
  - bot = program, který bude na chat připojen, a bude reagovat na různé příkazy
 
 Součástí bota bude databáze uživatelů a historie chatů, ve kterých bude bot připojený.
-Tuto práci jsem si vybral proto, že existuje celkem velké množství podobných botů v angličtině, ale žádné v češtině. Proto si myslím, že i přes to, že již existující boté budou mít více funkcí, bude mít můj bot alespoň nějaké využití.
+Tuto práci jsem si vybral proto, že existuje celkem velké množství podobných botů v angličtině, ale žádné v češtině. Proto si myslím, že i přes to, že již existující boté budou mít více funkcí, bude mít můj bot alespoň nějaké využití.  
 Bot je určen převážně pro lidi, kteří jsou aktivní v tzv. offline chatu (?) a většina příkazů půjde používat pouze pokud daný streamer zrovna nebude streamovat.
-Bot bude fungovat zejména pomocí příkazů, které musí nějaký uživatel napsat do chatu. Zároveň bude mít pár událostí, ke kterým se uživatel jednou přihlásí, a poté bude vždy upozorněn při dané události.
-Příkazy budou různorodé a budou pracovat zejména s různými API nebo např. s historií chatu.
+Bot bude fungovat zejména pomocí příkazů, které musí nějaký uživatel napsat do chatu. Zároveň bude mít pár událostí, ke kterým se uživatel jednou přihlásí, a poté bude vždy upozorněn při dané události.  
+Příkazy budou různorodé a budou pracovat zejména s různými API nebo např. s historií chatu.  
 Událostí může být např. zapnutí streamu nebo změna právě hrané hry.
 
 ## Popis stávajícího stavu
@@ -68,25 +68,25 @@ Ke tvorbě závěrečné práce budu používat Word, vzledem k tomu že ho už 
 
 Program bude rozdělen na dvě verze: main a dev. Main je verze co poběží na serveru, dev je verze na které budu pracovat. Jakmile bude nová funkce hotová na dev, tak bude dev spojen s mainem, a program na serveru se vypne, aktualizuje a zase spustí.
 
-1. příprava a základy
+1. příprava a základy  
    Nejdříve musím připravit půdu pro tvorbu samotné práce. Pod to spadá:
    - vytvoření vlastního serveru ze starého PC, ne kterém program poběží;
    - vytvoření databáze se systémem tabulek, do kterých se budou ukládat data která bude bot sbírat.\
    Součástí přípravy je také založení samotného projektu a naprogramování/nastavení věcí potřebných k napojení na Twitch (zejména obnovování autentifikačního klíče) a databázi.
    Po prvním výstupu by měla program být připravená pro konstantní běh na serveru.
-2. nasazení na server a první uživatelské funkce
+2. nasazení na server a první uživatelské funkce  
    V průbehu druhého výstupu vytvořím první funkce pro uživatele, a také začnu ukládat historii zpráv pro pozdější využití. Také vytvořím základ systému pro příkazy, který více využiju později.
    Na konci druhého výstupu budou pro uživatele dostupné minimálně tyto funkce:
    - Výpis emotikonů, které byly naposledy přidány
    - Výpis emotikonů, které byly naposledy odebrány
-   - Základní jednoduché příkazy\
-   Na konci druhého výstupu budou hotové nebo rozdělané (ale funkční) tyto systémy:
+   - Základní jednoduché příkazy\  
+   Na konci druhého výstupu budou hotové nebo rozdělané (ale funkční) tyto systémy:  
    - Komunikace s databází
    - Framework pro příkazy
-3. příkazy
+3. příkazy  
    V rámci třetího výstupu vytvořím co nejvíce různých příkazů a funkcí. Nelze přesně určit počet nových příkazů, vzhledem k tomu, že přesně nevím složitost implementace každého z nich, ale mým cílem je alespoň 15.
    Mezi příkazy které bych rád přidal patří např. vypsání náhodné zprávy z nějakého zpravodajského serveru, vypsání počasí v dané lokaci, vypsání náhodné zprávy kterou daný uživatel napsal
-4. polish
+4. polish  
    Poslední výstup mám rezervovaný zejména pro opravy, úpravy a vylepšování stávajících funkcí a systémů. Zároveň ještě budu přidávat nové příkazy, které jsem buď přidat nestihl, které mě napadli později, poopřípadě které napadly nějakého uživatele. U tohoto výstupu lze ještě hůře určit počet nových příkazů, vzledem k tomu že netuším kolik času mi zaberou opravy a vylepšování.
 
 Součástí každého výstupu jsou opravy akutních problémů, díky kterým bot nefunguje nebo je méně stabilní.
