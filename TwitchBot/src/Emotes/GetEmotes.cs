@@ -56,6 +56,7 @@ namespace TwitchBot.src.Emotes
           emotes.Add(emote);
         }
 
+        Log.Debug("Got BTTV emotes from API ({channel})", channel);
         return emotes;
       }
     }
@@ -92,6 +93,7 @@ namespace TwitchBot.src.Emotes
         emotes.Add(emote);
       }
 
+      Log.Debug("Got FFZ emotes from API ({channel})", channel);
       return emotes;
     }
 
@@ -123,6 +125,7 @@ namespace TwitchBot.src.Emotes
         emotes.Add(emote);
       }
 
+      Log.Debug("Got 7tv emotes from API ({channel})", channel);
       return emotes;
     }
 
