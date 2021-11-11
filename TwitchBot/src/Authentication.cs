@@ -44,7 +44,7 @@ namespace TwitchBot.src
         }
         else
         {
-          Log.Information("Token expires in about {expiresIn} hours", validationResponse.ExpiresIn / 3600);
+          Log.Information("Token expires in about {expiresIn} hours", TimeSpan.FromSeconds(validationResponse.ExpiresIn).TotalHours);
         }
       }
       else
