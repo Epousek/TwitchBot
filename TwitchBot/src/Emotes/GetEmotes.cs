@@ -29,13 +29,13 @@ namespace TwitchBot.src.Emotes
 
         RestResponse response = (RestResponse)await client.ExecuteAsync(request).ConfigureAwait(false);
 
-        if(response == null)
-        {
-          Log.Error("BTTV API currently unavailable.");
-          return null;
-        }
         if (!response.IsSuccessful)
         {
+          if(response.ErrorException == null)
+          {
+            Log.Error("BTTV API currently unavailable.");
+            return null;
+          }
           Log.Error(response.ErrorException, "Couldn't get emotes from BTTV API: {statusDescription}", response.StatusDescription);
           return null;
         }
@@ -69,13 +69,13 @@ namespace TwitchBot.src.Emotes
 
       RestResponse response = (RestResponse)await client.ExecuteAsync(request).ConfigureAwait(false);
 
-      if (response == null)
-      {
-        Log.Error("FFZ API currently unavailable.");
-        return null;
-      }
       if (!response.IsSuccessful)
       {
+        if (response.ErrorException == null)
+        {
+          Log.Error("FFZ API currently unavailable.");
+          return null;
+        }
         Log.Error(response.ErrorException, "Couldn't get emotes from BTTV API: {statusDescription}", response.StatusDescription);
         return null;
       }
@@ -104,13 +104,13 @@ namespace TwitchBot.src.Emotes
 
       RestResponse response = (RestResponse)await client.ExecuteAsync(request).ConfigureAwait(false);
 
-      if (response == null)
-      {
-        Log.Error("7tv API currently unavailable.");
-        return null;
-      }
       if (!response.IsSuccessful)
       {
+        if (response.ErrorException == null)
+        {
+          Log.Error("7tv API currently unavailable.");
+          return null;
+        }
         Log.Error(response.ErrorException, "Couldn't get emotes from BTTV API: {statusDescription}", response.StatusDescription);
         return null;
       }
