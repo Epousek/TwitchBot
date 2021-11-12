@@ -36,7 +36,7 @@ namespace TwitchBot.src.Emotes
             Log.Error("BTTV API currently unavailable.");
             return null;
           }
-          Log.Error(response.ErrorException, "Couldn't get emotes from BTTV API: {statusDescription}", response.StatusDescription);
+          Log.Error(response.ErrorException, "Couldn't get emotes from BTTV API: {statusDescription}", response.ErrorMessage);
           return null;
         }
 
@@ -76,7 +76,7 @@ namespace TwitchBot.src.Emotes
           Log.Error("FFZ API currently unavailable.");
           return null;
         }
-        Log.Error(response.ErrorException, "Couldn't get emotes from BTTV API: {statusDescription}", response.StatusDescription);
+        Log.Error(response.ErrorException, "Couldn't get emotes from BTTV API: {statusDescription}", response.ErrorMessage);
         return null;
       }
 
@@ -111,7 +111,7 @@ namespace TwitchBot.src.Emotes
           Log.Error("7tv API currently unavailable.");
           return null;
         }
-        Log.Error(response.ErrorException, "Couldn't get emotes from BTTV API: {statusDescription}", response.StatusDescription);
+        Log.Error(response.ErrorException, "Couldn't get emotes from BTTV API: {statusDescription}", response.ErrorMessage);
         return null;
       }
 
