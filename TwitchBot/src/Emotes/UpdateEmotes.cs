@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TwitchBot.src.Models;
 using TwitchBot.src.Connections;
+using Serilog;
 
 namespace TwitchBot.src.Emotes
 {
@@ -31,12 +32,30 @@ namespace TwitchBot.src.Emotes
       List<EmoteModel> notActiveAnymore = new();
       List<EmoteModel> activeAgain = new();
 
-      foreach (EmoteModel emote in await GetEmotes.BttvAPIAsync(channel).ConfigureAwait(false))
-        fromAPI.Add(emote);
-      foreach (EmoteModel emote in await GetEmotes.FfzAPIAsync(channel).ConfigureAwait(false))
-        fromAPI.Add(emote);
-      foreach (EmoteModel emote in await GetEmotes.SeventvAPIAsync(channel).ConfigureAwait(false))
-        fromAPI.Add(emote);
+      try
+      {
+        foreach (EmoteModel emote in await GetEmotes.BttvAPIAsync(channel).ConfigureAwait(false))
+          fromAPI.Add(emote);
+      } catch (Exception e)
+      {
+        Log.Error(e, "No emotes from bttv api: ", e.Message);
+      }
+      try
+      {
+        foreach (EmoteModel emote in await GetEmotes.FfzAPIAsync(channel).ConfigureAwait(false))
+          fromAPI.Add(emote);
+      } catch (Exception e)
+      {
+        Log.Error(e, "No emotes from ffz api: ", e.Message);
+      }
+      try
+      {
+        foreach (EmoteModel emote in await GetEmotes.SeventvAPIAsync(channel).ConfigureAwait(false))
+          fromAPI.Add(emote);
+      } catch (Exception e)
+      {
+        Log.Error(e, "No emotes from 7tv api: ", e.Message);
+      }
 
       foreach(EmoteModel emote in fromAPI)
       {
