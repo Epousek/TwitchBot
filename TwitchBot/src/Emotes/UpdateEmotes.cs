@@ -39,6 +39,7 @@ namespace TwitchBot.src.Emotes
       } catch (Exception e)
       {
         Log.Error(e, "No emotes from bttv api: ", e.Message);
+        return;
       }
       try
       {
@@ -47,6 +48,7 @@ namespace TwitchBot.src.Emotes
       } catch (Exception e)
       {
         Log.Error(e, "No emotes from ffz api: ", e.Message);
+        return;
       }
       try
       {
@@ -55,6 +57,7 @@ namespace TwitchBot.src.Emotes
       } catch (Exception e)
       {
         Log.Error(e, "No emotes from 7tv api: ", e.Message);
+        return;
       }
 
       foreach(EmoteModel emote in fromAPI)
