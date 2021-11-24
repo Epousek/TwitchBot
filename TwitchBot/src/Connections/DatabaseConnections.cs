@@ -145,6 +145,7 @@ namespace TwitchBot.src.Connections
           {
             await com.ExecuteNonQueryAsync().ConfigureAwait(false);
             Log.Debug("Message write successful.");
+            BotInfo.MessagesLoggedSinceStart++;
           }
           catch (Exception e)
           {

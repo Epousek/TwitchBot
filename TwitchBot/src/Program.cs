@@ -17,6 +17,7 @@ namespace TwitchBot.src
 
     static async Task Main()
     {
+      BotInfo.RunningSince = DateTime.Now;
       await SecretsConfig.SetConfig().ConfigureAwait(false);
 
       var builder = new ConfigurationBuilder();
