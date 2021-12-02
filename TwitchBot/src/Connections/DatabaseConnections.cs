@@ -69,6 +69,7 @@ namespace TwitchBot.src.Connections
               com.Parameters.AddWithValue("isActive", emote.IsActive);
               com.Parameters.AddWithValue("added", emote.Added);
               com.Parameters.AddWithValue("removed", emote.Removed);
+              com.Parameters.AddWithValue("service", emote.Service);
 
               try
               {
