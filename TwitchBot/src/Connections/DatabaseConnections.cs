@@ -137,7 +137,7 @@ namespace TwitchBot.src.Connections
         using(MySqlCommand com = new ("sp_AddedEmotes", con))
         {
           com.CommandType = CommandType.StoredProcedure;
-          com.Parameters.AddWithValue("channel", channel);
+          com.Parameters.AddWithValue("channel", Helpers.FirstToUpper(channel));
 
           using (var reader = await com.ExecuteReaderAsync())
           {
