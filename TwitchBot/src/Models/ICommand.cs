@@ -15,7 +15,7 @@ namespace TwitchBot.src.Models
     bool OfflineOnly { get; }
     bool UsableByBanned { get; }
     bool Optoutable { get; }
-    int TimesUsedSinceRestart { get; protected set; }
+    int TimesUsedSinceRestart { get; set; }
     int? TimesUsedTotal { get; set; }
 
     public Task UseCommandAsync(ChatMessageModel message);
