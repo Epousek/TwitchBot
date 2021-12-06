@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TwitchBot.src.Commands;
 using TwitchBot.src.Connections;
 using TwitchBot.src.Models;
 using TwitchLib.Api;
@@ -15,9 +16,12 @@ namespace TwitchBot.src
   class Bot
   {
     static TwitchClient client;
+    static CommandGetter cg;
 
     public Bot(List<string> channelsToConnectTo)
     {
+      cg = new();
+
       ConnectionCredentials creds = new(SecretsConfig.Credentials.Username, SecretsConfig.Credentials.AccessToken);
       var clientOptions = new ClientOptions
       {
@@ -36,6 +40,9 @@ namespace TwitchBot.src
       client.Connect();
     }
 
+    public static void WriteMessage(string message, string channel)
+      => client.SendMessage(channel, message);
+
     //private void Client_OnConnected(object sender, TwitchLib.Client.Events.OnConnectedArgs e) 
     //{
     //  Log.Information("Connected to {channel}.", e.AutoJoinChannel);
@@ -48,15 +55,19 @@ namespace TwitchBot.src
 
     private async void Client_OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)
     {
-      ChatMessageModel msg = new() {
+
+      ChatMessageModel message = new() {
         Channel = e.ChatMessage.Channel,
         Username = e.ChatMessage.Username,
         Message = e.ChatMessage.Message,
         TimeStamp = DateTime.Now
       };
-      Log.Debug("{channel} - {name}: {message}", msg.Channel, msg.Username, msg.Message);
-
-      await DatabaseConnections.WriteMessage(msg).ConfigureAwait(false);
+      Log.Debug("{channel} - {name}: {message}", message.Channel, message.Username, message.Message);
+      
+      if (e.ChatMessage.Message.StartsWith("$"))
+        await cg.CheckIfCommandAsync(message);
+      
+      await DatabaseConnections.WriteMessage(message).ConfigureAwait(false);
     }
 
     //private void Client_OnLog(object sender, TwitchLib.Client.Events.OnLogArgs e)
