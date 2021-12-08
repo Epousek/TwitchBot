@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TwitchBot.src.Enums;
 
 namespace TwitchBot.src.Models
 {
@@ -11,7 +12,7 @@ namespace TwitchBot.src.Models
     string Name { get; }
     string About { get; }
     string Help { get; }
-    int Permission { get; }
+    Permission Permission { get; }
     bool OfflineOnly { get; }
     bool UsableByBanned { get; }
     bool Optoutable { get; }
