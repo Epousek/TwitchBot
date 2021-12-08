@@ -2,8 +2,8 @@
 {
   public enum Permission
   {
-    regular,
-    admin,
-    owner
+    Regular,
+    Admin,
+    Owner
   }
 }
