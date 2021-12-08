@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TwitchBot.src.Connections;
 using TwitchBot.src.Models;
+using TwitchBot.src.Enums;
 using Humanizer;
 using Humanizer.Localisation;
 
@@ -18,13 +19,13 @@ namespace TwitchBot.src.Commands
 
     public string Help { get; } = "$emotes";
 
-    public int Permission => throw new NotImplementedException();
+    public Permission Permission { get; } = Permission.Regular;
 
     public bool OfflineOnly => throw new NotImplementedException();
 
     public bool UsableByBanned => throw new NotImplementedException();
 
-    public bool Optoutable => throw new NotImplementedException();
+    public bool Optoutable { get; } = false;
 
     public int TimesUsedSinceRestart { get; set; }
 
