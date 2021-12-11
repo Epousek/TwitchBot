@@ -22,7 +22,8 @@ namespace TwitchBot.src.Commands
       message.Message = message.Message[1..];
 
       KeyValuePair<string, ICommand> command;
-      IEnumerable<KeyValuePair<string, ICommand>> commands = commandInstances.Where(c => message.Message.StartsWith(c.Value.Name, StringComparison.OrdinalIgnoreCase));
+      IEnumerable<KeyValuePair<string, ICommand>> commands;
+      commands = commandInstances.Where(c => message.Message.StartsWith(c.Value.Name, StringComparison.OrdinalIgnoreCase));
 
       if (commands?.Any() == true)
       {
@@ -31,7 +32,25 @@ namespace TwitchBot.src.Commands
       }
       else
       {
-        Log.Debug("Není to command!");
+        commands = commandInstances.Where(c =>
+        {
+          foreach (string alias in c.Value.Aliases)
+          {
+            if(message.Message.StartsWith(alias, StringComparison.OrdinalIgnoreCase));
+              return true;
+          }
+          return false;
+        });
+
+        if (commands?.Any() == true)
+        {
+          command = commands.First();
+          await command.Value.UseCommandAsync(message);
+        }
+        else
+        {
+          Log.Debug("Není to command!");
+        }
       }
     }
   }
