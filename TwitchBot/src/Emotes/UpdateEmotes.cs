@@ -19,7 +19,7 @@ namespace TwitchBot.src.Emotes
         {
           foreach(string channel in channels)
             await CompareEmotes(channel).ConfigureAwait(false);
-          Thread.Sleep(TimeSpan.FromMinutes(5));
+          Thread.Sleep(TimeSpan.FromMinutes(1));
         }
       }).ConfigureAwait(false);
     }
