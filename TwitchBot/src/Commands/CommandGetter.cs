@@ -8,13 +8,14 @@ using TwitchBot.src.Models;
 
 namespace TwitchBot.src.Commands
 {
-  class CommandGetter
+  public class CommandGetter
   {
     private Dictionary<string, ICommand> commandInstances = new();
 
     public CommandGetter()
     {
       commandInstances.Add("Emotes", new Emotes());
+      commandInstances.Add("Suggest", new Suggest());
     }
 
     public async Task CheckIfCommandAsync(ChatMessageModel message)
@@ -22,8 +23,7 @@ namespace TwitchBot.src.Commands
       message.Message = message.Message[1..];
 
       KeyValuePair<string, ICommand> command;
-      IEnumerable<KeyValuePair<string, ICommand>> commands;
-      commands = commandInstances.Where(c => message.Message.StartsWith(c.Value.Name, StringComparison.OrdinalIgnoreCase));
+      IEnumerable<KeyValuePair<string, ICommand>> commands = commandInstances.Where(c => message.Message.StartsWith(c.Value.Name, StringComparison.OrdinalIgnoreCase));
 
       if (commands?.Any() == true)
       {

@@ -165,6 +165,31 @@ namespace TwitchBot.src.Connections
       }
     }
 
+    public static async Task WriteSuggestion(ChatMessageModel msg)
+    {
+      using (MySqlConnection con = new (SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (MySqlCommand com = new ("sp_WriteSuggestion", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("timeStamp", msg.TimeStamp);
+          com.Parameters.AddWithValue("user", msg.Username);
+          com.Parameters.AddWithValue("suggestion", msg.Message);
+
+          try
+          {
+            await com.ExecuteNonQueryAsync();
+          }
+          catch (Exception e)
+          {
+            Log.Error("Couldn't write suggestion to db: {error}: {errorMessage}", e, e.Message);
+          }
+          con.Close();
+        }
+      }
+    }
+
     public static async Task WriteMessage(ChatMessageModel msg)
     {
       using (MySqlConnection con = new (SecretsConfig.Credentials.ConnectionString))
