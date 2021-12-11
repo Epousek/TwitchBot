@@ -69,7 +69,6 @@ namespace TwitchBot.src
 
     private async void Client_OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)
     {
-
       ChatMessageModel message = new() {
         Channel = e.ChatMessage.Channel,
         Username = e.ChatMessage.Username,

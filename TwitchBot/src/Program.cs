@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace TwitchBot.src
 {
-  class Program
+  static class Program
   {
     static List<string> channelsToConnectTo;
 

@@ -100,7 +100,7 @@ namespace TwitchBot.src.Connections
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(channel));
-          
+
           using (var reader = await com.ExecuteReaderAsync().ConfigureAwait(false))
           {
             if (!reader.HasRows)
@@ -141,7 +141,7 @@ namespace TwitchBot.src.Connections
 
           using (var reader = await com.ExecuteReaderAsync())
           {
-            List<EmoteModel> emotes = new List<EmoteModel>();
+            List<EmoteModel> emotes = new ();
             if (!reader.HasRows)
             {
               Log.Warning("Couldn't retrieve data from {0}Emotes (it may not have any).", channel);
@@ -179,7 +179,7 @@ namespace TwitchBot.src.Connections
 
           using (var reader = await com.ExecuteReaderAsync())
           {
-            List<EmoteModel> emotes = new List<EmoteModel>();
+            List<EmoteModel> emotes = new ();
             if (!reader.HasRows)
             {
               Log.Warning("Couldn't retrieve data from {0}Emotes (it may not have any).", channel);
@@ -207,6 +207,8 @@ namespace TwitchBot.src.Connections
     {
       using (MySqlConnection con = new (SecretsConfig.Credentials.ConnectionString))
       {
+        Log.Debug("Writing suggestion ({suggestion})", msg);
+
         con.Open();
         using (MySqlCommand com = new ("sp_WriteSuggestion", con))
         {

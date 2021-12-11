@@ -37,7 +37,7 @@ namespace TwitchBot.src.Commands
         {
           foreach (string alias in c.Value.Aliases)
           {
-            if(message.Message.StartsWith(alias, StringComparison.OrdinalIgnoreCase));
+            if(message.Message.StartsWith(alias, StringComparison.OrdinalIgnoreCase))
               return true;
           }
           return false;

@@ -24,8 +24,6 @@ namespace TwitchBot.src.Commands
     public int TimesUsedSinceRestart { get; set; }
     public int? TimesUsedTotal { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-    
-
     public async Task UseCommandAsync(ChatMessageModel message)
     {
       if (DateTime.Now - LastUsed < Cooldown)
