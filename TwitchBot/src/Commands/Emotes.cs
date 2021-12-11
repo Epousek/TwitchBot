@@ -14,25 +14,24 @@ namespace TwitchBot.src.Commands
   class Emotes : ICommand
   {
     public string Name { get; } = nameof(Emotes);
-
     public string About { get; } = "Vypíše naposledy přidané emoty";
-
     public string Help { get; } = "$emotes";
-
+    public string[] Aliases { get; } = { "emotikony", "added" };
     public Permission Permission { get; } = Permission.Regular;
-
-    public bool OfflineOnly => throw new NotImplementedException();
-
-    public bool UsableByBanned => throw new NotImplementedException();
-
+    public TimeSpan Cooldown { get; } = TimeSpan.FromSeconds(10);
+    public bool OfflineOnly { get; } = false;
+    public bool UsableByBanned { get; } = false;
     public bool Optoutable { get; } = false;
-
     public int TimesUsedSinceRestart { get; set; }
-
     public int? TimesUsedTotal { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+    private DateTime lastUsed;
 
     public async Task UseCommandAsync(ChatMessageModel message)
     {
+      if (DateTime.Now - lastUsed < Cooldown)
+        return;
+
       TimeSpan sinceAddition;
       List<EmoteModel> emotes = await DatabaseConnections.GetLastAddedEmotes(message.Channel);
       StringBuilder builder = new("@");
@@ -61,6 +60,7 @@ namespace TwitchBot.src.Commands
 
       Bot.WriteMessage(builder.ToString(), message.Channel);
       TimesUsedSinceRestart++;
+      lastUsed = DateTime.Now;
     }
   }
 }
