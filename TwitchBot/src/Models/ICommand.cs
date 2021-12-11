@@ -15,6 +15,7 @@ namespace TwitchBot.src.Models
     string[] Aliases { get; }
     Permission Permission { get; }
     TimeSpan Cooldown { get; }
+    DateTime LastUsed { get; set; }
     bool OfflineOnly { get; }
     bool UsableByBanned { get; }
     bool Optoutable { get; }

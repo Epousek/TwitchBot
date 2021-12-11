@@ -19,17 +19,16 @@ namespace TwitchBot.src.Commands
     public string[] Aliases { get; } = { "emotikony", "added" };
     public Permission Permission { get; } = Permission.Regular;
     public TimeSpan Cooldown { get; } = TimeSpan.FromSeconds(10);
+    public DateTime LastUsed { get; set; }
     public bool OfflineOnly { get; } = false;
     public bool UsableByBanned { get; } = false;
     public bool Optoutable { get; } = false;
     public int TimesUsedSinceRestart { get; set; }
     public int? TimesUsedTotal { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-    private DateTime lastUsed;
-
     public async Task UseCommandAsync(ChatMessageModel message)
     {
-      if (DateTime.Now - lastUsed < Cooldown)
+      if (DateTime.Now - LastUsed < Cooldown)
         return;
 
       TimeSpan sinceAddition;
@@ -60,7 +59,7 @@ namespace TwitchBot.src.Commands
 
       Bot.WriteMessage(builder.ToString(), message.Channel);
       TimesUsedSinceRestart++;
-      lastUsed = DateTime.Now;
+      LastUsed = DateTime.Now;
     }
   }
 }
