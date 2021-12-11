@@ -18,7 +18,6 @@ namespace TwitchBot.src
     static async Task Main()
     {
       BotInfo.RunningSince = DateTime.Now;
-      System.Globalization.CultureInfo.CurrentCulture = new ("cs-CS", false);
       await SecretsConfig.SetConfig().ConfigureAwait(false);
 
       var builder = new ConfigurationBuilder();
