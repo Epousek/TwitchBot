@@ -13,6 +13,7 @@ namespace TwitchBot.src.Models
     string About { get; }
     string Help { get; }
     Permission Permission { get; }
+    TimeSpan Cooldown { get; }
     bool OfflineOnly { get; }
     bool UsableByBanned { get; }
     bool Optoutable { get; }
