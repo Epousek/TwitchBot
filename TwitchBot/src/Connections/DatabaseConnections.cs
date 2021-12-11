@@ -100,13 +100,13 @@ namespace TwitchBot.src.Connections
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(channel));
-          
+
           using (var reader = await com.ExecuteReaderAsync().ConfigureAwait(false))
           {
             if (!reader.HasRows)
             {
               Log.Warning("{table} has no rows.", Helpers.FirstToUpper(channel) + "Emotes");
-              return new List<EmoteModel>() { };
+              return new List<EmoteModel>();
             }
             while (reader.Read())
             {
@@ -123,6 +123,109 @@ namespace TwitchBot.src.Connections
             Log.Debug("Successfully got emotes from db.");
             return emotes;
           }
+        }
+      }
+    }
+
+    public static async Task<List<EmoteModel>> GetLastAddedEmotes(string channel)
+    {
+      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
+      {
+        Log.Debug("Getting last added emotes");
+
+        con.Open();
+        using(MySqlCommand com = new ("sp_AddedEmotes", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("channel", Helpers.FirstToUpper(channel));
+
+          using (var reader = await com.ExecuteReaderAsync())
+          {
+            List<EmoteModel> emotes = new ();
+            if (!reader.HasRows)
+            {
+              Log.Warning("Couldn't retrieve data from {0}Emotes (it may not have any).", channel);
+              return emotes;
+            }
+            while (await reader.ReadAsync())
+            {
+              emotes.Add(new EmoteModel
+              {
+                Name = reader.GetString(0),
+                Service = reader.GetString(1),
+                Added = reader.GetDateTime(2),
+                Removed = await reader.IsDBNullAsync(3).ConfigureAwait(false) ? null : reader.GetDateTime(3),
+                IsActive = reader.GetBoolean(4)
+              });
+            }
+
+            return emotes;
+          }
+        }
+      }
+    }
+
+    public static async Task<List<EmoteModel>> GetLastRemovedEmotes(string channel)
+    {
+      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
+      {
+        Log.Debug("Getting last removed emotes");
+
+        con.Open();
+        using (MySqlCommand com = new("sp_RemovedEmotes", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("channel", Helpers.FirstToUpper(channel));
+
+          using (var reader = await com.ExecuteReaderAsync())
+          {
+            List<EmoteModel> emotes = new ();
+            if (!reader.HasRows)
+            {
+              Log.Warning("Couldn't retrieve data from {0}Emotes (it may not have any).", channel);
+              return emotes;
+            }
+            while (await reader.ReadAsync())
+            {
+              emotes.Add(new EmoteModel
+              {
+                Name = reader.GetString(0),
+                Service = reader.GetString(1),
+                Added = reader.GetDateTime(2),
+                Removed = await reader.IsDBNullAsync(3).ConfigureAwait(false) ? null : reader.GetDateTime(3),
+                IsActive = reader.GetBoolean(4)
+              });
+            }
+
+            return emotes;
+          }
+        }
+      }
+    }
+
+    public static async Task WriteSuggestion(ChatMessageModel msg)
+    {
+      using (MySqlConnection con = new (SecretsConfig.Credentials.ConnectionString))
+      {
+        Log.Debug("Writing suggestion ({suggestion})", msg);
+
+        con.Open();
+        using (MySqlCommand com = new ("sp_WriteSuggestion", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("timeStamp", msg.TimeStamp);
+          com.Parameters.AddWithValue("user", msg.Username);
+          com.Parameters.AddWithValue("suggestion", msg.Message);
+
+          try
+          {
+            await com.ExecuteNonQueryAsync();
+          }
+          catch (Exception e)
+          {
+            Log.Error("Couldn't write suggestion to db: {error}: {errorMessage}", e, e.Message);
+          }
+          con.Close();
         }
       }
     }
@@ -146,6 +249,7 @@ namespace TwitchBot.src.Connections
           {
             await com.ExecuteNonQueryAsync().ConfigureAwait(false);
             Log.Debug("Message write successful.");
+            BotInfo.MessagesLoggedSinceStart++;
           }
           catch (Exception e)
           {

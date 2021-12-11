@@ -11,12 +11,13 @@ using System.Diagnostics;
 
 namespace TwitchBot.src
 {
-  class Program
+  static class Program
   {
     static List<string> channelsToConnectTo;
 
     static async Task Main()
     {
+      BotInfo.RunningSince = DateTime.Now;
       await SecretsConfig.SetConfig().ConfigureAwait(false);
 
       var builder = new ConfigurationBuilder();
