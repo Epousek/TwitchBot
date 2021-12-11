@@ -15,6 +15,7 @@ namespace TwitchBot.src.Commands
     public CommandGetter()
     {
       commandInstances.Add("Emotes", new Emotes());
+      commandInstances.Add("Removed", new Removed());
       commandInstances.Add("Suggest", new Suggest());
     }
 

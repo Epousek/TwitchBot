@@ -165,6 +165,44 @@ namespace TwitchBot.src.Connections
       }
     }
 
+    public static async Task<List<EmoteModel>> GetLastRemovedEmotes(string channel)
+    {
+      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
+      {
+        Log.Debug("Getting last removed emotes");
+
+        con.Open();
+        using (MySqlCommand com = new("sp_RemovedEmotes", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("channel", Helpers.FirstToUpper(channel));
+
+          using (var reader = await com.ExecuteReaderAsync())
+          {
+            List<EmoteModel> emotes = new List<EmoteModel>();
+            if (!reader.HasRows)
+            {
+              Log.Warning("Couldn't retrieve data from {0}Emotes (it may not have any).", channel);
+              return emotes;
+            }
+            while (await reader.ReadAsync())
+            {
+              emotes.Add(new EmoteModel
+              {
+                Name = reader.GetString(0),
+                Service = reader.GetString(1),
+                Added = reader.GetDateTime(2),
+                Removed = await reader.IsDBNullAsync(3).ConfigureAwait(false) ? null : reader.GetDateTime(3),
+                IsActive = reader.GetBoolean(4)
+              });
+            }
+
+            return emotes;
+          }
+        }
+      }
+    }
+
     public static async Task WriteSuggestion(ChatMessageModel msg)
     {
       using (MySqlConnection con = new (SecretsConfig.Credentials.ConnectionString))
