@@ -43,7 +43,7 @@ namespace TwitchBot.src.Commands
 
         builder.Append(emotes[i].Name);
         builder.Append(" (");
-        builder.Append(sinceAddition.Humanize(3, minUnit: TimeUnit.Minute));
+        builder.Append(sinceAddition.Humanize(3, minUnit: TimeUnit.Minute, culture: new("cs-CS")));
         if (i != emotes.Count - 1)
           builder.Append("), ");
         else
