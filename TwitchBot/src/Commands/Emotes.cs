@@ -37,24 +37,17 @@ namespace TwitchBot.src.Commands
       builder.Append(message.Username);
       builder.Append(" Naposledy přidané emoty: ");
 
-      foreach (EmoteModel emote in emotes)
+      for (int i = 0; i < emotes.Count; i++)
       {
-        sinceAddition = (TimeSpan)(DateTime.Now - emote.Added);
-        if (builder.Length < 290)
-        {
-          builder.Append(emote.Name);
-          builder.Append(" (");
-          builder.Append(sinceAddition.Humanize(3, minUnit: TimeUnit.Minute));
+        sinceAddition = (TimeSpan)(DateTime.Now - emotes[i].Added);
+
+        builder.Append(emotes[i].Name);
+        builder.Append(" (");
+        builder.Append(sinceAddition.Humanize(3, minUnit: TimeUnit.Minute));
+        if (i != emotes.Count - 1)
           builder.Append("), ");
-        }
         else
-        {
-          builder.Append(emote.Name);
-          builder.Append(" (");
-          builder.Append(sinceAddition.Humanize(3, minUnit: TimeUnit.Minute));
           builder.Append(").");
-          break;
-        }
       }
 
       Bot.WriteMessage(builder.ToString(), message.Channel);
