@@ -47,6 +47,7 @@ namespace TwitchBot.src.Commands
         {
           command = commands.First();
           await command.Value.UseCommandAsync(message);
+          BotInfo.CommandsUsedSinceStart++;
         }
         else
         {
