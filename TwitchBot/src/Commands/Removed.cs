@@ -37,7 +37,7 @@ namespace TwitchBot.src.Commands
       builder.Append(message.Username);
       if (emotes.Count == 0)
       {
-        builder.Append(" Od doby co jsem na tomto kanálu nebyly odebrány žádné emoty");
+        builder.Append(" Od doby co jsem na tomto kanále nebyly odebrány žádné emoty");
         Bot.WriteMessage(builder.ToString(), message.Channel);
         return;
       }
