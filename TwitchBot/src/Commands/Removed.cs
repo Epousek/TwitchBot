@@ -35,6 +35,12 @@ namespace TwitchBot.src.Commands
       List<EmoteModel> emotes = await DatabaseConnections.GetLastRemovedEmotes(message.Channel);
       StringBuilder builder = new("@");
       builder.Append(message.Username);
+      if (emotes.Count == 0)
+      {
+        builder.Append(" Od doby co jsem na tomto kanálu nebyly odebrány žádné emoty");
+        Bot.WriteMessage(builder.ToString(), message.Channel);
+        return;
+      }
       builder.Append(" Naposledy odebrané emoty: ");
 
       for (int i = 0; i < emotes.Count; i++)
