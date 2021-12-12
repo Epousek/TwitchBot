@@ -76,11 +76,10 @@ namespace TwitchBot.src
         TimeStamp = DateTime.Now
       };
       Log.Debug("{channel} - {name}: {message}", message.Channel, message.Username, message.Message);
+      await DatabaseConnections.WriteMessage(message).ConfigureAwait(false);
 
       if (e.ChatMessage.Message.StartsWith("$"))
         await cg.CheckIfCommandAsync(message);
-
-      await DatabaseConnections.WriteMessage(message).ConfigureAwait(false);
     }
 
     private async void Client_OnDisconnected(object sender, TwitchLib.Communication.Events.OnDisconnectedEventArgs e)
