@@ -37,6 +37,7 @@ namespace TwitchBot.src
 
       Log.Information($"Bot starting in {(Debugger.IsAttached ? "debug" : "production")} mode");
 
+      GitHub.Init();
       channelsToConnectTo = await SetChannelsToConnectToAsync().ConfigureAwait(false);
 
       Thread emotesThread = new(async () => await Emotes.UpdateEmotes.StartUpdatingEmotes(channelsToConnectTo).ConfigureAwait(false));
