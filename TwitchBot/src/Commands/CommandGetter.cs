@@ -18,6 +18,7 @@ namespace TwitchBot.src.Commands
       commandInstances.Add("Emotes", new Emotes());
       commandInstances.Add("Removed", new Removed());
       commandInstances.Add("Suggest", new Suggest());
+      commandInstances.Add("Info", new Info());
     }
 
     public async Task CheckIfCommandAsync(ChatMessageModel message)
