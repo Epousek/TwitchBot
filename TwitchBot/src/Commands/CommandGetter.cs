@@ -14,6 +14,7 @@ namespace TwitchBot.src.Commands
 
     public CommandGetter()
     {
+      commandInstances.Clear();
       commandInstances.Add("Emotes", new Emotes());
       commandInstances.Add("Removed", new Removed());
       commandInstances.Add("Suggest", new Suggest());
@@ -30,15 +31,19 @@ namespace TwitchBot.src.Commands
       {
         command = commands.First();
         await command.Value.UseCommandAsync(message);
+        BotInfo.CommandsUsedSinceStart++;
       }
       else
       {
         commands = commandInstances.Where(c =>
         {
-          foreach (string alias in c.Value.Aliases)
+          if(c.Value.Aliases.Length > 0)
           {
-            if(message.Message.StartsWith(alias, StringComparison.OrdinalIgnoreCase))
-              return true;
+            foreach (string alias in c.Value.Aliases)
+            {
+              if(message.Message.StartsWith(alias, StringComparison.OrdinalIgnoreCase))
+                return true;
+            }
           }
           return false;
         });
