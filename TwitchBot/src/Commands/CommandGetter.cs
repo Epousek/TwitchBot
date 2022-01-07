@@ -10,7 +10,7 @@ namespace TwitchBot.src.Commands
 {
   public class CommandGetter
   {
-    private Dictionary<string, ICommand> commandInstances = new();
+    public Dictionary<string, ICommand> commandInstances = new();
 
     public CommandGetter()
     {
