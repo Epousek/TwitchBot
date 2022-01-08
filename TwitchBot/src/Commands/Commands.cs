@@ -11,25 +11,15 @@ namespace TwitchBot.src.Commands
   class Commands : ICommand
   {
     public string Name { get; } = nameof(Commands);
-
     public string About { get; } = "Vypíše seznam všech příkazů";
-
     public string Help { get; } = "prostě napiš ten příkaz lol";
-
     public string[] Aliases { get; } = { "příkazy" };
-
     public Permission Permission { get; } = Permission.Regular;
-
     public TimeSpan Cooldown { get; } = TimeSpan.FromSeconds(20);
-
     public DateTime LastUsed { get; set; }
-
     public bool OfflineOnly { get; } = false;
-
     public bool UsableByBanned { get; } = false;
-
     public bool Optoutable { get; } = false;
-
     public int TimesUsedSinceRestart { get; set; }
     public int? TimesUsedTotal { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
