@@ -16,14 +16,14 @@ namespace TwitchBot.src
 {
   class Bot
   {
+    public static CommandGetter cg;
     private static TwitchClient client;
-    private static CommandGetter cg;
     private List<string> channels;
     private bool reconnect;
 
     public Bot(List<string> channelsToConnectTo)
     {
-      cg = new();
+      cg = new CommandGetter();
       channels = channelsToConnectTo;
 
       ConnectionCredentials creds = new(SecretsConfig.Credentials.Username, SecretsConfig.Credentials.AccessToken);
@@ -76,11 +76,10 @@ namespace TwitchBot.src
         TimeStamp = DateTime.Now
       };
       Log.Debug("{channel} - {name}: {message}", message.Channel, message.Username, message.Message);
+      await DatabaseConnections.WriteMessage(message).ConfigureAwait(false);
 
       if (e.ChatMessage.Message.StartsWith("$"))
         await cg.CheckIfCommandAsync(message);
-
-      await DatabaseConnections.WriteMessage(message).ConfigureAwait(false);
     }
 
     private async void Client_OnDisconnected(object sender, TwitchLib.Communication.Events.OnDisconnectedEventArgs e)

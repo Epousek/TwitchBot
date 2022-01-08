@@ -14,7 +14,7 @@ namespace TwitchBot.src.Commands
   class Emotes : ICommand
   {
     public string Name { get; } = nameof(Emotes);
-    public string About { get; } = "Vypíše naposledy přidané emoty";
+    public string AboutCommand { get; } = "Vypíše naposledy přidané emoty";
     public string Help { get; } = "$emotes";
     public string[] Aliases { get; } = { "emotikony", "added" };
     public Permission Permission { get; } = Permission.Regular;
@@ -35,6 +35,12 @@ namespace TwitchBot.src.Commands
       List<EmoteModel> emotes = await DatabaseConnections.GetLastAddedEmotes(message.Channel);
       StringBuilder builder = new("@");
       builder.Append(message.Username);
+      if (emotes.Count == 0)
+      {
+        builder.Append(" Od doby co jsem na tomto kanále nebyly přidány žádne emoty.");
+        Bot.WriteMessage(builder.ToString(), message.Channel);
+        return;
+      }
       builder.Append(" Naposledy přidané emoty: ");
 
       for (int i = 0; i < emotes.Count; i++)

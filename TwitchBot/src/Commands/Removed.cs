@@ -14,7 +14,7 @@ namespace TwitchBot.src.Commands
   class Removed : ICommand
   {
     public string Name { get; } = nameof(Removed);
-    public string About { get; } = "Vypíše naposledy odebrané emoty na tomto kanále.";
+    public string AboutCommand { get; } = "Vypíše naposledy odebrané emoty na tomto kanále.";
     public string Help { get; } = "$removed";
     public string[] Aliases { get; } = { "odstraněné" };
     public Permission Permission { get; } = Permission.Regular;
@@ -35,6 +35,12 @@ namespace TwitchBot.src.Commands
       List<EmoteModel> emotes = await DatabaseConnections.GetLastRemovedEmotes(message.Channel);
       StringBuilder builder = new("@");
       builder.Append(message.Username);
+      if (emotes.Count == 0)
+      {
+        builder.Append(" Od doby co jsem na tomto kanále nebyly odebrány žádné emoty");
+        Bot.WriteMessage(builder.ToString(), message.Channel);
+        return;
+      }
       builder.Append(" Naposledy odebrané emoty: ");
 
       for (int i = 0; i < emotes.Count; i++)
