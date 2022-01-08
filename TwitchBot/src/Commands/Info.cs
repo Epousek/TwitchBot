@@ -32,7 +32,7 @@ namespace TwitchBot.src.Commands
       StringBuilder sb = new StringBuilder("@");
       sb.Append(message.Username)
         .Append(" Uptime: ")
-        .Append((DateTime.Now - BotInfo.RunningSince).Humanize(3, minUnit: Humanizer.Localisation.TimeUnit.Second))
+        .Append((DateTime.Now - BotInfo.RunningSince).Humanize(3, culture: new("cs-CS"), minUnit: Humanizer.Localisation.TimeUnit.Second))
         .Append("; počet použitých příkazů od zapnutí: ")
         .Append(BotInfo.CommandsUsedSinceStart)
         .Append("; verze: ")
