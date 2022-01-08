@@ -14,7 +14,7 @@ namespace TwitchBot.src.Commands
   class Emotes : ICommand
   {
     public string Name { get; } = nameof(Emotes);
-    public string About { get; } = "Vypíše naposledy přidané emoty";
+    public string AboutCommand { get; } = "Vypíše naposledy přidané emoty";
     public string Help { get; } = "$emotes";
     public string[] Aliases { get; } = { "emotikony", "added" };
     public Permission Permission { get; } = Permission.Regular;

@@ -13,7 +13,7 @@ namespace TwitchBot.src.Commands
   class Info : ICommand
   {
     public string Name { get; } = nameof(Info);
-    public string About { get; } = "Vypíše informace o právě běžící instanci bota.";
+    public string AboutCommand { get; } = "Vypíše informace o právě běžící instanci bota.";
     public string Help { get; } = "$ping";
     public string[] Aliases { get; } = Array.Empty<string>();
     public Permission Permission { get; } = Permission.Regular;

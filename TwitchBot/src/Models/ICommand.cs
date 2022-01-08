@@ -10,7 +10,7 @@ namespace TwitchBot.src.Models
   public interface ICommand
   {
     string Name { get; }
-    string About { get; }
+    string AboutCommand { get; }
     string Help { get; }
     string[] Aliases { get; }
     Permission Permission { get; }

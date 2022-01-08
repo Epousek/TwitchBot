@@ -11,7 +11,7 @@ namespace TwitchBot.src.Commands
   class Commands : ICommand
   {
     public string Name { get; } = nameof(Commands);
-    public string About { get; } = "Vypíše seznam všech příkazů";
+    public string AboutCommand { get; } = "Vypíše seznam všech příkazů";
     public string Help { get; } = "prostě napiš ten příkaz lol";
     public string[] Aliases { get; } = { "příkazy" };
     public Permission Permission { get; } = Permission.Regular;

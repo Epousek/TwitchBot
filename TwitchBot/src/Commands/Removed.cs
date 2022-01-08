@@ -14,7 +14,7 @@ namespace TwitchBot.src.Commands
   class Removed : ICommand
   {
     public string Name { get; } = nameof(Removed);
-    public string About { get; } = "Vypíše naposledy odebrané emoty na tomto kanále.";
+    public string AboutCommand { get; } = "Vypíše naposledy odebrané emoty na tomto kanále.";
     public string Help { get; } = "$removed";
     public string[] Aliases { get; } = { "odstraněné" };
     public Permission Permission { get; } = Permission.Regular;
