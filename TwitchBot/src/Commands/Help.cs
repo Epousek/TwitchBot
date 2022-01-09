@@ -47,19 +47,76 @@ namespace TwitchBot.src.Commands
 
         if (command.Aliases.Length > 0)
         {
-          builder.Append("; příkaz má následující aliasy: ");
+          builder.Append("; místo ");
+
+          if (command.HelpMessage.Contains(' '))
+            builder.Append(command.HelpMessage, 0, command.HelpMessage.IndexOf(' '));
+          else
+            builder.Append(command.HelpMessage);
+          
+          builder.Append(" můžeš použít jeden z aliasů: ");
+
           foreach (var alias in command.Aliases)
           {
             builder
               .Append(alias)
               .Append(", ");
           }
+
           builder
             .Remove(builder.Length - 2, 2)
             .Append('.');
         }
 
         Bot.WriteMessage(builder.ToString(), message.Channel);
+      }
+      else
+      {
+        var commands = commandInstances.Where(c =>
+        {
+          if (c.Value.Aliases.Length > 0)
+          {
+            foreach (string alias in c.Value.Aliases)
+            {
+              if (string.Equals(args[0], alias, StringComparison.OrdinalIgnoreCase))
+                return true;
+            }
+          }
+          return false;
+        });
+
+        if (commands?.Any() == true)
+        {
+          var command = commands.First().Value;
+          var builder = new StringBuilder("@");
+
+          builder
+            .Append(message.Username)
+            .Append(" Pro použití tohoto příkazu napiš: ")
+            .Append(command.HelpMessage)
+            .Append("; místo ");
+
+          if (command.HelpMessage.Contains(' '))
+            builder.Append(command.HelpMessage, 0, command.HelpMessage.IndexOf(' '));
+          else
+            builder.Append(command.HelpMessage);
+
+          builder.Append(" můžeš použít jeden z aliasů: ");
+
+          foreach (var alias in command.Aliases)
+          {
+            builder
+              .Append(alias)
+              .Append(", ");
+          }
+
+          builder
+            .Remove(builder.Length - 2, 2)
+            .Append('.');
+
+          Bot.WriteMessage(builder.ToString(), message.Channel);
+        }
+
       }
     }
   }
