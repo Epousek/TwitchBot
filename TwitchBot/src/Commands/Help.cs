@@ -28,11 +28,17 @@ namespace TwitchBot.src.Commands
       var ca = new CommandArguments(message);
       var args = ca.GetOneArgument();
       var commandInstances = Bot.cg.commandInstances;
-      args[0] = Helpers.FirstToUpper(args[0]);
+      if(args.Count > 0)
+        args[0] = Helpers.FirstToUpper(args[0]);
 
       if (args.Count != 1)
       {
-        Bot.WriteMessage($"@{message.Username} zadej prosím jeden argument", message.Channel);
+        Bot.WriteMessage($"@{message.Username} pro pomoc s příkazem napiš $help *příkaz*. Pro seznam příkazů napiš $commands.", message.Channel);
+        return;
+      }
+      if(args[0].Contains(' '))
+      {
+        Bot.WriteMessage($"@{message.Username} napiš jenom název příkazu. :)", message.Channel);
         return;
       }
       if (commandInstances.ContainsKey(args[0]))
@@ -116,7 +122,10 @@ namespace TwitchBot.src.Commands
 
           Bot.WriteMessage(builder.ToString(), message.Channel);
         }
-
+        else
+        {
+          Bot.WriteMessage($"@{message.Username} tento příkaz buď neexistuje, nebo jsi ho napsal špatně, nebo epousek něco posral", message.Channel);
+        }
       }
     }
   }
