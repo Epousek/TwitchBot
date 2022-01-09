@@ -27,7 +27,10 @@ namespace TwitchBot.src.Commands
 
     public List<string> GetOneArgument()
     {
-      return new List<string>() { message };
+      if (string.IsNullOrEmpty(message))
+        return new List<string>();
+      else
+        return new List<string>() { message };
     }
 
     public List<string> GetXArguments(int argCount)
