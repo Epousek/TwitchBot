@@ -10,7 +10,7 @@ namespace TwitchBot.src.Commands
 {
   class About : ICommand
   {
-    public string Name { get; } = nameof(Commands);
+    public string Name { get; } = nameof(About);
     public string AboutCommand { get; } = "Napíše základní informace o botovi";
     public string HelpMessage { get; } = "$about";
     public string[] Aliases { get; } = Array.Empty<string>();
