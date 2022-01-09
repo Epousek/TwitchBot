@@ -13,7 +13,7 @@ namespace TwitchBot.src.Commands
   {
     public string Name { get; } = nameof(Suggest);
     public string AboutCommand { get; } = "Pomocí tohoto příkazu můžeš navrhnout novou funkci nebo nahlásit chybu.";
-    public string Help { get; } = "$suggest *návrh*";
+    public string HelpMessage { get; } = "$suggest *návrh*";
     public string[] Aliases { get; } = { "návrh" };
     public Permission Permission { get; } = Permission.Regular;
     public TimeSpan Cooldown { get; } = TimeSpan.FromSeconds(1);

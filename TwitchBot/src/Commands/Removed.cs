@@ -15,7 +15,7 @@ namespace TwitchBot.src.Commands
   {
     public string Name { get; } = nameof(Removed);
     public string AboutCommand { get; } = "Vypíše naposledy odebrané emoty na tomto kanále.";
-    public string Help { get; } = "$removed";
+    public string HelpMessage { get; } = "$removed";
     public string[] Aliases { get; } = { "odstraněné" };
     public Permission Permission { get; } = Permission.Regular;
     public TimeSpan Cooldown { get; } = TimeSpan.FromSeconds(10);

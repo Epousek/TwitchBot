@@ -14,7 +14,7 @@ namespace TwitchBot.src.Commands
   {
     public string Name { get; } = nameof(Info);
     public string AboutCommand { get; } = "Vypíše informace o právě běžící instanci bota.";
-    public string Help { get; } = "$ping";
+    public string HelpMessage { get; } = "$ping";
     public string[] Aliases { get; } = Array.Empty<string>();
     public Permission Permission { get; } = Permission.Regular;
     public TimeSpan Cooldown { get; } = TimeSpan.FromSeconds(10);
