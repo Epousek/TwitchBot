@@ -26,15 +26,9 @@ namespace TwitchBot.src.Commands
 
     public async Task UseCommandAsync(ChatMessageModel message)
     {
-      if (DateTime.Now - LastUsed < Cooldown)
-        return;
-
       message.Message = message.Message[message.Message.IndexOf(' ')..];
       await DatabaseConnections.WriteSuggestion(message);
       Bot.WriteMessage($"@{message.Username} díky za návrh!", message.Channel);
-
-      TimesUsedSinceRestart++;
-      LastUsed = DateTime.Now;
     }
   }
 }

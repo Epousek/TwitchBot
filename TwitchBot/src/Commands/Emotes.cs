@@ -28,9 +28,6 @@ namespace TwitchBot.src.Commands
 
     public async Task UseCommandAsync(ChatMessageModel message)
     {
-      if (DateTime.Now - LastUsed < Cooldown)
-        return;
-
       TimeSpan sinceAddition;
       List<EmoteModel> emotes = await DatabaseConnections.GetLastAddedEmotes(message.Channel);
       StringBuilder builder = new("@");
@@ -57,8 +54,6 @@ namespace TwitchBot.src.Commands
       }
 
       Bot.WriteMessage(builder.ToString(), message.Channel);
-      TimesUsedSinceRestart++;
-      LastUsed = DateTime.Now;
     }
   }
 }
