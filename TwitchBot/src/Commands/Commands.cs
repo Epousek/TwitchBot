@@ -30,7 +30,7 @@ namespace TwitchBot.src.Commands
         .Append(" seznam všech příkazů: ");
       foreach (var command in Bot.cg.commandInstances)
       {
-        sb.Append(command.Key)
+        sb.Append(command.Key.ToLower())
           .Append(", ");
       }
       sb.Remove(sb.Length - 2, 2)
