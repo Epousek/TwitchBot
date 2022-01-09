@@ -76,8 +76,8 @@ namespace TwitchBot.src
         TimeStamp = DateTime.Now
       };
 
-      if (message.Message.Contains(" 󠀀 "))
-        message.Message = message.Message.Replace(" 󠀀 ", "");
+      if (message.Message.Contains("󠀀"))
+        message.Message = message.Message.Replace("󠀀", "");
 
       Log.Debug("{channel} - {name}: {message}", message.Channel, message.Username, message.Message);
       await DatabaseConnections.WriteMessage(message).ConfigureAwait(false);
