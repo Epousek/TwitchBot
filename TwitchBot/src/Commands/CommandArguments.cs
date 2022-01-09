@@ -30,18 +30,17 @@ namespace TwitchBot.src.Commands
       return new List<string>() { message };
     }
 
-    public List<string> GetTwoArguments()
+    public List<string> GetXArguments(int argCount)
     {
-      List<string> args = new List<string>(Regex.Split(message, "(?= )"));
+      var args = new List<string>(Regex.Split(message, "(?= )"));
       int count = args.Count;
-      if (count < 2)
+      if (count < argCount)
         return new List<string>();
-      for (int i = 2; i < count; i++)
+      for (int i = argCount; i < count; i++)
       {
-        args[1] += args[2];
-        args.RemoveAt(2);
+        args[argCount - 1] += args[argCount];
+        args.RemoveAt(argCount);
       }
-
       return args;
     }
   }
