@@ -12,7 +12,7 @@ namespace TwitchBot.src.Commands
   {
     public string Name { get; } = nameof(Commands);
     public string AboutCommand { get; } = "Vypíše seznam všech příkazů";
-    public string Help { get; } = "prostě napiš ten příkaz lol";
+    public string HelpMessage { get; } = "$commands";
     public string[] Aliases { get; } = { "příkazy" };
     public Permission Permission { get; } = Permission.Regular;
     public TimeSpan Cooldown { get; } = TimeSpan.FromSeconds(20);

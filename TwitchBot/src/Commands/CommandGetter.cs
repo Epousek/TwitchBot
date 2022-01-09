@@ -21,20 +21,26 @@ namespace TwitchBot.src.Commands
       commandInstances.Add("Info", new Info());
       commandInstances.Add("Commands", new Commands());
       commandInstances.Add("About", new About());
+      commandInstances.Add("Help", new Help());
     }
 
     public async Task CheckIfCommandAsync(ChatMessageModel message)
     {
       message.Message = message.Message[1..];
 
-      KeyValuePair<string, ICommand> command;
-      IEnumerable<KeyValuePair<string, ICommand>> commands = commandInstances.Where(c => message.Message.StartsWith(c.Value.Name, StringComparison.OrdinalIgnoreCase));
+      ICommand command;
+      IEnumerable<KeyValuePair<string, ICommand>> commands = commandInstances.Where(c => message.Message.StartsWith(c.Key, StringComparison.OrdinalIgnoreCase));
 
       if (commands?.Any() == true)
       {
-        command = commands.First();
-        await command.Value.UseCommandAsync(message);
-        BotInfo.CommandsUsedSinceStart++;
+        command = commands.First().Value;
+        if (!IsOnCooldown(command))
+        {
+          await command.UseCommandAsync(message);
+          command.LastUsed = DateTime.Now;
+          command.TimesUsedSinceRestart++;
+          BotInfo.CommandsUsedSinceStart++;
+        }
       }
       else
       {
@@ -53,9 +59,14 @@ namespace TwitchBot.src.Commands
 
         if (commands?.Any() == true)
         {
-          command = commands.First();
-          await command.Value.UseCommandAsync(message);
-          BotInfo.CommandsUsedSinceStart++;
+          command = commands.First().Value;
+          if (!IsOnCooldown(command))
+          {
+            await command.UseCommandAsync(message);
+            command.LastUsed = DateTime.Now;
+            command.TimesUsedSinceRestart++;
+            BotInfo.CommandsUsedSinceStart++;
+          }
         }
         else
         {
@@ -63,5 +74,8 @@ namespace TwitchBot.src.Commands
         }
       }
     }
+
+    private static bool IsOnCooldown(ICommand command)
+      => (DateTime.Now - command.LastUsed).TotalSeconds < command.Cooldown.TotalSeconds;
   }
 }

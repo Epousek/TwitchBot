@@ -25,6 +25,7 @@ namespace TwitchBot.src
       else
       {
         Log.Fatal("Config file not found in {path}!", path);
+        throw new FileNotFoundException();
       }
     }
 

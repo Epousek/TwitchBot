@@ -15,7 +15,7 @@ namespace TwitchBot.src.Commands
   {
     public string Name { get; } = nameof(Emotes);
     public string AboutCommand { get; } = "Vypíše naposledy přidané emoty";
-    public string Help { get; } = "$emotes";
+    public string HelpMessage { get; } = "$emotes";
     public string[] Aliases { get; } = { "emotikony", "added" };
     public Permission Permission { get; } = Permission.Regular;
     public TimeSpan Cooldown { get; } = TimeSpan.FromSeconds(10);
@@ -28,9 +28,6 @@ namespace TwitchBot.src.Commands
 
     public async Task UseCommandAsync(ChatMessageModel message)
     {
-      if (DateTime.Now - LastUsed < Cooldown)
-        return;
-
       TimeSpan sinceAddition;
       List<EmoteModel> emotes = await DatabaseConnections.GetLastAddedEmotes(message.Channel);
       StringBuilder builder = new("@");
@@ -57,8 +54,6 @@ namespace TwitchBot.src.Commands
       }
 
       Bot.WriteMessage(builder.ToString(), message.Channel);
-      TimesUsedSinceRestart++;
-      LastUsed = DateTime.Now;
     }
   }
 }
