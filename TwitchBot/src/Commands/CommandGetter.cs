@@ -21,6 +21,7 @@ namespace TwitchBot.src.Commands
       commandInstances.Add("Info", new Info());
       commandInstances.Add("Commands", new Commands());
       commandInstances.Add("About", new About());
+      commandInstances.Add("test", new TestCommandWithArgument());
     }
 
     public async Task CheckIfCommandAsync(ChatMessageModel message)
@@ -28,7 +29,7 @@ namespace TwitchBot.src.Commands
       message.Message = message.Message[1..];
 
       KeyValuePair<string, ICommand> command;
-      IEnumerable<KeyValuePair<string, ICommand>> commands = commandInstances.Where(c => message.Message.StartsWith(c.Value.Name, StringComparison.OrdinalIgnoreCase));
+      IEnumerable<KeyValuePair<string, ICommand>> commands = commandInstances.Where(c => message.Message.StartsWith(c.Key, StringComparison.OrdinalIgnoreCase));
 
       if (commands?.Any() == true)
       {
