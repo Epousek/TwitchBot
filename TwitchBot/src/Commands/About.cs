@@ -11,9 +11,9 @@ namespace TwitchBot.src.Commands
   class About : ICommand
   {
     public string Name { get; } = nameof(Commands);
-    public string AboutCommand { get; } = "Vypíše seznam všech příkazů";
-    public string HelpMessage { get; } = "prostě napiš ten příkaz lol";
-    public string[] Aliases { get; } = { "příkazy" };
+    public string AboutCommand { get; } = "Napíše základní informace o botovi";
+    public string HelpMessage { get; } = "$about";
+    public string[] Aliases { get; } = Array.Empty<string>();
     public Permission Permission { get; } = Permission.Regular;
     public TimeSpan Cooldown { get; } = TimeSpan.FromSeconds(20);
     public DateTime LastUsed { get; set; }
@@ -27,7 +27,7 @@ namespace TwitchBot.src.Commands
     {
       var sb = new StringBuilder("@");
       sb.Append(message.Username)
-        .Append(" Tento bot byl vytvořený původně jakožto maturitní práce. Pro seznam příkazů napiš $commands. Pro pomoc s jednotlivým příkazem napiš $help a název příkazu (TBD).");
+        .Append(" Tento bot byl vytvořený původně jakožto maturitní práce. Pro seznam příkazů napiš $commands. Pro pomoc s jednotlivým příkazem napiš $help a název příkazu.");
       Bot.WriteMessage(sb.ToString(), message.Channel);
     }
   }
