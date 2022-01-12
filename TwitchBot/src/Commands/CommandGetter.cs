@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TwitchBot.src.Models;
+using TwitchBot.src.Interfaces;
 
 namespace TwitchBot.src.Commands
 {
@@ -46,11 +47,11 @@ namespace TwitchBot.src.Commands
       {
         commands = commandInstances.Where(c =>
         {
-          if(c.Value.Aliases.Length > 0)
+          if (c.Value.Aliases.Length > 0)
           {
             foreach (string alias in c.Value.Aliases)
             {
-              if(message.Message.StartsWith(alias, StringComparison.OrdinalIgnoreCase))
+              if (message.Message.StartsWith(alias, StringComparison.OrdinalIgnoreCase))
                 return true;
             }
           }

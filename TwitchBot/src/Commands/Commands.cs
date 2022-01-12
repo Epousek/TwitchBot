@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TwitchBot.src.Enums;
 using TwitchBot.src.Models;
+using TwitchBot.src.Interfaces;
 
 namespace TwitchBot.src.Commands
 {

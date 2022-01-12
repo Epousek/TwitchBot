@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TwitchBot.src.Enums;
 using TwitchBot.src.Models;
 using TwitchBot.src.Connections;
+using TwitchBot.src.Interfaces;
 using Humanizer;
 
 namespace TwitchBot.src.Commands
