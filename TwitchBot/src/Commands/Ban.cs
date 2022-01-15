@@ -30,8 +30,9 @@ namespace TwitchBot.src.Commands
     {
       var comArgs = new CommandArguments(message);
       var args = comArgs.GetOneArgument();
+      Permission? perms = await DatabaseConnections.GetPermission(message.Channel, args[0]).ConfigureAwait(false);
 
-      if (await DatabaseConnections.GetPermission(message.Channel, args[0]).ConfigureAwait(false) != Permission.Regular)
+      if (perms != null && perms != Permission.Regular)
       {
         Bot.WriteMessage("@" + message.Username + " Nemůžeš zabanovat admina/ownera. :/", message.Channel);
         return;
