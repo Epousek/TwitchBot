@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TwitchBot.src.Models;
 using TwitchBot.src.Interfaces;
+using TwitchBot.src.Connections;
 
 namespace TwitchBot.src.Commands
 {
@@ -35,13 +36,7 @@ namespace TwitchBot.src.Commands
       if (commands?.Any() == true)
       {
         command = commands.First().Value;
-        if (!IsOnCooldown(command))
-        {
-          await command.UseCommandAsync(message);
-          command.LastUsed = DateTime.Now;
-          command.TimesUsedSinceRestart++;
-          BotInfo.CommandsUsedSinceStart++;
-        }
+        await TryToUseCommand(command, message).ConfigureAwait(false);
       }
       else
       {
@@ -61,17 +56,47 @@ namespace TwitchBot.src.Commands
         if (commands?.Any() == true)
         {
           command = commands.First().Value;
-          if (!IsOnCooldown(command))
-          {
-            await command.UseCommandAsync(message);
-            command.LastUsed = DateTime.Now;
-            command.TimesUsedSinceRestart++;
-            BotInfo.CommandsUsedSinceStart++;
-          }
+          await TryToUseCommand(command, message).ConfigureAwait(false);
         }
         else
         {
           Log.Debug("Není to command!");
+        }
+      }
+    }
+
+    private async Task TryToUseCommand(ICommand command, ChatMessageModel message)
+    {
+      if (!IsOnCooldown(command))
+      {
+        if (await UsableBan(command, message))
+        {
+          await command.UseCommandAsync(message).ConfigureAwait(false);
+          command.LastUsed = DateTime.Now;
+          command.TimesUsedSinceRestart++;
+          BotInfo.CommandsUsedSinceStart++;
+        }
+        return;
+      }
+    }
+
+    private async Task<bool> UsableBan(ICommand command, ChatMessageModel message)
+    {
+      if (command.UsableByBanned) { return true; }
+      else
+      {
+        if (!await DatabaseConnections.IsInUsers(message.Channel, message.Username))
+        {
+          return true;
+        }
+        else if (!await DatabaseConnections.IsBanned(message.Channel, message.Username))
+        {
+          return true;
+        }
+        else
+        {
+          Bot.WriteMessage($"@{message.Username} Bohužel máš zakázáno používat příkazy :/ Pokud si myslíš, žes byl zabanovanej neprávem/omylem, napiš whisp @epousek", message.Channel);
+          return false;
         }
       }
     }
