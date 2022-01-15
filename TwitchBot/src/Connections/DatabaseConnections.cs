@@ -112,7 +112,11 @@ namespace TwitchBot.src.Connections
 
           try
           {
-            return Convert.ToBoolean(await com.ExecuteScalarAsync().ConfigureAwait(false));
+            var result = await com.ExecuteScalarAsync().ConfigureAwait(false);
+            if (result != null)
+              return Convert.ToBoolean(result);
+            else
+              return false;
           }
           catch (Exception e)
           {
