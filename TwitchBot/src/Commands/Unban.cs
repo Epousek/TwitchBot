@@ -14,7 +14,7 @@ namespace TwitchBot.src.Commands
   {
     public string Name { get; } = nameof(Ban);
     public string AboutCommand { get; } = "Odbanuje daného uživatele.";
-    public string HelpMessage { get; } = "$ban *username*";
+    public string HelpMessage { get; } = "$unban *username*";
     public string[] Aliases { get; } = Array.Empty<string>();
     public Permission Permission { get; } = Permission.Admin;
     public TimeSpan Cooldown { get; } = TimeSpan.FromSeconds(0);
