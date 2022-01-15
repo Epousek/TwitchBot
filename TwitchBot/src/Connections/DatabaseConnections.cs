@@ -146,7 +146,7 @@ namespace TwitchBot.src.Connections
           catch (Exception e)
           {
             Log.Error("sp_GetPermission exception: {ex}", e);
-            return null;
+            return Permission.Regular;
           }
         }
       }
