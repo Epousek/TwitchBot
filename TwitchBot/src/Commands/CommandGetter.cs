@@ -24,6 +24,7 @@ namespace TwitchBot.src.Commands
       commandInstances.Add("Commands", new Commands());
       commandInstances.Add("About", new About());
       commandInstances.Add("Help", new Help());
+      commandInstances.Add("Ban", new Ban());
     }
 
     public async Task CheckIfCommandAsync(ChatMessageModel message)
