@@ -46,7 +46,7 @@ namespace TwitchBot.src.Connections
         using (var com = new MySqlCommand("sp_WriteToUsers", con))
         {
           com.CommandType = CommandType.StoredProcedure;
-          com.Parameters.AddWithValue("tableName", tableName);
+          com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(tableName));
           com.Parameters.AddWithValue("username", username);
 
           try
@@ -73,7 +73,7 @@ namespace TwitchBot.src.Connections
           com.CommandType = CommandType.StoredProcedure;
 
           com.Parameters.AddWithValue("toUpdate", toUpdate);
-          com.Parameters.AddWithValue("tableName", tableName);
+          com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(tableName));
           com.Parameters.AddWithValue("username", username);
           if (toUpdate == "ban")
           {
@@ -94,6 +94,30 @@ namespace TwitchBot.src.Connections
           catch (Exception e)
           {
             Log.Error("sp_UpdateInUsers exception: {ex}", e);
+          }
+        }
+      }
+    }
+
+    public static async Task<bool> IsBanned(string tableName, string username)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_IsBanned", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(tableName));
+          com.Parameters.AddWithValue("username", username);
+
+          try
+          {
+            return Convert.ToBoolean(await com.ExecuteScalarAsync().ConfigureAwait(false));
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_IsBanned exception: {ex}", e);
+            return false;
           }
         }
       }
