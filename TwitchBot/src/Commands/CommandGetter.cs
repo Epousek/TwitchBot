@@ -73,9 +73,9 @@ namespace TwitchBot.src.Commands
     {
       if (command.Permission <= await DatabaseConnections.GetPermission(message.Channel, message.Username).ConfigureAwait(false))
       {
-        if (!IsOnCooldown(command))
+        if (await UsableBan(command, message).ConfigureAwait(false))
         {
-          if (await UsableBan(command, message))
+          if (!IsOnCooldown(command))
           {
             await command.UseCommandAsync(message).ConfigureAwait(false);
             command.LastUsed = DateTime.Now;
