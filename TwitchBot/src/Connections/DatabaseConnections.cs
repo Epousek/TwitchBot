@@ -30,9 +30,34 @@ namespace TwitchBot.src.Connections
           }
           catch (Exception e)
           {
-            Log.Warning("sp_IsInUser exception: {ex}", e.Message);
+            Log.Error("sp_IsInUser exception: {ex}", e);
             return false;
           }
+        }
+      }
+    }
+
+    public static async Task WriteToUsers(string tableName, string username)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_WriteToUsers", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("tableName", tableName);
+          com.Parameters.AddWithValue("username", username);
+
+          try
+          {
+            await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+            Log.Debug("Wrote {user} to {channel}", username, tableName);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_AddToUsers exception: {ex}", e);
+          }
+          con.Close();
         }
       }
     }
