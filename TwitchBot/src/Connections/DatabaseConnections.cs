@@ -2,10 +2,11 @@
 using System.Data;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Data.Common;
 using MySql.Data.MySqlClient;
 using Serilog;
+using TwitchBot.src.Enums;
 using TwitchBot.src.Models;
-using System.Data.Common;
 
 namespace TwitchBot.src.Connections
 {
@@ -58,6 +59,42 @@ namespace TwitchBot.src.Connections
             Log.Error("sp_AddToUsers exception: {ex}", e);
           }
           con.Close();
+        }
+      }
+    }
+
+    public static async Task UpdateUser(string toUpdate, string tableName, string username, bool? isBanned = null, Permission? permission = null)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_UpdateInUsers", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+
+          com.Parameters.AddWithValue("toUpdate", toUpdate);
+          com.Parameters.AddWithValue("tableName", tableName);
+          com.Parameters.AddWithValue("username", username);
+          if (toUpdate == "ban")
+          {
+            com.Parameters.AddWithValue("isBanned", isBanned);
+            com.Parameters.AddWithValue("permission", null);
+
+          }
+          if (toUpdate == "perms")
+          {
+            com.Parameters.AddWithValue("isBanned", null);
+            com.Parameters.AddWithValue("permission", (int)permission + 1);
+          }
+
+          try
+          {
+            await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_UpdateInUsers exception: {ex}", e);
+          }
         }
       }
     }
