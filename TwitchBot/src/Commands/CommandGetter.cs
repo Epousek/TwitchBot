@@ -69,16 +69,23 @@ namespace TwitchBot.src.Commands
 
     private async Task TryToUseCommand(ICommand command, ChatMessageModel message)
     {
-      if (!IsOnCooldown(command))
+      if (command.Permission <= await DatabaseConnections.GetPermission(message.Channel, message.Username).ConfigureAwait(false))
       {
-        if (await UsableBan(command, message))
+        if (!IsOnCooldown(command))
         {
-          await command.UseCommandAsync(message).ConfigureAwait(false);
-          command.LastUsed = DateTime.Now;
-          command.TimesUsedSinceRestart++;
-          BotInfo.CommandsUsedSinceStart++;
+          if (await UsableBan(command, message))
+          {
+            await command.UseCommandAsync(message).ConfigureAwait(false);
+            command.LastUsed = DateTime.Now;
+            command.TimesUsedSinceRestart++;
+            BotInfo.CommandsUsedSinceStart++;
+          }
+          return;
         }
-        return;
+      }
+      else
+      {
+        Bot.WriteMessage("@" + message.Username + " Nemáš dostatečná oprávnění pro tento příkaz.", message.Channel);
       }
     }
 
