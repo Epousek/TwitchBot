@@ -39,12 +39,13 @@ namespace TwitchBot.src.Commands
       if (!await DatabaseConnections.IsInUsers(message.Channel, args[0]).ConfigureAwait(false))
       {
         await DatabaseConnections.WriteToUsers(message.Channel, args[0]).ConfigureAwait(false);
-        await DatabaseConnections.UpdateUser("ban", message.Channel, args[0], true);
+        await DatabaseConnections.UpdateUser("ban", message.Channel, args[0], true).ConfigureAwait(false);
       }
       else
       {
-        await DatabaseConnections.UpdateUser("ban", message.Channel, args[0], true);
+        await DatabaseConnections.UpdateUser("ban", message.Channel, args[0], true).ConfigureAwait(false);
       }
+      Bot.WriteMessage(args[0] + " nyní nemůže používat příkazy na tomto kanále.", message.Channel);
     }
   }
 }
