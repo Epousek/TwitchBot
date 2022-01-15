@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TwitchBot.src.Enums;
 using TwitchBot.src.Models;
+using TwitchBot.src.Interfaces;
 
 namespace TwitchBot.src.Commands
 {
@@ -30,7 +31,7 @@ namespace TwitchBot.src.Commands
         .Append(" seznam všech příkazů: ");
       foreach (var command in Bot.cg.commandInstances)
       {
-        sb.Append(command.Key)
+        sb.Append(command.Key.ToLower())
           .Append(", ");
       }
       sb.Remove(sb.Length - 2, 2)

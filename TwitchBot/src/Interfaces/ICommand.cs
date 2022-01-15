@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TwitchBot.src.Enums;
+using TwitchBot.src.Models;
 
-namespace TwitchBot.src.Models
+namespace TwitchBot.src.Interfaces
 {
   public interface ICommand
   {

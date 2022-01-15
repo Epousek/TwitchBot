@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TwitchBot.src.Enums;
 using TwitchBot.src.Models;
+using TwitchBot.src.Interfaces;
 
 namespace TwitchBot.src.Commands
 {
@@ -28,7 +29,7 @@ namespace TwitchBot.src.Commands
       var ca = new CommandArguments(message);
       var args = ca.GetOneArgument();
       var commandInstances = Bot.cg.commandInstances;
-      if(args.Count > 0)
+      if (args.Count > 0)
         args[0] = Helpers.FirstToUpper(args[0]);
 
       if (args.Count != 1)
@@ -36,7 +37,7 @@ namespace TwitchBot.src.Commands
         Bot.WriteMessage($"@{message.Username} pro pomoc s příkazem napiš $help *příkaz*. Pro seznam příkazů napiš $commands.", message.Channel);
         return;
       }
-      if(args[0].Contains(' '))
+      if (args[0].Contains(' '))
       {
         Bot.WriteMessage($"@{message.Username} napiš jenom název příkazu. :)", message.Channel);
         return;
@@ -59,7 +60,7 @@ namespace TwitchBot.src.Commands
             builder.Append(command.HelpMessage, 0, command.HelpMessage.IndexOf(' '));
           else
             builder.Append(command.HelpMessage);
-          
+
           builder.Append(" můžeš použít jeden z aliasů: ");
 
           foreach (var alias in command.Aliases)

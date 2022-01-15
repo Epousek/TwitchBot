@@ -2,15 +2,156 @@
 using System.Data;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Data.Common;
 using MySql.Data.MySqlClient;
 using Serilog;
+using TwitchBot.src.Enums;
 using TwitchBot.src.Models;
-using System.Data.Common;
 
 namespace TwitchBot.src.Connections
 {
   public static class DatabaseConnections
   {
+    public static async Task<bool> IsInUsers(string tableName, string username)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_IsInUsers", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(tableName));
+          com.Parameters.AddWithValue("username", username);
+
+          try
+          {
+            var result = await com.ExecuteScalarAsync().ConfigureAwait(false);
+            await con.CloseAsync().ConfigureAwait(false);
+            return Convert.ToBoolean(result);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_IsInUser exception: {ex}", e);
+            return false;
+          }
+        }
+      }
+    }
+
+    public static async Task WriteToUsers(string tableName, string username)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_WriteToUsers", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(tableName));
+          com.Parameters.AddWithValue("username", username);
+
+          try
+          {
+            await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+            Log.Debug("Wrote {user} to {channel}", username, tableName);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_AddToUsers exception: {ex}", e);
+          }
+          con.Close();
+        }
+      }
+    }
+
+    public static async Task UpdateUser(string toUpdate, string tableName, string username, bool? isBanned = null, Permission? permission = null)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_UpdateInUsers", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+
+          com.Parameters.AddWithValue("toUpdate", toUpdate);
+          com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(tableName));
+          com.Parameters.AddWithValue("username", username);
+          if (toUpdate == "ban")
+          {
+            com.Parameters.AddWithValue("isBanned", isBanned);
+            com.Parameters.AddWithValue("permission", null);
+
+          }
+          if (toUpdate == "perms")
+          {
+            com.Parameters.AddWithValue("isBanned", null);
+            com.Parameters.AddWithValue("permission", (int)permission + 1);
+          }
+
+          try
+          {
+            await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_UpdateInUsers exception: {ex}", e);
+          }
+        }
+      }
+    }
+
+    public static async Task<bool> IsBanned(string tableName, string username)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_IsBanned", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(tableName));
+          com.Parameters.AddWithValue("username", username);
+
+          try
+          {
+            var result = await com.ExecuteScalarAsync().ConfigureAwait(false);
+            if (result != null)
+              return Convert.ToBoolean(result);
+            else
+              return false;
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_IsBanned exception: {ex}", e);
+            return false;
+          }
+        }
+      }
+    }
+
+    public static async Task<Permission?> GetPermission(string tableName, string username)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_GetPermission", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(tableName));
+          com.Parameters.AddWithValue("username", username);
+
+          try
+          {
+            var result = await com.ExecuteScalarAsync().ConfigureAwait(false);
+            return (Permission)Enum.Parse(typeof(Permission), Convert.ToString(result));
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_GetPermission exception: {ex}", e);
+            return null;
+          }
+        }
+      }
+    }
+
     public static async Task WriteEmotes(string channel, List<EmoteModel> emotes)
     {
       using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
@@ -18,7 +159,7 @@ namespace TwitchBot.src.Connections
         Log.Debug("Trying to write emote(s) to db.");
 
         con.Open();
-        using(MySqlCommand com = new("sp_WriteEmote", con))
+        using (MySqlCommand com = new("sp_WriteEmote", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           foreach (EmoteModel emote in emotes)
@@ -50,13 +191,13 @@ namespace TwitchBot.src.Connections
       using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using(MySqlCommand com = new("sp_UpdateEmote", con))
+        using (MySqlCommand com = new("sp_UpdateEmote", con))
         {
           com.CommandType = CommandType.StoredProcedure;
 
           foreach (EmoteModel emote in emotes)
           {
-            if((emote.IsActive && emote.Added == null) || (!emote.IsActive && emote.Removed == null))
+            if ((emote.IsActive && emote.Added == null) || (!emote.IsActive && emote.Removed == null))
             {
               Log.Error("{emote} is {isActive}, but doesn't have a time stamp. Skipping.", emote.Name, emote.IsActive);
             }
@@ -134,14 +275,14 @@ namespace TwitchBot.src.Connections
         Log.Debug("Getting last added emotes");
 
         con.Open();
-        using(MySqlCommand com = new ("sp_AddedEmotes", con))
+        using (MySqlCommand com = new("sp_AddedEmotes", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("channel", Helpers.FirstToUpper(channel));
 
           using (var reader = await com.ExecuteReaderAsync())
           {
-            List<EmoteModel> emotes = new ();
+            List<EmoteModel> emotes = new();
             if (!reader.HasRows)
             {
               Log.Warning("Couldn't retrieve data from {0}Emotes (it may not have any).", channel);
@@ -179,7 +320,7 @@ namespace TwitchBot.src.Connections
 
           using (var reader = await com.ExecuteReaderAsync())
           {
-            List<EmoteModel> emotes = new ();
+            List<EmoteModel> emotes = new();
             if (!reader.HasRows)
             {
               Log.Warning("Couldn't retrieve data from {0}Emotes (it may not have any).", channel);
@@ -205,12 +346,12 @@ namespace TwitchBot.src.Connections
 
     public static async Task WriteSuggestion(ChatMessageModel msg)
     {
-      using (MySqlConnection con = new (SecretsConfig.Credentials.ConnectionString))
+      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
       {
         Log.Debug("Writing suggestion ({suggestion})", msg);
 
         con.Open();
-        using (MySqlCommand com = new ("sp_WriteSuggestion", con))
+        using (MySqlCommand com = new("sp_WriteSuggestion", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("timeStamp", msg.TimeStamp);
@@ -232,12 +373,12 @@ namespace TwitchBot.src.Connections
 
     public static async Task WriteMessage(ChatMessageModel msg)
     {
-      using (MySqlConnection con = new (SecretsConfig.Credentials.ConnectionString))
+      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
       {
         Log.Debug("Writing \"{message}\" to db.", msg.Message);
 
         con.Open();
-        using (MySqlCommand com = new ("sp_WriteMessage", con))
+        using (MySqlCommand com = new("sp_WriteMessage", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(msg.Channel));
@@ -262,7 +403,7 @@ namespace TwitchBot.src.Connections
 
     public static async Task<List<string>> GetConnectedChannels()
     {
-      using (MySqlConnection con = new (SecretsConfig.Credentials.ConnectionString))
+      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
       {
         Log.Information("Getting channels to connect to.");
 
@@ -298,9 +439,9 @@ namespace TwitchBot.src.Connections
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("searchChannel", Helpers.FirstToUpper(channel));
 
-          using(var reader = await com.ExecuteReaderAsync().ConfigureAwait(false))
+          using (var reader = await com.ExecuteReaderAsync().ConfigureAwait(false))
           {
-            if(reader.Read())
+            if (reader.Read())
             {
               Log.Debug("Got ID for {channel}", channel);
               return (int)reader[0];
