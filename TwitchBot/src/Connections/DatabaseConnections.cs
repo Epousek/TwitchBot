@@ -127,6 +127,31 @@ namespace TwitchBot.src.Connections
       }
     }
 
+    public static async Task<Permission?> GetPermission(string tableName, string username)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_GetPermission", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(tableName));
+          com.Parameters.AddWithValue("username", username);
+
+          try
+          {
+            var result = await com.ExecuteScalarAsync().ConfigureAwait(false);
+            return (Permission)Enum.Parse(typeof(Permission), Convert.ToString(result));
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_GetPermission exception: {ex}", e);
+            return null;
+          }
+        }
+      }
+    }
+
     public static async Task WriteEmotes(string channel, List<EmoteModel> emotes)
     {
       using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
