@@ -12,7 +12,7 @@ namespace TwitchBot.src.Commands
 {
   internal class Admin : ICommand
   {
-    public string Name { get; } = nameof(Ban);
+    public string Name { get; } = nameof(Admin);
     public string AboutCommand { get; } = "Dá danému uživateli oprávnění admina.";
     public string HelpMessage { get; } = "$admin *username*";
     public string[] Aliases { get; } = Array.Empty<string>();

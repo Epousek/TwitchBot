@@ -12,7 +12,7 @@ namespace TwitchBot.src.Commands
 {
   internal class Unban : ICommand
   {
-    public string Name { get; } = nameof(Ban);
+    public string Name { get; } = nameof(Unban);
     public string AboutCommand { get; } = "Odbanuje daného uživatele.";
     public string HelpMessage { get; } = "$unban *username*";
     public string[] Aliases { get; } = Array.Empty<string>();
