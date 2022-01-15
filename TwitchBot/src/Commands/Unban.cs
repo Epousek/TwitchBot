@@ -38,7 +38,7 @@ namespace TwitchBot.src.Commands
         if (await DatabaseConnections.IsInUsers(message.Channel, args[0]).ConfigureAwait(false) && await DatabaseConnections.IsBanned(message.Channel, args[0]).ConfigureAwait(false))
         {
           await DatabaseConnections.UpdateUser("ban", message.Channel, args[0], false).ConfigureAwait(false);
-          Bot.WriteMessage("Uživatel " + args[0] + " byl odbanován na tomto kanále.", message.Channel);
+          Bot.WriteMessage(args[0] + " může opět používat příkazy na tomto kanále.", message.Channel);
         }
         else
         {
