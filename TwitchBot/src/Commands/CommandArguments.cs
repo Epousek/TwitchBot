@@ -44,6 +44,10 @@ namespace TwitchBot.src.Commands
         args[argCount - 1] += args[argCount];
         args.RemoveAt(argCount);
       }
+      for (int i = 0; i < args.Count; i++)
+      {
+        args[i] = args[i].TrimStart();
+      }
       return args;
     }
   }
