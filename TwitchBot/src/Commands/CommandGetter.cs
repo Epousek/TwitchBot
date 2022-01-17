@@ -28,6 +28,7 @@ namespace TwitchBot.src.Commands
       commandInstances.Add("Unban", new Unban());
       commandInstances.Add("Admin", new Admin());
       commandInstances.Add("Unadmin", new Unadmin());
+      commandInstances.Add("Remind", new Remind());
     }
 
     public async Task CheckIfCommandAsync(ChatMessageModel message)
