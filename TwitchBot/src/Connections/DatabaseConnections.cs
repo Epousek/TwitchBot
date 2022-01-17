@@ -12,6 +12,43 @@ namespace TwitchBot.src.Connections
 {
   public static class DatabaseConnections
   {
+    public static async Task AddReminder(Reminder reminder)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_AddReminder", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+
+          com.Parameters.AddWithValue("channelWhere", reminder.Channel);
+          com.Parameters.AddWithValue("fromUsername", reminder.From);
+          com.Parameters.AddWithValue("forUsername", reminder.For);
+          com.Parameters.AddWithValue("isTimed", reminder.IsTimed);
+          com.Parameters.AddWithValue("startTime", reminder.StartTime);
+          if (reminder.IsTimed)
+          {
+            com.Parameters.AddWithValue("endTime", reminder.EndTime);
+            com.Parameters.AddWithValue("lengthInSeconds", ((TimeSpan)reminder.Length).TotalSeconds);
+          }
+          else
+          {
+            com.Parameters.AddWithValue("endTime", null);
+            com.Parameters.AddWithValue("lengthInSeconds", null);
+          }
+
+          try
+          {
+            await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_AddReminder exception: {ex}", e);
+          }
+        }
+      }
+    }
+
     public static async Task<bool> IsInUsers(string tableName, string username)
     {
       using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
