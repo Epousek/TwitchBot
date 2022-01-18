@@ -29,10 +29,50 @@ namespace TwitchBot.src.Commands
     public bool Optoutable { get; } = false;
     public int TimesUsedSinceRestart { get; set; }
     public int? TimesUsedTotal { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public List<Remind> Reminders { get; }
 
     public async Task UseCommandAsync(ChatMessageModel message)
     {
       _ = new RemindInstance().NewReminder(message);
+    }
+
+    public async Task CheckForReminder(ChatMessageModel message)
+    {
+      if (RemindInstance.Reminders.Any(x => string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase)))
+      {
+        var reminder = RemindInstance.Reminders.Where(x => string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase)).ToArray()[0];
+        var builder = new StringBuilder("@");
+        builder.Append(reminder.For);
+        if (string.Equals(reminder.For, reminder.From, StringComparison.OrdinalIgnoreCase))
+        {
+          builder.Append(" upozornění od tebe");
+        }
+        else
+        {
+          builder
+            .Append(" upozornění od ")
+            .Append(reminder.From);
+        }
+        if (string.IsNullOrEmpty(reminder.Message))
+        {
+          builder.Append("! (bez zprávy) ");
+        }
+        else
+        {
+          builder
+            .Append(": ")
+            .Append(reminder.Message)
+            .Append(' ');
+        }
+        builder
+          .Append('(')
+          .Append((DateTime.Now - reminder.StartTime).Humanize(3, new CultureInfo("cs-CS"), minUnit: TimeUnit.Second))
+          .Append(')');
+
+        Bot.WriteMessage(builder.ToString(), reminder.Channel);
+        RemindInstance.Reminders.Remove(reminder);
+        await DatabaseConnections.DeactivateReminder(reminder).ConfigureAwait(false);
+      }
     }
   }
 }

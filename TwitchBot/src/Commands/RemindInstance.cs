@@ -12,8 +12,11 @@ using TwitchBot.src.Models;
 
 namespace TwitchBot.src.Commands
 {
+
   public class RemindInstance
   {
+    public static List<Reminder> Reminders { get; set; } = new List<Reminder>();
+
     public async Task NewReminder(ChatMessageModel message)
     {
       var comArgs = new CommandArguments(message);
@@ -23,8 +26,7 @@ namespace TwitchBot.src.Commands
         if (args[1] == "in")
         {   //TIMED REMIND
           args = comArgs.GetXArguments(4);
-          Reminder reminder;
-          CheckTime(args, out reminder);
+          CheckTime(args, out Reminder reminder);
           if (reminder != null)
           {
             reminder.IsTimed = true;
@@ -37,7 +39,7 @@ namespace TwitchBot.src.Commands
             await DatabaseConnections.AddReminder(reminder).ConfigureAwait(false);
             reminder.ID = await DatabaseConnections.GetReminderID(reminder).ConfigureAwait(false);
 
-            var builder = new StringBuilder('@');
+            var builder = new StringBuilder("@");
             builder
               .Append(reminder.From)
               .Append(' ');
@@ -45,21 +47,55 @@ namespace TwitchBot.src.Commands
             {
               builder
                 .Append("budeš upozorněn za ")
-                .Append(reminder.Length.Value.Humanize(3, new CultureInfo("cs-CS"), TimeUnit.Second));
+                .Append(reminder.Length.Value.Humanize(3, new CultureInfo("cs-CS"), minUnit: TimeUnit.Second));
             }
             else
             {
               builder
                 .Append(reminder.For)
                 .Append(" bude upozorněn za ")
-                .Append(reminder.Length.Value.Humanize(3, new CultureInfo("cs-CS"), TimeUnit.Second));
+                .Append(reminder.Length.Value.Humanize(3, new CultureInfo("cs-CS"), minUnit: TimeUnit.Second));
             }
             Bot.WriteMessage(builder.ToString(), message.Channel);
           }
+          return;
         }
-        {
+      }
+      if (!string.IsNullOrEmpty(args[0]))
+      {
+        args = comArgs.GetXArguments(2);
 
+        var reminder = new Reminder()
+        {
+          IsTimed = false,
+          From = message.Username,
+          For = args[0],
+          StartTime = DateTime.Now,
+          Channel = message.Channel,
+          Message = String.IsNullOrEmpty(args[1]) ? String.Empty : args[1],
+          Length = null
+        };
+        reminder.For = String.Equals(reminder.For, "me") ? reminder.From : reminder.For;
+
+        await DatabaseConnections.AddReminder(reminder).ConfigureAwait(false);
+        reminder.ID = await DatabaseConnections.GetReminderID(reminder).ConfigureAwait(false);
+
+        var builder = new StringBuilder("@");
+        builder
+          .Append(reminder.From)
+          .Append(' ');
+        if (string.Equals(reminder.For, reminder.From, StringComparison.OrdinalIgnoreCase))
+        {
+          builder.Append("Budeš upozorněn až příště napíšeš do chatu.");
         }
+        else
+        {
+          builder
+            .Append(reminder.For)
+            .Append(" bude upozorněn až příště něco napíše do chatu.");
+        }
+        Bot.WriteMessage(builder.ToString(), reminder.Channel);
+        Reminders.Add(reminder);
       }
     }
 
@@ -67,22 +103,20 @@ namespace TwitchBot.src.Commands
     {
       var reminder = (Reminder)state;
       var builder = new StringBuilder("@");
+      builder.Append(reminder.For);
       if (string.Equals(reminder.From, reminder.For, StringComparison.OrdinalIgnoreCase))
       {
-        builder
-          .Append(reminder.For)
-          .Append(" Upozornění od tebe");
+        builder.Append(" Upozornění od tebe");
       }
       else
       {
         builder
-          .Append(reminder.For)
           .Append(" Upozornění od ")
           .Append(reminder.From);
       }
       if (string.IsNullOrEmpty(reminder.Message))
       {
-        builder.Append(" bez zprávy. ");
+        builder.Append("! (bez zprávy) ");
       }
       else
       {
