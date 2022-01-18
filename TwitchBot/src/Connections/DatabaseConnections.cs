@@ -73,6 +73,28 @@ namespace TwitchBot.src.Connections
       }
     }
 
+    public static async Task DeactivateReminder(Reminder reminder)
+    {
+      using(var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_DeactivateReminder", con))
+        {
+          com.CommandType= CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("id", reminder.ID);
+
+          try
+          {
+            await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_DeactivateReminder exception: {ex}", e);
+          }
+        }
+      }
+    }
+
     public static async Task<bool> IsInUsers(string tableName, string username)
     {
       using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
