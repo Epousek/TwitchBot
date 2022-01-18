@@ -50,6 +50,29 @@ namespace TwitchBot.src.Connections
       }
     }
 
+    public static async Task<int> GetReminderID(Reminder reminder)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_GetReminderID", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("username", reminder.From);
+
+          try
+          {
+            return (int)await com.ExecuteScalarAsync().ConfigureAwait(false);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_GetReminderID exception: {ex}", e);
+            return -1;
+          }
+        }
+      }
+    }
+
     public static async Task<bool> IsInUsers(string tableName, string username)
     {
       using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
