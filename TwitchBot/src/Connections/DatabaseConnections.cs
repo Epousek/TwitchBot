@@ -24,6 +24,7 @@ namespace TwitchBot.src.Connections
           com.Parameters.AddWithValue("channelWhere", reminder.Channel);
           com.Parameters.AddWithValue("fromUsername", reminder.From);
           com.Parameters.AddWithValue("forUsername", reminder.For);
+          com.Parameters.AddWithValue("message", reminder.Message);
           com.Parameters.AddWithValue("isTimed", reminder.IsTimed);
           com.Parameters.AddWithValue("startTime", reminder.StartTime);
           if (reminder.IsTimed)
