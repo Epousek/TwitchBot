@@ -38,9 +38,9 @@ namespace TwitchBot.src.Commands
 
     public async Task CheckForReminder(ChatMessageModel message)
     {
-      if (RemindInstance.Reminders.Any(x => string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase)))
+      if (RemindInstance.Reminders.Any(x => string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase) && string.Equals(x.Channel, message.Channel)))
       {
-        var reminder = RemindInstance.Reminders.Where(x => string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase)).ToArray()[0];
+        var reminder = RemindInstance.Reminders.Where(x => string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase) && string.Equals(x.Channel, message.Channel)).ToArray()[0];
         var builder = new StringBuilder("@");
         builder.Append(reminder.For);
         if (string.Equals(reminder.For, reminder.From, StringComparison.OrdinalIgnoreCase))
