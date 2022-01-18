@@ -11,6 +11,7 @@ namespace TwitchBot.src.Models
     public string Channel { get; set; }
     public string From { get; set; }
     public string For { get; set; }
+    public string Message { get; set; }
     public bool IsTimed { get; set; }
     public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; }
