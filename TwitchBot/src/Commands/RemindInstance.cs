@@ -26,7 +26,7 @@ namespace TwitchBot.src.Commands
         if (args[1] == "in")
         {   //TIMED REMIND
           args = comArgs.GetXArguments(4);
-          CheckTime(args, out Reminder reminder);
+          CheckTime(args, message, out Reminder reminder);
           if (reminder != null)
           {
             reminder.IsTimed = true;
@@ -63,8 +63,12 @@ namespace TwitchBot.src.Commands
                 .Append(reminder.Length.Value.Humanize(3, new CultureInfo("cs-CS"), minUnit: TimeUnit.Second));
             }
             Bot.WriteMessage(builder.ToString(), message.Channel);
+            return;
           }
-          return;
+          else
+          {
+            return;
+          }
         }
       }
       if (!string.IsNullOrEmpty(args[0]))
@@ -146,12 +150,13 @@ namespace TwitchBot.src.Commands
     }
 
 
-    private void CheckTime(List<string> args, out Reminder reminder)
+    private void CheckTime(List<string> args, ChatMessageModel message, out Reminder reminder)
     {
       reminder = new Reminder();
       if (string.IsNullOrEmpty(args[2]))
       {     //NO TIME ARG
         reminder = null;
+        Bot.WriteMessage($"@{message.Username} musíš zadat čas, za jak dlouho mám uživatele upozornit (např. 30s; 5m; 1h...)", message.Channel);
       }
       else
       {
@@ -191,7 +196,13 @@ namespace TwitchBot.src.Commands
             else
             {
               reminder = null;
+              Bot.WriteMessage("xd", message.Channel);
             }
+          }
+          else
+          {
+            reminder = null;
+            Bot.WriteMessage($"@{message.Username} musíš napsat čas ve formátu *číslo**jednotka* (např. 30s; 5m; 1h...)", message.Channel);
           }
         }
       }
