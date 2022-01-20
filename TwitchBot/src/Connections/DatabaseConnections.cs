@@ -75,12 +75,12 @@ namespace TwitchBot.src.Connections
 
     public static async Task DeactivateReminder(Reminder reminder)
     {
-      using(var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
         using (var com = new MySqlCommand("sp_DeactivateReminder", con))
         {
-          com.CommandType= CommandType.StoredProcedure;
+          com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("id", reminder.ID);
 
           try
@@ -90,6 +90,30 @@ namespace TwitchBot.src.Connections
           catch (Exception e)
           {
             Log.Error("sp_DeactivateReminder exception: {ex}", e);
+          }
+        }
+      }
+    }
+
+    public static async Task<bool> AlreadyReminding(Reminder reminder)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_AlreadyReminding", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("fromUsername", reminder.From);
+          com.Parameters.AddWithValue("target", reminder.For);
+
+          try
+          {
+            return Convert.ToBoolean(await com.ExecuteScalarAsync().ConfigureAwait(false));
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_AlreadyReminding exception: {ex}", e);
+            return false;
           }
         }
       }

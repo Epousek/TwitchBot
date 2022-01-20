@@ -35,6 +35,12 @@ namespace TwitchBot.src.Commands
             reminder.Channel = message.Channel;
             reminder.Message = String.IsNullOrEmpty(args[3]) ? String.Empty : args[3];
 
+            if (await CheckIfAlreadyReminding(reminder).ConfigureAwait(false))
+            {
+              Bot.WriteMessage($"@{reminder.From} Pro tohoto uživatele už máš upozornění :/", reminder.Channel);
+              return;
+            }
+
             var timer = new Timer(TimerElapsed, reminder, (int)reminder.Length.Value.TotalMilliseconds, Timeout.Infinite);
             await DatabaseConnections.AddReminder(reminder).ConfigureAwait(false);
             reminder.ID = await DatabaseConnections.GetReminderID(reminder).ConfigureAwait(false);
@@ -76,6 +82,12 @@ namespace TwitchBot.src.Commands
           Length = null
         };
         reminder.For = String.Equals(reminder.For, "me") ? reminder.From : reminder.For;
+
+        if (await CheckIfAlreadyReminding(reminder).ConfigureAwait(false))
+        {
+          Bot.WriteMessage($"@{reminder.From} Pro tohoto uživatele už máš upozornění :/", reminder.Channel);
+          return;
+        }
 
         await DatabaseConnections.AddReminder(reminder).ConfigureAwait(false);
         reminder.ID = await DatabaseConnections.GetReminderID(reminder).ConfigureAwait(false);
@@ -133,6 +145,7 @@ namespace TwitchBot.src.Commands
       await DatabaseConnections.DeactivateReminder(reminder).ConfigureAwait(false);
     }
 
+
     private void CheckTime(List<string> args, out Reminder reminder)
     {
       reminder = new Reminder();
@@ -183,5 +196,8 @@ namespace TwitchBot.src.Commands
         }
       }
     }
+
+    private async Task<bool> CheckIfAlreadyReminding(Reminder reminder)
+      => await DatabaseConnections.AlreadyReminding(reminder).ConfigureAwait(false);
   }
 }
