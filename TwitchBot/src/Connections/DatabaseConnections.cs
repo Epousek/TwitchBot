@@ -163,6 +163,48 @@ namespace TwitchBot.src.Connections
       }
     }
 
+    public static async Task<List<Reminder>> GetActiveUntimedReminders()
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_GetActiveUntimedReminders", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+
+          try
+          {
+            var reader = await com.ExecuteReaderAsync().ConfigureAwait(false);
+
+            if (!reader.HasRows)
+              return new List<Reminder>();
+
+            var reminders = new List<Reminder>();
+            while (reader.Read())
+            {
+              reminders.Add(new Reminder()
+              {
+                Channel = reader.GetString(0),
+                From = reader.GetString(1),
+                For = reader.GetString(2),
+                Message = reader.GetString(3),
+                IsTimed = reader.GetBoolean(5),
+                StartTime = reader.GetDateTime(6),
+                ID = reader.GetInt32(9),
+              });
+            }
+
+            return reminders;
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_GetActiveUntimedReminders exception: {ex}", e);
+            return null;
+          }
+        }
+      }
+    }
+
     public static async Task<bool> IsInUsers(string tableName, string username)
     {
       using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
