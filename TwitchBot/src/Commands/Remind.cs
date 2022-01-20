@@ -47,16 +47,48 @@ namespace TwitchBot.src.Commands
           {
             foreach (var reminder in reminders.Where(x => x.EndTime < DateTime.Now))
             {
+              if (DateTime.Now - reminder.EndTime < TimeSpan.FromSeconds(1))
+              {
+                var builder = new StringBuilder("@");
+                builder.Append(reminder.For);
+                if (string.Equals(reminder.For, reminder.From, StringComparison.OrdinalIgnoreCase))
+                {
+                  builder.Append(" upozornění od tebe");
+                }
+                else
+                {
+                  builder
+                    .Append(" upozornění od ")
+                    .Append(reminder.From);
+                }
+                if (string.IsNullOrEmpty(reminder.Message))
+                {
+                  builder.Append("! (bez zprávy) ");
+                }
+                else
+                {
+                  builder
+                    .Append(": ")
+                    .Append(reminder.Message)
+                    .Append(' ');
+                }
+                builder
+                  .Append('(')
+                  .Append((DateTime.Now - reminder.StartTime).Humanize(3, new CultureInfo("cs-CS"), minUnit: TimeUnit.Second))
+                  .Append(')');
+
+                Bot.WriteMessage(builder.ToString(), reminder.Channel);
+              }
               Log.Warning("REMINDER FAILED: ID = {id}, end time = {et}", reminder.ID, reminder.EndTime);
               await DatabaseConnections.DeactivateReminder(reminder).ConfigureAwait(false);
             }
           }
-          Thread.Sleep(TimeSpan.FromMinutes(1));
+          Thread.Sleep(TimeSpan.FromSeconds(1));
         }
       }).ConfigureAwait(false);
     }
 
-    public async Task CheckForReminder(ChatMessageModel message)
+    public static async Task CheckForReminder(ChatMessageModel message)
     {
       if (RemindInstance.Reminders.Any(x => string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase) && string.Equals(x.Channel, message.Channel)))
       {
