@@ -23,7 +23,7 @@ namespace TwitchBot.src.Commands
     public string HelpMessage { get; } = "Časované upozornění: $remind *username/me* in *čas(např. 60m, 120s...)* *zpráva*; upozornění po napsání do chatu: $remind *username* *zpráva*";
     public string[] Aliases { get; } = Array.Empty<string>();
     public Permission Permission { get; } = Permission.Regular;
-    public TimeSpan Cooldown { get; } = TimeSpan.FromSeconds(0);
+    public TimeSpan Cooldown { get; } = TimeSpan.FromSeconds(1);
     public DateTime LastUsed { get; set; }
     public bool OfflineOnly { get; } = false;
     public bool UsableByBanned { get; } = false;
