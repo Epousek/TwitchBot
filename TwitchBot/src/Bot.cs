@@ -83,7 +83,7 @@ namespace TwitchBot.src
       Log.Debug("{channel} - {name}: {message}", message.Channel, message.Username, message.Message);
       await DatabaseConnections.WriteMessage(message).ConfigureAwait(false);
 
-      await ((Remind)cg.commandInstances["Remind"]).CheckForReminder(message).ConfigureAwait(false);
+      await Remind.CheckForReminder(message).ConfigureAwait(false);
 
       if (e.ChatMessage.Message.StartsWith("$"))
         await cg.CheckIfCommandAsync(message).ConfigureAwait(false);
