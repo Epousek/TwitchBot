@@ -12,6 +12,7 @@ using System.Text;
 using Humanizer;
 using System.Globalization;
 using Humanizer.Localisation;
+using Serilog;
 
 namespace TwitchBot.src.Commands
 {
@@ -34,6 +35,20 @@ namespace TwitchBot.src.Commands
     public async Task UseCommandAsync(ChatMessageModel message)
     {
       _ = new RemindInstance().NewReminder(message);
+    }
+
+    public static async Task StartCheckingReminders()
+    {
+      await Task.Run(async () =>
+      {
+        var reminders = await DatabaseConnections.GetActiveTimedReminders();
+        foreach (var reminder in reminders.Where(x => x.EndTime < DateTime.Now))
+        {
+          Log.Warning("REMINDER FAILED: ID = {id}, end time = {et}", reminder.ID, reminder.EndTime);
+          await DatabaseConnections.DeactivateReminder(reminder).ConfigureAwait(false);
+        }
+        Thread.Sleep(TimeSpan.FromMinutes(1));
+      }).ConfigureAwait(false);
     }
 
     public async Task CheckForReminder(ChatMessageModel message)
