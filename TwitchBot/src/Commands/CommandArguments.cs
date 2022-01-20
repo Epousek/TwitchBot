@@ -37,12 +37,20 @@ namespace TwitchBot.src.Commands
     {
       var args = new List<string>(Regex.Split(message, "(?= )"));
       int count = args.Count;
-      if (count < argCount)
-        return new List<string>();
+      //if (count < argCount)
+      //  return new List<string>();
       for (int i = argCount; i < count; i++)
       {
         args[argCount - 1] += args[argCount];
         args.RemoveAt(argCount);
+      }
+      for (int i = 0; i < args.Count; i++)
+      {
+        args[i] = args[i].TrimStart();
+      }
+      while (args.Count < argCount)
+      {
+        args.Add(String.Empty);
       }
       return args;
     }

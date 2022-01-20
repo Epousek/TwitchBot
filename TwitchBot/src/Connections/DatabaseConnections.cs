@@ -12,6 +12,157 @@ namespace TwitchBot.src.Connections
 {
   public static class DatabaseConnections
   {
+    public static async Task AddReminder(Reminder reminder)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_AddReminder", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+
+          com.Parameters.AddWithValue("channelWhere", reminder.Channel);
+          com.Parameters.AddWithValue("fromUsername", reminder.From);
+          com.Parameters.AddWithValue("forUsername", reminder.For);
+          com.Parameters.AddWithValue("message", reminder.Message);
+          com.Parameters.AddWithValue("isTimed", reminder.IsTimed);
+          com.Parameters.AddWithValue("startTime", reminder.StartTime);
+          if (reminder.IsTimed)
+          {
+            com.Parameters.AddWithValue("endTime", reminder.EndTime);
+            com.Parameters.AddWithValue("lengthInSeconds", ((TimeSpan)reminder.Length).TotalSeconds);
+          }
+          else
+          {
+            com.Parameters.AddWithValue("endTime", null);
+            com.Parameters.AddWithValue("lengthInSeconds", null);
+          }
+
+          try
+          {
+            await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_AddReminder exception: {ex}", e);
+          }
+        }
+      }
+    }
+
+    public static async Task<int> GetReminderID(Reminder reminder)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_GetReminderID", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("username", reminder.From);
+
+          try
+          {
+            return (int)await com.ExecuteScalarAsync().ConfigureAwait(false);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_GetReminderID exception: {ex}", e);
+            return -1;
+          }
+        }
+      }
+    }
+
+    public static async Task DeactivateReminder(Reminder reminder)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_DeactivateReminder", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("id", reminder.ID);
+
+          try
+          {
+            await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_DeactivateReminder exception: {ex}", e);
+          }
+        }
+      }
+    }
+
+    public static async Task<bool> AlreadyReminding(Reminder reminder)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_AlreadyReminding", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("fromUsername", reminder.From);
+          com.Parameters.AddWithValue("target", reminder.For);
+
+          try
+          {
+            return Convert.ToBoolean(await com.ExecuteScalarAsync().ConfigureAwait(false));
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_AlreadyReminding exception: {ex}", e);
+            return false;
+          }
+        }
+      }
+    }
+
+    public static async Task<List<Reminder>> GetActiveTimedReminders()
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_GetActiveTimedReminders", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+
+          try
+          {
+            var reader = await com.ExecuteReaderAsync().ConfigureAwait(false);
+
+            if (!reader.HasRows)
+              return new List<Reminder>();
+
+            var reminders = new List<Reminder>();
+            while (reader.Read())
+            {
+              reminders.Add(new Reminder()
+              {
+                Channel = reader.GetString(0),
+                From = reader.GetString(1),
+                For = reader.GetString(2),
+                Message = reader.GetString(3),
+                IsTimed = reader.GetBoolean(5),
+                StartTime = reader.GetDateTime(6),
+                EndTime = reader.GetDateTime(7),
+                Length = TimeSpan.FromSeconds(reader.GetInt32(8)),
+                ID = reader.GetInt32(9),
+              });
+            }
+
+            return reminders;
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_GetActiveTimedReminders exception: {ex}", e);
+            return null;
+          }
+        }
+      }
+    }
+
     public static async Task<bool> IsInUsers(string tableName, string username)
     {
       using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
