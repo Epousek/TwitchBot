@@ -19,6 +19,7 @@ namespace TwitchBot.src.Commands
       commandInstances.Clear();
       commandInstances.Add("Emotes", new Emotes());
       commandInstances.Add("Removed", new Removed());
+      commandInstances.Add("Remind", new Remind());
       commandInstances.Add("Suggest", new Suggest());
       commandInstances.Add("Info", new Info());
       commandInstances.Add("Commands", new Commands());
@@ -28,7 +29,6 @@ namespace TwitchBot.src.Commands
       commandInstances.Add("Unban", new Unban());
       commandInstances.Add("Admin", new Admin());
       commandInstances.Add("Unadmin", new Unadmin());
-      commandInstances.Add("Remind", new Remind());
     }
 
     public async Task CheckIfCommandAsync(ChatMessageModel message)
