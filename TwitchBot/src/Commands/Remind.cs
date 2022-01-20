@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Threading;
 using TwitchBot.src.Connections;
@@ -41,13 +40,19 @@ namespace TwitchBot.src.Commands
     {
       await Task.Run(async () =>
       {
-        var reminders = await DatabaseConnections.GetActiveTimedReminders();
-        foreach (var reminder in reminders.Where(x => x.EndTime < DateTime.Now))
+        while (true)
         {
-          Log.Warning("REMINDER FAILED: ID = {id}, end time = {et}", reminder.ID, reminder.EndTime);
-          await DatabaseConnections.DeactivateReminder(reminder).ConfigureAwait(false);
+          var reminders = await DatabaseConnections.GetActiveTimedReminders();
+          if (reminders != null)
+          {
+            foreach (var reminder in reminders.Where(x => x.EndTime < DateTime.Now))
+            {
+              Log.Warning("REMINDER FAILED: ID = {id}, end time = {et}", reminder.ID, reminder.EndTime);
+              await DatabaseConnections.DeactivateReminder(reminder).ConfigureAwait(false);
+            }
+          }
+          Thread.Sleep(TimeSpan.FromMinutes(1));
         }
-        Thread.Sleep(TimeSpan.FromMinutes(1));
       }).ConfigureAwait(false);
     }
 
@@ -87,6 +92,48 @@ namespace TwitchBot.src.Commands
         Bot.WriteMessage(builder.ToString(), reminder.Channel);
         RemindInstance.Reminders.Remove(reminder);
         await DatabaseConnections.DeactivateReminder(reminder).ConfigureAwait(false);
+      }
+      else
+      {
+        var reminders = await DatabaseConnections.GetActiveUntimedReminders().ConfigureAwait(false);
+        if (reminders.Any(x => string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase)))
+        {
+          reminders = reminders.Where(x => string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase)).ToList();
+          foreach (var reminder in reminders)
+          {
+            var builder = new StringBuilder("@");
+            builder.Append(reminder.For);
+            if (string.Equals(reminder.For, reminder.From, StringComparison.OrdinalIgnoreCase))
+            {
+              builder.Append(" upozornění od tebe");
+            }
+            else
+            {
+              builder
+                .Append(" upozornění od ")
+                .Append(reminder.From);
+            }
+            if (string.IsNullOrEmpty(reminder.Message))
+            {
+              builder.Append("! (bez zprávy) ");
+            }
+            else
+            {
+              builder
+                .Append(": ")
+                .Append(reminder.Message)
+                .Append(' ');
+            }
+            builder
+              .Append('(')
+              .Append((DateTime.Now - reminder.StartTime).Humanize(3, new CultureInfo("cs-CS"), minUnit: TimeUnit.Second))
+              .Append(')');
+
+            Bot.WriteMessage(builder.ToString(), reminder.Channel);
+            RemindInstance.Reminders.Remove(reminder);
+            await DatabaseConnections.DeactivateReminder(reminder).ConfigureAwait(false);
+          }
+        }
       }
     }
   }
