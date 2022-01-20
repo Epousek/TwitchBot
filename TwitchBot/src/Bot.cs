@@ -53,7 +53,7 @@ namespace TwitchBot.src
     private void Client_OnConnected(object sender, TwitchLib.Client.Events.OnConnectedArgs e)
     {
       Log.Information("{username} connected.", e.BotUsername);
-      if(client.JoinedChannels.Count == 0)
+      if (client.JoinedChannels.Count == 0)
       {
         foreach (string channel in channels)
         {
@@ -69,7 +69,8 @@ namespace TwitchBot.src
 
     private async void Client_OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)
     {
-      ChatMessageModel message = new() {
+      ChatMessageModel message = new()
+      {
         Channel = e.ChatMessage.Channel,
         Username = e.ChatMessage.Username,
         Message = e.ChatMessage.Message,
@@ -82,8 +83,10 @@ namespace TwitchBot.src
       Log.Debug("{channel} - {name}: {message}", message.Channel, message.Username, message.Message);
       await DatabaseConnections.WriteMessage(message).ConfigureAwait(false);
 
+      await ((Remind)cg.commandInstances["Remind"]).CheckForReminder(message).ConfigureAwait(false);
+
       if (e.ChatMessage.Message.StartsWith("$"))
-        await cg.CheckIfCommandAsync(message);
+        await cg.CheckIfCommandAsync(message).ConfigureAwait(false);
     }
 
     private async void Client_OnDisconnected(object sender, TwitchLib.Communication.Events.OnDisconnectedEventArgs e)

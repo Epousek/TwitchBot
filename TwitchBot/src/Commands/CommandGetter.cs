@@ -19,11 +19,12 @@ namespace TwitchBot.src.Commands
       commandInstances.Clear();
       commandInstances.Add("Emotes", new Emotes());
       commandInstances.Add("Removed", new Removed());
+      commandInstances.Add("Remind", new Remind());
       commandInstances.Add("Suggest", new Suggest());
-      commandInstances.Add("Info", new Info());
-      commandInstances.Add("Commands", new Commands());
-      commandInstances.Add("About", new About());
       commandInstances.Add("Help", new Help());
+      commandInstances.Add("Commands", new Commands());
+      commandInstances.Add("Info", new Info());
+      commandInstances.Add("About", new About());
       commandInstances.Add("Ban", new Ban());
       commandInstances.Add("Unban", new Unban());
       commandInstances.Add("Admin", new Admin());

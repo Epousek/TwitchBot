@@ -39,7 +39,7 @@ namespace TwitchBot.src.Commands
         .Append("; verze: ")
         .Append(release.TagName[1..])
         .Append(" (")
-        .Append(release.PublishedAt.Value.DateTime)
+        .Append(release.PublishedAt.Value.DateTime.AddHours(1))
         .Append(')');
 
       Bot.WriteMessage(sb.ToString(), message.Channel);

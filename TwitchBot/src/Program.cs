@@ -8,6 +8,7 @@ using TwitchBot.src.Connections;
 using Serilog;
 using Serilog.Sinks.MariaDB.Extensions;
 using System.Diagnostics;
+using TwitchBot.src.Commands;
 
 namespace TwitchBot.src
 {
@@ -41,9 +42,11 @@ namespace TwitchBot.src
       channelsToConnectTo = await SetChannelsToConnectToAsync().ConfigureAwait(false);
 
       Thread emotesThread = new(async () => await Emotes.UpdateEmotes.StartUpdatingEmotes(channelsToConnectTo).ConfigureAwait(false));
-      Thread authThread = new (async () => await Authentication.StartValidatingTokenAsync().ConfigureAwait(false));
+      Thread authThread = new(async () => await Authentication.StartValidatingTokenAsync().ConfigureAwait(false));
+      Thread remindersThread = new(async () => await Remind.StartCheckingReminders().ConfigureAwait(false));
       emotesThread.Start();
       authThread.Start();
+      remindersThread.Start();
 
       Bot bot = new(channelsToConnectTo);
       Console.ReadLine();
