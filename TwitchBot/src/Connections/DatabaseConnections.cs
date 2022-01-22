@@ -38,6 +38,36 @@ namespace TwitchBot.src.Connections
       }
     }
 
+    public static async Task<bool> CheckOptout(string channel, string username, string command)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_CheckOptout", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+
+          com.Parameters.AddWithValue("channelName", Helpers.FirstToUpper(channel));
+          com.Parameters.AddWithValue("username", username);
+          com.Parameters.AddWithValue("command", command);
+
+          try
+          {
+            var result = await com.ExecuteScalarAsync().ConfigureAwait(false);
+            if (result == null)
+              return false;
+            else
+              return (bool)result;
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_CheckOptout exception: {ex}", e);
+            return false;
+          }
+        }
+      }
+    }
+
     public static async Task AddReminder(Reminder reminder)
     {
       using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
