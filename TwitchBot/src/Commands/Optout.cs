@@ -14,7 +14,7 @@ namespace TwitchBot.src.Commands
   {
     public string Name { get; } = nameof(Optout);
     public string AboutCommand { get; } = "Zakážeš aby na tebe byl používán určitý příkaz. Zatím funguje pro: remind";
-    public string HelpMessage { get; } = "$info";
+    public string HelpMessage { get; } = "$optout *příkaz*";
     public string[] Aliases { get; } = Array.Empty<string>();
     public Permission Permission { get; } = Permission.Regular;
     public TimeSpan Cooldown { get; } = TimeSpan.FromSeconds(5);
