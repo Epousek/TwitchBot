@@ -40,7 +40,7 @@ namespace TwitchBot.src.Commands
         if (!await DatabaseConnections.IsInUsers(message.Channel, message.Username).ConfigureAwait(false))
           await DatabaseConnections.WriteToUsers(message.Channel, message.Username).ConfigureAwait(false);
 
-        await DatabaseConnections.UpdateOptout(message.Channel, message.Username, args[0].ToLower(), false).ConfigureAwait(false);
+        await DatabaseConnections.UpdateOptout(message.Channel, message.Username, args[0].ToLower(), true).ConfigureAwait(false);
         Bot.WriteMessage($"@{message.Username} Už nebudeš dostávat připomínky.", message.Channel);
       }
     }
