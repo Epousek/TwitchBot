@@ -21,6 +21,13 @@ namespace TwitchBot.src.Commands
     {
       var comArgs = new CommandArguments(message);
       var args = comArgs.GetXArguments(3);
+
+      if (args != null && await DatabaseConnections.CheckOptout(message.Channel, args[0], "remind").ConfigureAwait(false))
+      {
+        Bot.WriteMessage($"@{message.Username} tomuto uživateli nelze poslat připomenutí. :/", message.Channel);
+        return;
+      }
+
       if (!string.IsNullOrEmpty(args[1]))
       {
         if (args[1] == "in")
