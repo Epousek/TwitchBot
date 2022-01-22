@@ -92,38 +92,43 @@ namespace TwitchBot.src.Commands
     {
       if (RemindInstance.Reminders.Any(x => string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase) && string.Equals(x.Channel, message.Channel)))
       {
-        var reminder = RemindInstance.Reminders.Where(x => string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase) && string.Equals(x.Channel, message.Channel)).ToArray()[0];
-        var builder = new StringBuilder("@");
-        builder.Append(reminder.For);
-        if (string.Equals(reminder.For, reminder.From, StringComparison.OrdinalIgnoreCase))
+        var reminders = RemindInstance.Reminders.Where(x => string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase) && string.Equals(x.Channel, message.Channel)).ToList();
+        foreach (var reminder in reminders)
         {
-          builder.Append(" upozornění od tebe");
-        }
-        else
-        {
+          var builder = new StringBuilder("@");
+          builder.Append(reminder.For);
+          if (string.Equals(reminder.For, reminder.From, StringComparison.OrdinalIgnoreCase))
+          {
+            builder.Append(" upozornění od tebe");
+          }
+          else
+          {
+            builder
+              .Append(" upozornění od ")
+              .Append(reminder.From);
+          }
+          if (string.IsNullOrEmpty(reminder.Message))
+          {
+            builder.Append("! (bez zprávy) ");
+          }
+          else
+          {
+            builder
+              .Append(": ")
+              .Append(reminder.Message)
+              .Append(' ');
+          }
           builder
-            .Append(" upozornění od ")
-            .Append(reminder.From);
-        }
-        if (string.IsNullOrEmpty(reminder.Message))
-        {
-          builder.Append("! (bez zprávy) ");
-        }
-        else
-        {
-          builder
-            .Append(": ")
-            .Append(reminder.Message)
-            .Append(' ');
-        }
-        builder
-          .Append('(')
-          .Append((DateTime.Now - reminder.StartTime).Humanize(3, new CultureInfo("cs-CS"), minUnit: TimeUnit.Second))
-          .Append(')');
+            .Append('(')
+            .Append((DateTime.Now - reminder.StartTime).Humanize(3, new CultureInfo("cs-CS"), minUnit: TimeUnit.Second))
+            .Append(')');
 
-        Bot.WriteMessage(builder.ToString(), reminder.Channel);
-        RemindInstance.Reminders.Remove(reminder);
-        await DatabaseConnections.DeactivateReminder(reminder).ConfigureAwait(false);
+          Bot.WriteMessage(builder.ToString(), reminder.Channel);
+          RemindInstance.Reminders.Remove(reminder);
+          await DatabaseConnections.DeactivateReminder(reminder).ConfigureAwait(false);
+
+          Thread.Sleep(TimeSpan.FromSeconds(1));
+        }
       }
       else
       {
@@ -164,6 +169,8 @@ namespace TwitchBot.src.Commands
             Bot.WriteMessage(builder.ToString(), reminder.Channel);
             RemindInstance.Reminders.Remove(reminder);
             await DatabaseConnections.DeactivateReminder(reminder).ConfigureAwait(false);
+
+            Thread.Sleep(TimeSpan.FromSeconds(1));
           }
         }
       }
