@@ -26,7 +26,7 @@ namespace TwitchBot.src.Commands
     public DateTime LastUsed { get; set; }
     public bool OfflineOnly { get; } = false;
     public bool UsableByBanned { get; } = false;
-    public bool Optoutable { get; } = false;
+    public bool Optoutable { get; } = true;
     public int TimesUsedSinceRestart { get; set; }
     public int? TimesUsedTotal { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public List<Remind> Reminders { get; }
