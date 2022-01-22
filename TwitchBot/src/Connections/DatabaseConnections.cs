@@ -12,6 +12,32 @@ namespace TwitchBot.src.Connections
 {
   public static class DatabaseConnections
   {
+    public static async Task UpdateOptout(string channel, string username, string command, bool isOptout)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_UpdateOptout", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+
+          com.Parameters.AddWithValue("channelName", Helpers.FirstToUpper(channel));
+          com.Parameters.AddWithValue("username", username);
+          com.Parameters.AddWithValue("command", command);
+          com.Parameters.AddWithValue("isOptout", isOptout);
+
+          try
+          {
+            await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_UpdateOptout exception: {ex}", e);
+          }
+        }
+      }
+    }
+
     public static async Task AddReminder(Reminder reminder)
     {
       using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))

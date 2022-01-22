@@ -29,6 +29,7 @@ namespace TwitchBot.src.Commands
       commandInstances.Add("Unban", new Unban());
       commandInstances.Add("Admin", new Admin());
       commandInstances.Add("Unadmin", new Unadmin());
+      commandInstances.Add("Optout", new Optout());
     }
 
     public async Task CheckIfCommandAsync(ChatMessageModel message)
