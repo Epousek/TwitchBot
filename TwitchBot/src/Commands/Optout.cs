@@ -41,7 +41,11 @@ namespace TwitchBot.src.Commands
           await DatabaseConnections.WriteToUsers(message.Channel, message.Username).ConfigureAwait(false);
 
         await DatabaseConnections.UpdateOptout(message.Channel, message.Username, args[0].ToLower(), true).ConfigureAwait(false);
-        Bot.WriteMessage($"@{message.Username} Už nebudeš dostávat připomínky.", message.Channel);
+        Bot.WriteMessage($"@{message.Username} Úspěšně jsi optoutnul z {args[0]}.", message.Channel);
+      }
+      else
+      {
+        Bot.WriteMessage($"@{message.Username} Tento příkaz neexistuje nebo z něj nejde optoutnout. :/", message.Channel);
       }
     }
   }
