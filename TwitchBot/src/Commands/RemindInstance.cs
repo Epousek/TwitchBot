@@ -52,14 +52,14 @@ namespace TwitchBot.src.Commands
             if (string.Equals(reminder.For, reminder.From, StringComparison.OrdinalIgnoreCase))
             {
               builder
-                .Append("budeš upozorněn za ")
+                .Append("budeš upozorněn(a) za ")
                 .Append(reminder.Length.Value.Humanize(3, new CultureInfo("cs-CS"), minUnit: TimeUnit.Second));
             }
             else
             {
               builder
                 .Append(reminder.For)
-                .Append(" bude upozorněn za ")
+                .Append(" bude upozorněn(a) za ")
                 .Append(reminder.Length.Value.Humanize(3, new CultureInfo("cs-CS"), minUnit: TimeUnit.Second));
             }
             Bot.WriteMessage(builder.ToString(), message.Channel);
@@ -102,13 +102,13 @@ namespace TwitchBot.src.Commands
           .Append(' ');
         if (string.Equals(reminder.For, reminder.From, StringComparison.OrdinalIgnoreCase))
         {
-          builder.Append("Budeš upozorněn až příště napíšeš do chatu.");
+          builder.Append("Budeš upozorněn(a) až příště napíšeš do chatu.");
         }
         else
         {
           builder
             .Append(reminder.For)
-            .Append(" bude upozorněn až příště něco napíše do chatu.");
+            .Append(" bude upozorněn(a) až příště něco napíše do chatu.");
         }
         Bot.WriteMessage(builder.ToString(), reminder.Channel);
         Reminders.Add(reminder);
