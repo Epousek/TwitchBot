@@ -35,7 +35,7 @@ namespace TwitchBot.src.Commands
 
     public async Task CheckIfCommandAsync(ChatMessageModel message)
     {
-      message.Message = message.Message[1..];
+      message.Message = Bot.prefix == "$" ? message.Message[1..] : message.Message[2..];
 
       ICommand command;
       IEnumerable<KeyValuePair<string, ICommand>> commands = commandInstances.Where(c => message.Message.StartsWith(c.Key, StringComparison.OrdinalIgnoreCase));

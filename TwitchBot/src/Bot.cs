@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using TwitchBot.src.Commands;
@@ -17,12 +18,15 @@ namespace TwitchBot.src
   class Bot
   {
     public static CommandGetter cg;
+    public static string prefix;
     private static TwitchClient client;
     private List<string> channels;
     private bool reconnect;
 
     public Bot(List<string> channelsToConnectTo)
     {
+      prefix = Debugger.IsAttached ? "$$" : "$";
+
       cg = new CommandGetter();
       channels = channelsToConnectTo;
 
@@ -85,7 +89,7 @@ namespace TwitchBot.src
 
       await Remind.CheckForReminder(message).ConfigureAwait(false);
 
-      if (e.ChatMessage.Message.StartsWith("$"))
+      if (e.ChatMessage.Message.StartsWith(prefix))
         await cg.CheckIfCommandAsync(message).ConfigureAwait(false);
     }
 
