@@ -37,6 +37,32 @@ namespace TwitchBot.src.Connections
       }
     }
 
+    public static async Task AddAfkUser(AfkModel afk)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_AddAfkUser", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+
+          com.Parameters.AddWithValue("afkChannel", afk.Channel);
+          com.Parameters.AddWithValue("afkUsername", afk.Username);
+          com.Parameters.AddWithValue("afkMessage", afk.Message);
+          com.Parameters.AddWithValue("afkSince", afk.AfkSince);
+
+          try
+          {
+            await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_AddAfkUser exception: {ex}", e);
+          }
+        }
+      }
+    }
+
     public static async Task UpdateOptout(string channel, string username, string command, bool isOptout)
     {
       using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
@@ -229,7 +255,7 @@ namespace TwitchBot.src.Connections
                 StartTime = reader.GetDateTime(6),
                 EndTime = reader.GetDateTime(7),
                 Length = TimeSpan.FromSeconds(reader.GetInt32(8)),
-                ID = reader.GetInt32(9),
+                ID = reader.GetInt32(9)
               });
             }
 
