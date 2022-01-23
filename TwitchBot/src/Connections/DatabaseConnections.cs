@@ -103,7 +103,11 @@ namespace TwitchBot.src.Connections
 
           try
           {
-            return (bool)await com.ExecuteScalarAsync().ConfigureAwait(false);
+            var result = await com.ExecuteScalarAsync().ConfigureAwait(false);
+            if (result != null)
+              return (bool)result;
+            else
+              return false;
 
           }
           catch (Exception e)
