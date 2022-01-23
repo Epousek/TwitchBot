@@ -12,6 +12,150 @@ namespace TwitchBot.src.Connections
 {
   public static class DatabaseConnections
   {
+    public static async Task<bool> IsInAfkUsers(string channel, string username)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_IsInAfkUsers", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("afkChannel", channel);
+          com.Parameters.AddWithValue("afkUsername", username);
+
+          try
+          {
+            var result = await com.ExecuteScalarAsync().ConfigureAwait(false);
+            return (long)result == 1;
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_IsInAfkUsers exception: {ex}", e);
+            return false;
+          }
+        }
+      }
+    }
+
+    public static async Task AddAfkUser(AfkModel afk)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_AddAfkUser", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+
+          com.Parameters.AddWithValue("afkChannel", afk.Channel);
+          com.Parameters.AddWithValue("afkUsername", afk.Username);
+          com.Parameters.AddWithValue("afkMessage", afk.Message);
+          com.Parameters.AddWithValue("afkSince", afk.AfkSince);
+
+          try
+          {
+            await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_AddAfkUser exception: {ex}", e);
+          }
+        }
+      }
+    }
+
+    public static async Task UpdateAfkUser(AfkModel afk)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_UpdateAfkUser", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+
+          com.Parameters.AddWithValue("afkChannel", afk.Channel);
+          com.Parameters.AddWithValue("afkUsername", afk.Username);
+          com.Parameters.AddWithValue("afkMessage", afk.Message);
+          com.Parameters.AddWithValue("afkSince", afk.AfkSince);
+          com.Parameters.AddWithValue("isAfk", afk.IsAfk);
+
+          try
+          {
+            await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_UpdateAfkUser exception: {ex}", e);
+          }
+        }
+      }
+    }
+
+    public static async Task<bool> IsAfk(string channel, string username)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_IsAfk", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("afkChannel", channel);
+          com.Parameters.AddWithValue("afkUsername", username);
+
+          try
+          {
+            return (bool)await com.ExecuteScalarAsync().ConfigureAwait(false);
+
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_IsAfk exception: {ex}", e);
+            return false;
+          }
+        }
+      }
+    }
+
+    public static async Task<AfkModel> GetAfkUser(string channel, string username)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_GetAfkUser", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("afkChannel", channel);
+          com.Parameters.AddWithValue("afkUsername", username);
+
+          try
+          {
+            var reader = await com.ExecuteReaderAsync().ConfigureAwait(false);
+            if (reader.HasRows)
+            {
+              reader.Read();
+
+              return new AfkModel()
+              {
+                Channel = reader.GetString(0),
+                Username = reader.GetString(1),
+                Message = reader.GetString(2),
+                AfkSince = reader.GetDateTime(3),
+                IsAfk = reader.GetBoolean(4)
+              };
+            }
+            else
+            {
+              return null;
+            }
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_GetAfkUser exception: {ex}", e);
+            return null;
+          }
+        }
+      }
+    }
+
     public static async Task UpdateOptout(string channel, string username, string command, bool isOptout)
     {
       using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
@@ -204,7 +348,7 @@ namespace TwitchBot.src.Connections
                 StartTime = reader.GetDateTime(6),
                 EndTime = reader.GetDateTime(7),
                 Length = TimeSpan.FromSeconds(reader.GetInt32(8)),
-                ID = reader.GetInt32(9),
+                ID = reader.GetInt32(9)
               });
             }
 

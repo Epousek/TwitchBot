@@ -40,7 +40,7 @@ namespace TwitchBot.src.Commands
           await DatabaseConnections.WriteToUsers(message.Channel, message.Username).ConfigureAwait(false);
 
         await DatabaseConnections.UpdateOptout(message.Channel, message.Username, args[0].ToLower(), false).ConfigureAwait(false);
-        Bot.WriteMessage($"@{message.Username} Úspěšně jsi zrušil optout pro {args[0]}.", message.Channel);
+        Bot.WriteMessage($"@{message.Username} Úspěšně jsi zrušil optout pro {args[0]}. (na tomto kanále)", message.Channel);
       }
       else
       {
