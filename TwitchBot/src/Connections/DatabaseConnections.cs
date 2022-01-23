@@ -115,6 +115,47 @@ namespace TwitchBot.src.Connections
       }
     }
 
+    public static async Task<AfkModel> GetAfkUser(string channel, string username)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_GetAfkUser", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("afkChannel", channel);
+          com.Parameters.AddWithValue("afkUsername", username);
+
+          try
+          {
+            var reader = await com.ExecuteReaderAsync().ConfigureAwait(false);
+            if (reader.HasRows)
+            {
+              reader.Read();
+
+              return new AfkModel()
+              {
+                Channel = reader.GetString(0),
+                Username = reader.GetString(1),
+                Message = reader.GetString(2),
+                AfkSince = reader.GetDateTime(3),
+                IsAfk = reader.GetBoolean(4)
+              };
+            }
+            else
+            {
+              return null;
+            }
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_GetAfkUser exception: {ex}", e);
+            return null;
+          }
+        }
+      }
+    }
+
     public static async Task UpdateOptout(string channel, string username, string command, bool isOptout)
     {
       using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
