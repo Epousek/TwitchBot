@@ -88,6 +88,7 @@ namespace TwitchBot.src
       await DatabaseConnections.WriteMessage(message).ConfigureAwait(false);
 
       await Remind.CheckForReminder(message).ConfigureAwait(false);
+      await Afk.CheckAfk(message).ConfigureAwait(false);
 
       if (e.ChatMessage.Message.StartsWith(prefix))
         await cg.CheckIfCommandAsync(message).ConfigureAwait(false);
