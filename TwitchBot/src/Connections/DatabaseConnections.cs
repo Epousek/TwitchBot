@@ -90,6 +90,31 @@ namespace TwitchBot.src.Connections
       }
     }
 
+    public static async Task<bool> IsAfk(string channel, string username)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_IsAfk", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("afkChannel", channel);
+          com.Parameters.AddWithValue("afkUsername", username);
+
+          try
+          {
+            return (bool)await com.ExecuteScalarAsync().ConfigureAwait(false);
+
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_IsAfk exception: {ex}", e);
+            return false;
+          }
+        }
+      }
+    }
+
     public static async Task UpdateOptout(string channel, string username, string command, bool isOptout)
     {
       using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
