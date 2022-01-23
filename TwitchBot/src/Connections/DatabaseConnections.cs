@@ -12,6 +12,31 @@ namespace TwitchBot.src.Connections
 {
   public static class DatabaseConnections
   {
+    public static async Task<bool> IsInAfkUsers(string channel, string username)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_IsInAfkUsers", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("afkChannel", channel);
+          com.Parameters.AddWithValue("afkUsername", username);
+
+          try
+          {
+            var result = await com.ExecuteScalarAsync().ConfigureAwait(false);
+            return (long)result == 1;
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_IsInAfkUsers exception: {ex}", e);
+            return false;
+          }
+        }
+      }
+    }
+
     public static async Task UpdateOptout(string channel, string username, string command, bool isOptout)
     {
       using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
