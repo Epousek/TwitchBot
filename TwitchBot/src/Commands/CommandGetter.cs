@@ -20,6 +20,7 @@ namespace TwitchBot.src.Commands
       commandInstances.Add("Emotes", new Emotes());
       commandInstances.Add("Removed", new Removed());
       commandInstances.Add("Remind", new Remind());
+      commandInstances.Add("Afk", new Afk());
       commandInstances.Add("Suggest", new Suggest());
       commandInstances.Add("Help", new Help());
       commandInstances.Add("Commands", new Commands());
