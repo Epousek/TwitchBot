@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TwitchBot.src.Connections;
 using TwitchBot.src.Enums;
@@ -30,6 +31,12 @@ namespace TwitchBot.src.Commands
 
     public async Task UseCommandAsync(ChatMessageModel message)
     {
+      if (await DatabaseConnections.IsAfk(message.Channel, message.Username).ConfigureAwait(false))
+      {
+        Bot.WriteMessage($"@{message.Username} už jsi afk.", message.Channel);
+        return;
+      }
+
       var comArgs = new CommandArguments(message);
       var args = comArgs.GetOneArgument();
 
@@ -64,6 +71,9 @@ namespace TwitchBot.src.Commands
 
     public static async Task CheckAfk(ChatMessageModel message)
     {
+      if (message.Message.StartsWith($"{Bot.prefix}afk", StringComparison.OrdinalIgnoreCase))
+        return;
+
       if (await DatabaseConnections.IsAfk(message.Channel, message.Username))
       {
         var afk = await DatabaseConnections.GetAfkUser(message.Channel, message.Username).ConfigureAwait(false);
