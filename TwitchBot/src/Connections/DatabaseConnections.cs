@@ -63,6 +63,33 @@ namespace TwitchBot.src.Connections
       }
     }
 
+    public static async Task UpdateAfkUser(AfkModel afk)
+    {
+      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        using (var com = new MySqlCommand("sp_UpdateAfkUser", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+
+          com.Parameters.AddWithValue("afkChannel", afk.Channel);
+          com.Parameters.AddWithValue("afkUsername", afk.Username);
+          com.Parameters.AddWithValue("afkMessage", afk.Message);
+          com.Parameters.AddWithValue("afkSince", afk.AfkSince);
+          com.Parameters.AddWithValue("isAfk", afk.IsAfk);
+
+          try
+          {
+            await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_UpdateAfkUser exception: {ex}", e);
+          }
+        }
+      }
+    }
+
     public static async Task UpdateOptout(string channel, string username, string command, bool isOptout)
     {
       using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
