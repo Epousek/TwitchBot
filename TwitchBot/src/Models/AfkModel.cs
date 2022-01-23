@@ -12,5 +12,6 @@ namespace TwitchBot.src.Models
     public string Username { get; set; }
     public string Message { get; set; }
     public DateTime AfkSince { get; set; }
+    public bool? IsAfk { get; set; }
   }
 }
