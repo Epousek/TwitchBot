@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace TwitchBot.src.Models
+namespace TwitchBot.Models
 {
   public class Reminder
   {
@@ -16,6 +12,6 @@ namespace TwitchBot.src.Models
     public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; }
     public TimeSpan? Length { get; set; }
-    public int? ID { get; set; }
+    public int? Id { get; set; }
   }
 }

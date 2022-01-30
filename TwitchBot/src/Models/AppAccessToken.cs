@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace TwitchBot.src.Models
+namespace TwitchBot.Models
 {
-  class AppAccessToken
+  internal class AppAccessToken
   {
     [JsonProperty("access_token")]
     public string AccessToken { get; set; }

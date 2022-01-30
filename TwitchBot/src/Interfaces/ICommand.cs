@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using TwitchBot.src.Enums;
-using TwitchBot.src.Models;
+using TwitchBot.Enums;
+using TwitchBot.Models;
 
-namespace TwitchBot.src.Interfaces
+namespace TwitchBot.Interfaces
 {
   public interface ICommand
   {

@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using TwitchBot.src.Connections;
-using TwitchBot.src.Enums;
-using TwitchBot.src.Interfaces;
-using TwitchBot.src.Models;
+using TwitchBot.Connections;
+using TwitchBot.Enums;
+using TwitchBot.Interfaces;
+using TwitchBot.Models;
 
-namespace TwitchBot.src.Commands
+namespace TwitchBot.Commands
 {
   internal class Admin : ICommand
   {

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using RestSharp;
 using Newtonsoft.Json.Linq;
+using RestSharp;
 using Serilog;
-using TwitchBot.src.Models;
+using TwitchBot.Models;
 
-namespace TwitchBot.src
+namespace TwitchBot
 {
-  static class Authentication
+  internal static class Authentication
   {
     public static async Task StartValidatingTokenAsync()
     {
@@ -22,11 +22,11 @@ namespace TwitchBot.src
       }).ConfigureAwait(false);
     }
 
-    private async static Task ValidateAccessToken()
+    private static async Task ValidateAccessToken()
     {
       Log.Information("Trying to validate app access token");
-      RestClient client = new("https://id.twitch.tv/oauth2/validate");
-      RestRequest request = new();
+      var client = new RestClient("https://id.twitch.tv/oauth2/validate");
+      var request = new RestRequest();
 
       request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
       request.AddHeader("Accept", "application/json");
@@ -35,8 +35,8 @@ namespace TwitchBot.src
       var response = await client.ExecuteAsync(request).ConfigureAwait(false);
       if (response.IsSuccessful)
       {
-        JObject responseJson = JObject.Parse(response.Content);
-        TokenValidationResponse validationResponse = responseJson.ToObject<TokenValidationResponse>();
+        var responseJson = JObject.Parse(response.Content);
+        var validationResponse = responseJson.ToObject<TokenValidationResponse>();
         if(validationResponse.ExpiresIn < 5400)
         {
           Log.Information("Token is about to expire, refreshing.");
@@ -57,12 +57,12 @@ namespace TwitchBot.src
     {
       Log.Information("Trying to refresh token.");
 
-      RestClient client = new ("https://id.twitch.tv/oauth2/token");
-      RestRequest request = new () { Method = Method.POST };
+      var client = new RestClient("https://id.twitch.tv/oauth2/token");
+      var request = new RestRequest { Method = Method.POST };
 
       request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
       request.AddHeader("Accept", "application/json");
-      request.AddParameter("client_id", SecretsConfig.Credentials.ClientID);
+      request.AddParameter("client_id", SecretsConfig.Credentials.ClientId);
       request.AddParameter("client_secret", SecretsConfig.Credentials.Secret);
       request.AddParameter("grant_type", "refresh_token");
       request.AddParameter("refresh_token", SecretsConfig.Credentials.RefreshToken);
@@ -72,8 +72,8 @@ namespace TwitchBot.src
       {
         Log.Information("Refreshed tokens.");
 
-        JObject responseJson = JObject.Parse(response.Content);
-        AppAccessToken newToken = responseJson.ToObject<AppAccessToken>();
+        var responseJson = JObject.Parse(response.Content);
+        var newToken = responseJson.ToObject<AppAccessToken>();
         await SecretsConfig.SetToken(newToken).ConfigureAwait(false);
       }
       else

@@ -1,19 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Threading;
-using TwitchBot.src.Connections;
-using TwitchBot.src.Enums;
-using TwitchBot.src.Interfaces;
-using TwitchBot.src.Models;
-using System.Text;
-using Humanizer;
 using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Humanizer;
 using Humanizer.Localisation;
 using Serilog;
+using TwitchBot.Connections;
+using TwitchBot.Enums;
+using TwitchBot.Interfaces;
+using TwitchBot.Models;
 
-namespace TwitchBot.src.Commands
+namespace TwitchBot.Commands
 {
   internal class Remind : ICommand
   {
@@ -29,11 +28,11 @@ namespace TwitchBot.src.Commands
     public bool Optoutable { get; } = true;
     public int TimesUsedSinceRestart { get; set; }
     public int? TimesUsedTotal { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public List<Remind> Reminders { get; }
 
-    public async Task UseCommandAsync(ChatMessageModel message)
+    public Task UseCommandAsync(ChatMessageModel message)
     {
       _ = new RemindInstance().NewReminder(message);
+      return Task.CompletedTask;
     }
 
     public static async Task StartCheckingReminders()
@@ -79,7 +78,7 @@ namespace TwitchBot.src.Commands
 
                 Bot.WriteMessage(builder.ToString(), reminder.Channel);
               }
-              Log.Warning("REMINDER FAILED: ID = {id}, end time = {et}", reminder.ID, reminder.EndTime);
+              Log.Warning("REMINDER FAILED: ID = {id}, end time = {et}", reminder.Id, reminder.EndTime);
               await DatabaseConnections.DeactivateReminder(reminder).ConfigureAwait(false);
             }
           }
@@ -90,7 +89,9 @@ namespace TwitchBot.src.Commands
 
     public static async Task CheckForReminder(ChatMessageModel message)
     {
-      if (RemindInstance.Reminders.Any(x => string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase) && string.Equals(x.Channel, message.Channel)))
+      if (RemindInstance.Reminders.Any(x => 
+            string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(x.Channel, message.Channel)))
       {
         var reminders = RemindInstance.Reminders.Where(x => string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase) && string.Equals(x.Channel, message.Channel)).ToList();
         foreach (var reminder in reminders)

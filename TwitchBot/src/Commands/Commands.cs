@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TwitchBot.src.Enums;
-using TwitchBot.src.Models;
-using TwitchBot.src.Interfaces;
+using TwitchBot.Enums;
+using TwitchBot.Interfaces;
+using TwitchBot.Models;
 
-namespace TwitchBot.src.Commands
+namespace TwitchBot.Commands
 {
-  class Commands : ICommand
+  internal class Commands : ICommand
   {
     public string Name { get; } = nameof(Commands);
     public string AboutCommand { get; } = "Vypíše seznam všech příkazů";
@@ -24,20 +22,21 @@ namespace TwitchBot.src.Commands
     public int TimesUsedSinceRestart { get; set; }
     public int? TimesUsedTotal { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-    public async Task UseCommandAsync(ChatMessageModel message)
+    public Task UseCommandAsync(ChatMessageModel message)
     {
-      StringBuilder sb = new StringBuilder("@");
-      sb.Append(message.Username)
+      var builder = new StringBuilder("@");
+      builder.Append(message.Username)
         .Append(" seznam všech příkazů: ");
-      foreach (var command in Bot.cg.commandInstances)
+      foreach (var command in Bot.Cg.CommandInstances)
       {
-        sb.Append(command.Key.ToLower())
+        builder.Append(command.Key.ToLower())
           .Append(", ");
       }
-      sb.Remove(sb.Length - 2, 2)
+      builder.Remove(builder.Length - 2, 2)
         .Append('.');
 
-      Bot.WriteMessage(sb.ToString(), message.Channel);
+      Bot.WriteMessage(builder.ToString(), message.Channel);
+      return Task.CompletedTask;
     }
   }
 }

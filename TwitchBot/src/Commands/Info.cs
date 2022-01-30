@@ -1,17 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
-using TwitchBot.src.Enums;
-using TwitchBot.src.Models;
-using TwitchBot.src.Connections;
-using TwitchBot.src.Interfaces;
 using Humanizer;
+using Octokit;
+using TwitchBot.Connections;
+using TwitchBot.Interfaces;
+using TwitchBot.Models;
+using Permission = TwitchBot.Enums.Permission;
 
-namespace TwitchBot.src.Commands
+namespace TwitchBot.Commands
 {
-  class Info : ICommand
+  internal class Info : ICommand
   {
     public string Name { get; } = nameof(Info);
     public string AboutCommand { get; } = "Vypíše informace o právě běžící instanci bota.";
@@ -30,10 +30,12 @@ namespace TwitchBot.src.Commands
     {
       var release = await GitHub.GetLastReleaseAsync();
 
-      StringBuilder sb = new StringBuilder("@");
-      sb.Append(message.Username)
+      var builder = new StringBuilder("@");
+      builder.Append(message.Username)
         .Append(" Uptime: ")
-        .Append((DateTime.Now - BotInfo.RunningSince).Humanize(3, culture: new("cs-CS"), minUnit: Humanizer.Localisation.TimeUnit.Second))
+        .Append((DateTime.Now - BotInfo.RunningSince).Humanize(3,
+          new CultureInfo("cs-CS"),
+          minUnit: Humanizer.Localisation.TimeUnit.Second))
         .Append("; počet použitých příkazů od zapnutí: ")
         .Append(BotInfo.CommandsUsedSinceStart)
         .Append("; verze: ")
@@ -42,7 +44,7 @@ namespace TwitchBot.src.Commands
         .Append(release.PublishedAt.Value.DateTime.AddHours(1))
         .Append(')');
 
-      Bot.WriteMessage(sb.ToString(), message.Channel);
+      Bot.WriteMessage(builder.ToString(), message.Channel);
     }
   }
 }

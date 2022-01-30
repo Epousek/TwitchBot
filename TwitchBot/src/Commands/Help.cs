@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TwitchBot.src.Enums;
-using TwitchBot.src.Models;
-using TwitchBot.src.Interfaces;
+using TwitchBot.Enums;
+using TwitchBot.Interfaces;
+using TwitchBot.Models;
 
-namespace TwitchBot.src.Commands
+namespace TwitchBot.Commands
 {
-  class Help : ICommand
+  internal class Help : ICommand
   {
     public string Name { get; } = nameof(Emotes);
     public string AboutCommand { get; } = "Napíše jak použít daný command.";
@@ -24,23 +23,23 @@ namespace TwitchBot.src.Commands
     public int TimesUsedSinceRestart { get; set; }
     public int? TimesUsedTotal { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-    public async Task UseCommandAsync(ChatMessageModel message)
+    public Task UseCommandAsync(ChatMessageModel message)
     {
-      var ca = new CommandArguments(message);
-      var args = ca.GetOneArgument();
-      var commandInstances = Bot.cg.commandInstances;
+      var comArgs = new CommandArguments(message);
+      var args = comArgs.GetOneArgument();
+      var commandInstances = Bot.Cg.CommandInstances;
       if (args.Count > 0)
         args[0] = Helpers.FirstToUpper(args[0]);
 
       if (args.Count != 1)
       {
         Bot.WriteMessage($"@{message.Username} pro pomoc s příkazem napiš $help *příkaz*. Pro seznam příkazů napiš $commands.", message.Channel);
-        return;
+        return Task.CompletedTask;
       }
       if (args[0].Contains(' '))
       {
         Bot.WriteMessage($"@{message.Username} napiš jenom název příkazu. :)", message.Channel);
-        return;
+        return Task.CompletedTask;
       }
       if (commandInstances.ContainsKey(args[0]))
       {
@@ -81,20 +80,16 @@ namespace TwitchBot.src.Commands
       {
         var commands = commandInstances.Where(c =>
         {
-          if (c.Value.Aliases.Length > 0)
-          {
-            foreach (string alias in c.Value.Aliases)
-            {
-              if (string.Equals(args[0], alias, StringComparison.OrdinalIgnoreCase))
-                return true;
-            }
-          }
-          return false;
+          return c.Value.Aliases.Length > 0 &&
+                 c.Value.Aliases.Any(alias => string.Equals(args[0],
+                   alias,
+                   StringComparison.OrdinalIgnoreCase));
         });
 
-        if (commands?.Any() == true)
+        var commandList = commands.ToList();
+        if (commandList.Any())
         {
-          var command = commands.First().Value;
+          var command = commandList.First().Value;
           var builder = new StringBuilder("@");
 
           builder
@@ -128,6 +123,8 @@ namespace TwitchBot.src.Commands
           Bot.WriteMessage($"@{message.Username} tento příkaz buď neexistuje, nebo jsi ho napsal špatně, nebo epousek něco posral", message.Channel);
         }
       }
+
+      return Task.CompletedTask;
     }
   }
 }

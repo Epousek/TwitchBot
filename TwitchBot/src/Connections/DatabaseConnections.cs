@@ -1,23 +1,23 @@
 ﻿using System;
-using System.Data;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Data;
 using System.Data.Common;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using Serilog;
-using TwitchBot.src.Enums;
-using TwitchBot.src.Models;
+using TwitchBot.Enums;
+using TwitchBot.Models;
 
-namespace TwitchBot.src.Connections
+namespace TwitchBot.Connections
 {
   public static class DatabaseConnections
   {
     public static async Task<bool> IsInAfkUsers(string channel, string username)
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_IsInAfkUsers", con))
+        await using (var com = new MySqlCommand("sp_IsInAfkUsers", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("afkChannel", channel);
@@ -39,10 +39,10 @@ namespace TwitchBot.src.Connections
 
     public static async Task AddAfkUser(AfkModel afk)
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_AddAfkUser", con))
+        await using (var com = new MySqlCommand("sp_AddAfkUser", con))
         {
           com.CommandType = CommandType.StoredProcedure;
 
@@ -65,10 +65,10 @@ namespace TwitchBot.src.Connections
 
     public static async Task UpdateAfkUser(AfkModel afk)
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_UpdateAfkUser", con))
+        await using (var com = new MySqlCommand("sp_UpdateAfkUser", con))
         {
           com.CommandType = CommandType.StoredProcedure;
 
@@ -92,10 +92,10 @@ namespace TwitchBot.src.Connections
 
     public static async Task<bool> IsAfk(string channel, string username)
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_IsAfk", con))
+        await using (var com = new MySqlCommand("sp_IsAfk", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("afkChannel", channel);
@@ -106,8 +106,7 @@ namespace TwitchBot.src.Connections
             var result = await com.ExecuteScalarAsync().ConfigureAwait(false);
             if (result != null)
               return (bool)result;
-            else
-              return false;
+            return false;
 
           }
           catch (Exception e)
@@ -121,10 +120,10 @@ namespace TwitchBot.src.Connections
 
     public static async Task<AfkModel> GetAfkUser(string channel, string username)
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_GetAfkUser", con))
+        await using (var com = new MySqlCommand("sp_GetAfkUser", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("afkChannel", channel);
@@ -133,23 +132,19 @@ namespace TwitchBot.src.Connections
           try
           {
             var reader = await com.ExecuteReaderAsync().ConfigureAwait(false);
-            if (reader.HasRows)
-            {
-              reader.Read();
-
-              return new AfkModel()
-              {
-                Channel = reader.GetString(0),
-                Username = reader.GetString(1),
-                Message = reader.GetString(2),
-                AfkSince = reader.GetDateTime(3),
-                IsAfk = reader.GetBoolean(4)
-              };
-            }
-            else
-            {
+            if (!reader.HasRows) 
               return null;
-            }
+
+            await reader.ReadAsync();
+            return new AfkModel
+            {
+              Channel = reader.GetString(0),
+              Username = reader.GetString(1),
+              Message = reader.GetString(2),
+              AfkSince = reader.GetDateTime(3),
+              IsAfk = reader.GetBoolean(4)
+            };
+
           }
           catch (Exception e)
           {
@@ -162,10 +157,10 @@ namespace TwitchBot.src.Connections
 
     public static async Task UpdateOptout(string channel, string username, string command, bool isOptout)
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_UpdateOptout", con))
+        await using (var com = new MySqlCommand("sp_UpdateOptout", con))
         {
           com.CommandType = CommandType.StoredProcedure;
 
@@ -188,10 +183,10 @@ namespace TwitchBot.src.Connections
 
     public static async Task<bool> CheckOptout(string channel, string username, string command)
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_CheckOptout", con))
+        await using (var com = new MySqlCommand("sp_CheckOptout", con))
         {
           com.CommandType = CommandType.StoredProcedure;
 
@@ -204,8 +199,7 @@ namespace TwitchBot.src.Connections
             var result = await com.ExecuteScalarAsync().ConfigureAwait(false);
             if (result == null)
               return false;
-            else
-              return (bool)result;
+            return (bool)result;
           }
           catch (Exception e)
           {
@@ -218,10 +212,10 @@ namespace TwitchBot.src.Connections
 
     public static async Task AddReminder(Reminder reminder)
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_AddReminder", con))
+        await using (var com = new MySqlCommand("sp_AddReminder", con))
         {
           com.CommandType = CommandType.StoredProcedure;
 
@@ -254,12 +248,12 @@ namespace TwitchBot.src.Connections
       }
     }
 
-    public static async Task<int> GetReminderID(Reminder reminder)
+    public static async Task<int> GetReminderId(Reminder reminder)
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_GetReminderID", con))
+        await using (var com = new MySqlCommand("sp_GetReminderID", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("username", reminder.From);
@@ -279,13 +273,13 @@ namespace TwitchBot.src.Connections
 
     public static async Task DeactivateReminder(Reminder reminder)
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_DeactivateReminder", con))
+        await using (var com = new MySqlCommand("sp_DeactivateReminder", con))
         {
           com.CommandType = CommandType.StoredProcedure;
-          com.Parameters.AddWithValue("id", reminder.ID);
+          com.Parameters.AddWithValue("id", reminder.Id);
 
           try
           {
@@ -301,10 +295,10 @@ namespace TwitchBot.src.Connections
 
     public static async Task<bool> AlreadyReminding(Reminder reminder)
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_AlreadyReminding", con))
+        await using (var com = new MySqlCommand("sp_AlreadyReminding", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("fromUsername", reminder.From);
@@ -325,10 +319,10 @@ namespace TwitchBot.src.Connections
 
     public static async Task<List<Reminder>> GetActiveTimedReminders()
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_GetActiveTimedReminders", con))
+        await using (var com = new MySqlCommand("sp_GetActiveTimedReminders", con))
         {
           com.CommandType = CommandType.StoredProcedure;
 
@@ -340,9 +334,9 @@ namespace TwitchBot.src.Connections
               return new List<Reminder>();
 
             var reminders = new List<Reminder>();
-            while (reader.Read())
+            while (await reader.ReadAsync())
             {
-              reminders.Add(new Reminder()
+              reminders.Add(new Reminder
               {
                 Channel = reader.GetString(0),
                 From = reader.GetString(1),
@@ -352,7 +346,7 @@ namespace TwitchBot.src.Connections
                 StartTime = reader.GetDateTime(6),
                 EndTime = reader.GetDateTime(7),
                 Length = TimeSpan.FromSeconds(reader.GetInt32(8)),
-                ID = reader.GetInt32(9)
+                Id = reader.GetInt32(9)
               });
             }
 
@@ -369,10 +363,10 @@ namespace TwitchBot.src.Connections
 
     public static async Task<List<Reminder>> GetActiveUntimedReminders()
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_GetActiveUntimedReminders", con))
+        await using (var com = new MySqlCommand("sp_GetActiveUntimedReminders", con))
         {
           com.CommandType = CommandType.StoredProcedure;
 
@@ -384,9 +378,9 @@ namespace TwitchBot.src.Connections
               return new List<Reminder>();
 
             var reminders = new List<Reminder>();
-            while (reader.Read())
+            while (await reader.ReadAsync())
             {
-              reminders.Add(new Reminder()
+              reminders.Add(new Reminder
               {
                 Channel = reader.GetString(0),
                 From = reader.GetString(1),
@@ -394,7 +388,7 @@ namespace TwitchBot.src.Connections
                 Message = reader.GetString(3),
                 IsTimed = reader.GetBoolean(5),
                 StartTime = reader.GetDateTime(6),
-                ID = reader.GetInt32(9),
+                Id = reader.GetInt32(9)
               });
             }
 
@@ -411,10 +405,10 @@ namespace TwitchBot.src.Connections
 
     public static async Task<bool> IsInUsers(string tableName, string username)
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_IsInUsers", con))
+        await using (var com = new MySqlCommand("sp_IsInUsers", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(tableName));
@@ -437,10 +431,10 @@ namespace TwitchBot.src.Connections
 
     public static async Task WriteToUsers(string tableName, string username)
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_WriteToUsers", con))
+        await using (var com = new MySqlCommand("sp_WriteToUsers", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(tableName));
@@ -455,33 +449,33 @@ namespace TwitchBot.src.Connections
           {
             Log.Error("sp_AddToUsers exception: {ex}", e);
           }
-          con.Close();
+          await con.CloseAsync();
         }
       }
     }
 
     public static async Task UpdateUser(string toUpdate, string tableName, string username, bool? isBanned = null, Permission? permission = null)
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_UpdateInUsers", con))
+        await using (var com = new MySqlCommand("sp_UpdateInUsers", con))
         {
           com.CommandType = CommandType.StoredProcedure;
 
           com.Parameters.AddWithValue("toUpdate", toUpdate);
           com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(tableName));
           com.Parameters.AddWithValue("username", username);
-          if (toUpdate == "ban")
+          switch (toUpdate)
           {
-            com.Parameters.AddWithValue("isBanned", isBanned);
-            com.Parameters.AddWithValue("permission", null);
-
-          }
-          if (toUpdate == "perms")
-          {
-            com.Parameters.AddWithValue("isBanned", null);
-            com.Parameters.AddWithValue("permission", (int)permission + 1);
+            case "ban":
+              com.Parameters.AddWithValue("isBanned", isBanned);
+              com.Parameters.AddWithValue("permission", null);
+              break;
+            case "perms":
+              com.Parameters.AddWithValue("isBanned", null);
+              com.Parameters.AddWithValue("permission", (int)permission + 1);
+              break;
           }
 
           try
@@ -498,10 +492,10 @@ namespace TwitchBot.src.Connections
 
     public static async Task<bool> IsBanned(string tableName, string username)
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_IsBanned", con))
+        await using (var com = new MySqlCommand("sp_IsBanned", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(tableName));
@@ -510,10 +504,8 @@ namespace TwitchBot.src.Connections
           try
           {
             var result = await com.ExecuteScalarAsync().ConfigureAwait(false);
-            if (result != null)
-              return Convert.ToBoolean(result);
-            else
-              return false;
+
+            return result != null && Convert.ToBoolean(result);
           }
           catch (Exception e)
           {
@@ -526,10 +518,10 @@ namespace TwitchBot.src.Connections
 
     public static async Task<Permission?> GetPermission(string tableName, string username)
     {
-      using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (var com = new MySqlCommand("sp_GetPermission", con))
+        await using (var com = new MySqlCommand("sp_GetPermission", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(tableName));
@@ -551,15 +543,15 @@ namespace TwitchBot.src.Connections
 
     public static async Task WriteEmotes(string channel, List<EmoteModel> emotes)
     {
-      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         Log.Debug("Trying to write emote(s) to db.");
 
         con.Open();
-        using (MySqlCommand com = new("sp_WriteEmote", con))
+        await using (var com = new MySqlCommand("sp_WriteEmote", con))
         {
           com.CommandType = CommandType.StoredProcedure;
-          foreach (EmoteModel emote in emotes)
+          foreach (var emote in emotes)
           {
             com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(channel));
             com.Parameters.AddWithValue("emoteName", emote.Name);
@@ -585,14 +577,14 @@ namespace TwitchBot.src.Connections
 
     public static async Task UpdateEmotes(string channel, List<EmoteModel> emotes)
     {
-      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        using (MySqlCommand com = new("sp_UpdateEmote", con))
+        await using (var com = new MySqlCommand("sp_UpdateEmote", con))
         {
           com.CommandType = CommandType.StoredProcedure;
 
-          foreach (EmoteModel emote in emotes)
+          foreach (var emote in emotes)
           {
             if ((emote.IsActive && emote.Added == null) || (!emote.IsActive && emote.Removed == null))
             {
@@ -628,25 +620,25 @@ namespace TwitchBot.src.Connections
 
     public static async Task<List<EmoteModel>> GetEmotes(string channel)
     {
-      List<EmoteModel> emotes = new();
-      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
+      var emotes = new List<EmoteModel>();
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         Log.Debug("Getting emotes from db.");
 
         con.Open();
-        using (MySqlCommand com = new("sp_GetEmotes", con))
+        await using (var com = new MySqlCommand("sp_GetEmotes", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(channel));
 
-          using (var reader = await com.ExecuteReaderAsync().ConfigureAwait(false))
+          await using (var reader = await com.ExecuteReaderAsync().ConfigureAwait(false))
           {
             if (!reader.HasRows)
             {
               Log.Warning("{table} has no rows.", Helpers.FirstToUpper(channel) + "Emotes");
               return new List<EmoteModel>();
             }
-            while (reader.Read())
+            while (await reader.ReadAsync())
             {
               emotes.Add(new EmoteModel
               {
@@ -667,19 +659,19 @@ namespace TwitchBot.src.Connections
 
     public static async Task<List<EmoteModel>> GetLastAddedEmotes(string channel)
     {
-      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         Log.Debug("Getting last added emotes");
 
         con.Open();
-        using (MySqlCommand com = new("sp_AddedEmotes", con))
+        await using (var com = new MySqlCommand("sp_AddedEmotes", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("channel", Helpers.FirstToUpper(channel));
 
-          using (var reader = await com.ExecuteReaderAsync())
+          await using (var reader = await com.ExecuteReaderAsync())
           {
-            List<EmoteModel> emotes = new();
+            var emotes = new List<EmoteModel>();
             if (!reader.HasRows)
             {
               Log.Warning("Couldn't retrieve data from {0}Emotes (it may not have any).", channel);
@@ -705,19 +697,19 @@ namespace TwitchBot.src.Connections
 
     public static async Task<List<EmoteModel>> GetLastRemovedEmotes(string channel)
     {
-      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         Log.Debug("Getting last removed emotes");
 
         con.Open();
-        using (MySqlCommand com = new("sp_RemovedEmotes", con))
+        await using (var com = new MySqlCommand("sp_RemovedEmotes", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("channel", Helpers.FirstToUpper(channel));
 
-          using (var reader = await com.ExecuteReaderAsync())
+          await using (var reader = await com.ExecuteReaderAsync())
           {
-            List<EmoteModel> emotes = new();
+            var emotes = new List<EmoteModel>();
             if (!reader.HasRows)
             {
               Log.Warning("Couldn't retrieve data from {0}Emotes (it may not have any).", channel);
@@ -743,12 +735,12 @@ namespace TwitchBot.src.Connections
 
     public static async Task WriteSuggestion(ChatMessageModel msg)
     {
-      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         Log.Debug("Writing suggestion ({suggestion})", msg);
 
         con.Open();
-        using (MySqlCommand com = new("sp_WriteSuggestion", con))
+        await using (var com = new MySqlCommand("sp_WriteSuggestion", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("timeStamp", msg.TimeStamp);
@@ -763,19 +755,19 @@ namespace TwitchBot.src.Connections
           {
             Log.Error("Couldn't write suggestion to db: {error}: {errorMessage}", e, e.Message);
           }
-          con.Close();
+          await con.CloseAsync();
         }
       }
     }
 
     public static async Task WriteMessage(ChatMessageModel msg)
     {
-      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         Log.Debug("Writing \"{message}\" to db.", msg.Message);
 
         con.Open();
-        using (MySqlCommand com = new("sp_WriteMessage", con))
+        await using (var com = new MySqlCommand("sp_WriteMessage", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(msg.Channel));
@@ -793,30 +785,30 @@ namespace TwitchBot.src.Connections
           {
             Log.Error(e, "Message write unsuccessful: {ex}", e.Message);
           }
-          con.Close();
+          await con.CloseAsync();
         }
       }
     }
 
     public static async Task<List<string>> GetConnectedChannels()
     {
-      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         Log.Information("Getting channels to connect to.");
 
         con.Open();
-        using (MySqlCommand command = new("sp_GetConnectedChannels", con))
+        await using (var command = new MySqlCommand("sp_GetConnectedChannels", con))
         {
           command.CommandType = CommandType.StoredProcedure;
-          using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
+          await using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
           {
-            List<string> channels = new();
-            while (reader.Read())
+            var channels = new List<string>();
+            while (await reader.ReadAsync())
             {
               channels.Add(reader.GetString(0));
             }
 
-            con.Close();
+            await con.CloseAsync();
             Log.Debug("Successfully got channels to connect to.");
             return channels;
           }
@@ -824,30 +816,28 @@ namespace TwitchBot.src.Connections
       }
     }
 
-    public static async Task<int> GetConnectedChannelID(string channel)
+    public static async Task<int> GetConnectedChannelId(string channel)
     {
-      using (MySqlConnection con = new(SecretsConfig.Credentials.ConnectionString))
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         Log.Debug("Trying to get ID for {channel}", channel);
 
         con.Open();
-        using (MySqlCommand com = new("sp_GetIDByConnectedChannel", con))
+        await using (var com = new MySqlCommand("sp_GetIDByConnectedChannel", con))
         {
           com.CommandType = CommandType.StoredProcedure;
           com.Parameters.AddWithValue("searchChannel", Helpers.FirstToUpper(channel));
 
-          using (var reader = await com.ExecuteReaderAsync().ConfigureAwait(false))
+          await using (var reader = await com.ExecuteReaderAsync().ConfigureAwait(false))
           {
-            if (reader.Read())
+            if (await reader.ReadAsync())
             {
               Log.Debug("Got ID for {channel}", channel);
               return (int)reader[0];
             }
-            else
-            {
-              Log.Error("Couldn't get ID for {channel}", channel);
-              return -1;
-            }
+
+            Log.Error("Couldn't get ID for {channel}", channel);
+            return -1;
           }
         }
       }

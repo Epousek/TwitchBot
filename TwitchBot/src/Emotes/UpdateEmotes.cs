@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TwitchBot.src.Models;
-using TwitchBot.src.Connections;
 using Serilog;
+using TwitchBot.Connections;
+using TwitchBot.Models;
 
-namespace TwitchBot.src.Emotes
+namespace TwitchBot.Emotes
 {
-  static class UpdateEmotes
+  internal static class UpdateEmotes
   {
     public static async Task StartUpdatingEmotes(List<string> channels)
     {
@@ -17,7 +17,7 @@ namespace TwitchBot.src.Emotes
       {
         while (true)
         {
-          foreach(string channel in channels)
+          foreach(var channel in channels)
             await CompareEmotes(channel).ConfigureAwait(false);
           Thread.Sleep(TimeSpan.FromMinutes(1));
         }
@@ -26,71 +26,68 @@ namespace TwitchBot.src.Emotes
 
     private static async Task CompareEmotes(string channel)
     {
-      List<EmoteModel> fromDB = await GetEmotes.EmotesFromDB(channel).ConfigureAwait(false);
-      List<EmoteModel> fromAPI = new();
-      List<EmoteModel> notInDB = new();
-      List<EmoteModel> notActiveAnymore = new();
-      List<EmoteModel> activeAgain = new();
+      var fromDb = await GetEmotes.EmotesFromDb(channel).ConfigureAwait(false);
+      var fromApi = new List<EmoteModel>();
+      var notInDb = new List<EmoteModel>();
+      var notActiveAnymore = new List<EmoteModel>();
+      var activeAgain = new List<EmoteModel>();
 
       try
       {
-        foreach (EmoteModel emote in await GetEmotes.BttvAPIAsync(channel).ConfigureAwait(false))
-          fromAPI.Add(emote);
-      } catch (Exception e)
+        fromApi.AddRange(await GetEmotes.BttvApiAsync(channel).ConfigureAwait(false));
+      } 
+      catch (Exception e)
       {
-        Log.Error(e, "No emotes from bttv api: ", e.Message);
+        Log.Error(e, "No emotes from bttv api: {message}", e.Message);
         return;
       }
       try
       {
-        foreach (EmoteModel emote in await GetEmotes.FfzAPIAsync(channel).ConfigureAwait(false))
-          fromAPI.Add(emote);
-      } catch (Exception e)
+        fromApi.AddRange(await GetEmotes.FfzApiAsync(channel).ConfigureAwait(false));
+      } 
+      catch (Exception e)
       {
-        Log.Error(e, "No emotes from ffz api: ", e.Message);
+        Log.Error(e, "No emotes from ffz api: {message}", e.Message);
         return;
       }
       try
       {
-        foreach (EmoteModel emote in await GetEmotes.SeventvAPIAsync(channel).ConfigureAwait(false))
-          fromAPI.Add(emote);
-      } catch (Exception e)
+        fromApi.AddRange(await GetEmotes.SeventvApiAsync(channel).ConfigureAwait(false));
+      } 
+      catch (Exception e)
       {
-        Log.Error(e, "No emotes from 7tv api: ", e.Message);
+        Log.Error(e, "No emotes from 7tv api: {message}", e.Message);
         return;
       }
 
-      foreach(EmoteModel emote in fromAPI)
+      foreach (var emote in fromApi.Where(emote 
+                 => !fromDb.Any(x 
+                   => x.Name == emote.Name && x.Service == emote.Service)))
       {
-        if (!fromDB.Any(x => x.Name == emote.Name && x.Service == emote.Service))
-        {
-          emote.Added = DateTime.Now;
-          notInDB.Add(emote);
-        }
+        emote.Added = DateTime.Now;
+        notInDb.Add(emote);
       }
 
-      foreach(EmoteModel emote in fromDB.Where(x => x.IsActive))
+      foreach(var emote in fromDb.Where(x => x.IsActive))
       {
-        if(!fromAPI.Any(x => x.Name == emote.Name && x.Service == emote.Service))
-        {
-          emote.Removed = DateTime.Now;
-          emote.IsActive = false;
-          notActiveAnymore.Add(emote);
-        }
+        if (fromApi.Any(x => x.Name == emote.Name && x.Service == emote.Service)) 
+          continue;
+        emote.Removed = DateTime.Now;
+        emote.IsActive = false;
+        notActiveAnymore.Add(emote);
       }
 
-      foreach(EmoteModel emote in fromAPI)
+      foreach (var emote in fromApi.Where(emote 
+                 => fromDb.Any(x 
+                   => x.Name == emote.Name && x.Service == emote.Service && !x.IsActive)))
       {
-        if(fromDB.Any(x => x.Name == emote.Name && x.Service == emote.Service && !x.IsActive))
-        {
-          emote.Added = DateTime.Now;
-          emote.IsActive = true;
-          activeAgain.Add(emote);
-        }
+        emote.Added = DateTime.Now;
+        emote.IsActive = true;
+        activeAgain.Add(emote);
       }
 
-      if (notInDB.Count > 0)
-        await DatabaseConnections.WriteEmotes(channel, notInDB).ConfigureAwait(false);
+      if (notInDb.Count > 0)
+        await DatabaseConnections.WriteEmotes(channel, notInDb).ConfigureAwait(false);
       if (notActiveAnymore.Count > 0)
         await DatabaseConnections.UpdateEmotes(channel, notActiveAnymore).ConfigureAwait(false);
       if (activeAgain.Count > 0)
