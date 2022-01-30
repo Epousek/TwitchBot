@@ -54,6 +54,18 @@ namespace TwitchBot.src
     public static void WriteMessage(string message, string channel)
       => client.SendMessage(channel, message);
 
+    public static async Task StartReconnecting()
+    {
+      await Task.Run(() =>
+      {
+        while (true)
+        {
+          Thread.Sleep(TimeSpan.FromDays(1));
+          client.Reconnect();
+        }
+      }).ConfigureAwait(false);
+    }
+
     private void Client_OnConnected(object sender, TwitchLib.Client.Events.OnConnectedArgs e)
     {
       Log.Information("{username} connected.", e.BotUsername);

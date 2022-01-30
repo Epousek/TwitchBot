@@ -44,9 +44,11 @@ namespace TwitchBot.src
       Thread emotesThread = new(async () => await Emotes.UpdateEmotes.StartUpdatingEmotes(channelsToConnectTo).ConfigureAwait(false));
       Thread authThread = new(async () => await Authentication.StartValidatingTokenAsync().ConfigureAwait(false));
       Thread remindersThread = new(async () => await Remind.StartCheckingReminders().ConfigureAwait(false));
+      Thread reconnectThread = new(async () => await Bot.StartReconnecting().ConfigureAwait(false));
       emotesThread.Start();
       authThread.Start();
       remindersThread.Start();
+      reconnectThread.Start();
 
       Bot bot = new(channelsToConnectTo);
       Console.ReadLine();
