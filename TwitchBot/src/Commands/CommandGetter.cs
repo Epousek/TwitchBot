@@ -77,9 +77,7 @@ namespace TwitchBot.Commands
           if (!IsOnCooldown(command))
           {
             await command.UseCommandAsync(message).ConfigureAwait(false);
-            command.LastUsed = DateTime.Now;
-            command.TimesUsedSinceRestart++;
-            BotInfo.CommandsUsedSinceStart++;
+            await IncrementCommand(command, message);
           }
         }
       }
@@ -100,6 +98,22 @@ namespace TwitchBot.Commands
       
       Bot.WriteMessage($"@{message.Username} Bohužel máš zakázáno používat příkazy :/ Pokud si myslíš, žes byl zabanovanej neprávem/omylem, napiš whisp @epousek", message.Channel);
       return false;
+    }
+
+    private static async Task IncrementCommand(ICommand command, ChatMessageModel message)
+    {
+      command.LastUsed = DateTime.Now;
+      command.TimesUsedSinceRestart++;
+      BotInfo.CommandsUsedSinceStart++;
+
+      var isInCommandsInfo = await DatabaseConnections.IsInCommandsInfo(command.Name).ConfigureAwait(false);
+      
+      if (isInCommandsInfo == null)
+        return;
+      if (!(bool)isInCommandsInfo)
+        await DatabaseConnections.AddToCommandsInfo(command.Name).ConfigureAwait(false);
+
+      await DatabaseConnections.UpdateCommandsInfo(command.Name, message);
     }
 
     private static bool IsOnCooldown(ICommand command)
