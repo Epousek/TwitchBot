@@ -12,6 +12,52 @@ namespace TwitchBot.Connections
 {
   public static class DatabaseConnections
   {
+    public static async Task<bool?> IsInCommandsInfo(string commandName)
+    {
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        await using (var com = new MySqlCommand("sp_IsInCommandsInfo", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("commandName", commandName);
+
+          try
+          {
+            var result = await com.ExecuteScalarAsync().ConfigureAwait(false);
+            return Convert.ToBoolean(result);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_IsInCommandsInfo exception: {ex}", e);
+            return null;
+          }
+        }
+      }
+    }
+
+    public static async Task AddToCommandsInfo(string commandName)
+    {
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        await using (var com = new MySqlCommand("sp_AddToCommandsInfo", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("commandName", commandName);
+
+          try
+          {
+            await com.ExecuteNonQueryAsync();
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_AddToCommandsInfo exception: {ex}", e);
+          }
+        }
+      }
+    }
+    
     public static async Task<bool> IsInAfkUsers(string channel, string username)
     {
       await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
