@@ -57,6 +57,31 @@ namespace TwitchBot.Connections
         }
       }
     }
+
+    public static async Task UpdateCommandsInfo(string commandName, ChatMessageModel message)
+    {
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        await using (var com = new MySqlCommand("sp_UpdateCommandsInfo", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+
+          com.Parameters.AddWithValue("commandName", commandName);
+          com.Parameters.AddWithValue("usedWhen", message.TimeStamp);
+          com.Parameters.AddWithValue("usedBy", message.Username);
+          com.Parameters.AddWithValue("usedIn", message.Channel);
+
+          try
+          { }
+          catch (Exception e)
+          {
+            Log.Error("sp_UpdateCommandsInfo exception: {ex}", e);
+            throw;
+          }
+        }
+      }
+    }
     
     public static async Task<bool> IsInAfkUsers(string channel, string username)
     {
