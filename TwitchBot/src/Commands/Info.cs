@@ -29,15 +29,17 @@ namespace TwitchBot.Commands
     public async Task UseCommandAsync(ChatMessageModel message)
     {
       var release = await GitHub.GetLastReleaseAsync();
-
+      var totalCommandsUsed = await DatabaseConnections.GetTotalCommandsUsed().ConfigureAwait(false);
       var builder = new StringBuilder("@");
       builder.Append(message.Username)
         .Append(" Uptime: ")
-        .Append((DateTime.Now - BotInfo.RunningSince).Humanize(3,
+        .Append((DateTime.Now - BotInfo.RunningSince).Humanize(
+          3,
           new CultureInfo("cs-CS"),
           minUnit: Humanizer.Localisation.TimeUnit.Second))
         .Append("; počet použitých příkazů od zapnutí: ")
         .Append(BotInfo.CommandsUsedSinceStart)
+        .Append(totalCommandsUsed == -1 ? "" : $"; počet použitých příkazů celkem: {totalCommandsUsed}")
         .Append("; verze: ")
         .Append(release.TagName[1..])
         .Append(" (")
