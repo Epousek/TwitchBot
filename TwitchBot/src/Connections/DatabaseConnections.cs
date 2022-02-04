@@ -73,7 +73,9 @@ namespace TwitchBot.Connections
           com.Parameters.AddWithValue("usedIn", message.Channel);
 
           try
-          { }
+          {
+            await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+          }
           catch (Exception e)
           {
             Log.Error("sp_UpdateCommandsInfo exception: {ex}", e);
