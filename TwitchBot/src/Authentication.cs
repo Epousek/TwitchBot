@@ -58,7 +58,10 @@ namespace TwitchBot
       Log.Information("Trying to refresh token.");
 
       var client = new RestClient("https://id.twitch.tv/oauth2/token");
-      var request = new RestRequest { Method = Method.POST };
+      var request = new RestRequest
+      {
+        Method = Method.Post
+      };
 
       request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
       request.AddHeader("Accept", "application/json");
