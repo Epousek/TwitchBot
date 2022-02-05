@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using MySqlX.XDevAPI;
-using Newtonsoft.Json.Linq;
-using RestSharp;
-using Serilog;
 using TwitchBot.Connections;
-using TwitchBot.Models;
 
 namespace TwitchBot
 {
