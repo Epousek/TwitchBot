@@ -1,21 +1,21 @@
-﻿using Humanizer;
-using Humanizer.Localisation;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using TwitchBot.src.Connections;
-using TwitchBot.src.Models;
+using Humanizer;
+using Humanizer.Localisation;
+using TwitchBot.Connections;
+using TwitchBot.Models;
 
-namespace TwitchBot.src.Commands
+namespace TwitchBot.Commands
 {
 
   public class RemindInstance
   {
-    public static List<Reminder> Reminders { get; set; } = new List<Reminder>();
+    public static List<Reminder> Reminders { get; } = new List<Reminder>();
 
     public async Task NewReminder(ChatMessageModel message)
     {
@@ -33,66 +33,63 @@ namespace TwitchBot.src.Commands
         if (args[1] == "in")
         {   //TIMED REMIND
           args = comArgs.GetXArguments(4);
-          CheckTime(args, message, out Reminder reminder);
-          if (reminder != null)
-          {
-            reminder.IsTimed = true;
-            reminder.From = message.Username;
-            reminder.For = string.Equals(args[0], "me") ? reminder.From : args[0];
-            reminder.Channel = message.Channel;
-            reminder.Message = String.IsNullOrEmpty(args[3]) ? String.Empty : args[3];
-
-            if (await CheckIfAlreadyReminding(reminder).ConfigureAwait(false))
-            {
-              Bot.WriteMessage($"@{reminder.From} Pro tohoto uživatele už máš upozornění :/", reminder.Channel);
-              return;
-            }
-
-            var timer = new Timer(TimerElapsed, reminder, (int)reminder.Length.Value.TotalMilliseconds, Timeout.Infinite);
-            await DatabaseConnections.AddReminder(reminder).ConfigureAwait(false);
-            reminder.ID = await DatabaseConnections.GetReminderID(reminder).ConfigureAwait(false);
-
-            var builder = new StringBuilder("@");
-            builder
-              .Append(reminder.From)
-              .Append(' ');
-            if (string.Equals(reminder.For, reminder.From, StringComparison.OrdinalIgnoreCase))
-            {
-              builder
-                .Append("budeš upozorněn(a) za ")
-                .Append(reminder.Length.Value.Humanize(3, new CultureInfo("cs-CS"), minUnit: TimeUnit.Second));
-            }
-            else
-            {
-              builder
-                .Append(reminder.For)
-                .Append(" bude upozorněn(a) za ")
-                .Append(reminder.Length.Value.Humanize(3, new CultureInfo("cs-CS"), minUnit: TimeUnit.Second));
-            }
-            Bot.WriteMessage(builder.ToString(), message.Channel);
+                    CheckTime(args, message, out var reminder);
+          if (reminder == null) 
             return;
+          reminder.IsTimed = true;
+          reminder.From = message.Username;
+          reminder.For = string.Equals(args[0], "me") ? reminder.From : args[0];
+          reminder.Channel = message.Channel;
+          reminder.Message = string.IsNullOrEmpty(args[3]) ? string.Empty : args[3];
+
+          if (await CheckIfAlreadyReminding(reminder).ConfigureAwait(false))
+          {
+            Bot.WriteMessage($"@{reminder.From} Pro tohoto uživatele už máš upozornění :/", reminder.Channel);
+            return;
+          }
+
+          _ = new Timer(TimerElapsed, reminder, (int)reminder.Length.Value.TotalMilliseconds, Timeout.Infinite);
+
+          await DatabaseConnections.AddReminder(reminder).ConfigureAwait(false);
+          reminder.Id = await DatabaseConnections.GetReminderId(reminder).ConfigureAwait(false);
+
+          var builder = new StringBuilder("@");
+          builder
+            .Append(reminder.From)
+            .Append(' ');
+          if (string.Equals(reminder.For, reminder.From, StringComparison.OrdinalIgnoreCase))
+          {
+            builder
+              .Append("budeš upozorněn(a) za ")
+              .Append(reminder.Length.Value.Humanize(3, new CultureInfo("cs-CS"), minUnit: TimeUnit.Second));
           }
           else
           {
-            return;
+            builder
+              .Append(reminder.For)
+              .Append(" bude upozorněn(a) za ")
+              .Append(reminder.Length.Value.Humanize(3, new CultureInfo("cs-CS"), minUnit: TimeUnit.Second));
           }
+          Bot.WriteMessage(builder.ToString(), message.Channel);
+          return;
+
         }
       }
       if (!string.IsNullOrEmpty(args[0]))
       {
         args = comArgs.GetXArguments(2);
 
-        var reminder = new Reminder()
+        var reminder = new Reminder
         {
           IsTimed = false,
           From = message.Username,
           For = args[0],
           StartTime = DateTime.Now,
           Channel = message.Channel,
-          Message = String.IsNullOrEmpty(args[1]) ? String.Empty : args[1],
+          Message = string.IsNullOrEmpty(args[1]) ? string.Empty : args[1],
           Length = null
         };
-        reminder.For = String.Equals(reminder.For, "me") ? reminder.From : reminder.For;
+        reminder.For = string.Equals(reminder.For, "me") ? reminder.From : reminder.For;
 
         if (await CheckIfAlreadyReminding(reminder).ConfigureAwait(false))
         {
@@ -101,7 +98,7 @@ namespace TwitchBot.src.Commands
         }
 
         await DatabaseConnections.AddReminder(reminder).ConfigureAwait(false);
-        reminder.ID = await DatabaseConnections.GetReminderID(reminder).ConfigureAwait(false);
+        reminder.Id = await DatabaseConnections.GetReminderId(reminder).ConfigureAwait(false);
 
         var builder = new StringBuilder("@");
         builder
@@ -122,7 +119,7 @@ namespace TwitchBot.src.Commands
       }
     }
 
-    private async void TimerElapsed(object state)
+    private static async void TimerElapsed(object state)
     {
       var reminder = (Reminder)state;
       var builder = new StringBuilder("@");
@@ -157,7 +154,7 @@ namespace TwitchBot.src.Commands
     }
 
 
-    private void CheckTime(List<string> args, ChatMessageModel message, out Reminder reminder)
+    private static void CheckTime(IList<string> args, ChatMessageModel message, out Reminder reminder)
     {
       reminder = new Reminder();
       if (string.IsNullOrEmpty(args[2]))
@@ -167,10 +164,9 @@ namespace TwitchBot.src.Commands
       }
       else
       {
-        int time;
         try
         {     //no units specified => minutes
-          time = int.Parse(args[2]);
+          var time = int.Parse(args[2]);
           reminder.StartTime = DateTime.Now;
           reminder.Length = TimeSpan.FromMinutes(time);
           reminder.EndTime = reminder.StartTime + reminder.Length;
@@ -215,7 +211,7 @@ namespace TwitchBot.src.Commands
       }
     }
 
-    private async Task<bool> CheckIfAlreadyReminding(Reminder reminder)
+    private static async Task<bool> CheckIfAlreadyReminding(Reminder reminder)
       => await DatabaseConnections.AlreadyReminding(reminder).ConfigureAwait(false);
   }
 }

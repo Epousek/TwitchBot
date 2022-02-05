@@ -1,22 +1,22 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using TwitchBot.src.Connections;
 using Serilog;
 using Serilog.Sinks.MariaDB.Extensions;
-using System.Diagnostics;
-using TwitchBot.src.Commands;
+using TwitchBot.Commands;
+using TwitchBot.Connections;
 
-namespace TwitchBot.src
+namespace TwitchBot
 {
-  static class Program
+  internal static class Program
   {
-    static List<string> channelsToConnectTo;
+    private static List<string> _channelsToConnectTo;
 
-    static async Task Main()
+    private static async Task Main()
     {
       BotInfo.RunningSince = DateTime.Now;
       await SecretsConfig.SetConfig().ConfigureAwait(false);
@@ -29,7 +29,7 @@ namespace TwitchBot.src
         .ReadFrom.Configuration(builder.Build())
         .Enrich.FromLogContext()
         .WriteTo.MariaDB(
-        connectionString: SecretsConfig.Credentials.ConnectionString,
+        SecretsConfig.Credentials.ConnectionString,
         restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information,
         autoCreateTable: true,
         tableName: "Logs"
@@ -39,16 +39,18 @@ namespace TwitchBot.src
       Log.Information($"Bot starting in {(Debugger.IsAttached ? "debug" : "production")} mode");
 
       GitHub.Init();
-      channelsToConnectTo = await SetChannelsToConnectToAsync().ConfigureAwait(false);
+      _channelsToConnectTo = await SetChannelsToConnectToAsync().ConfigureAwait(false);
 
-      Thread emotesThread = new(async () => await Emotes.UpdateEmotes.StartUpdatingEmotes(channelsToConnectTo).ConfigureAwait(false));
-      Thread authThread = new(async () => await Authentication.StartValidatingTokenAsync().ConfigureAwait(false));
-      Thread remindersThread = new(async () => await Remind.StartCheckingReminders().ConfigureAwait(false));
+      var emotesThread = new Thread(async () => await Emotes.UpdateEmotes.StartUpdatingEmotes(_channelsToConnectTo).ConfigureAwait(false));
+      var authThread = new Thread(async () => await Authentication.StartValidatingTokenAsync().ConfigureAwait(false));
+      var remindersThread = new Thread(async () => await Remind.StartCheckingReminders().ConfigureAwait(false));
+      var reconnectThread = new Thread(async () => await Bot.StartReconnecting().ConfigureAwait(false));
       emotesThread.Start();
       authThread.Start();
       remindersThread.Start();
+      reconnectThread.Start();
 
-      Bot bot = new(channelsToConnectTo);
+      var bot = new Bot(_channelsToConnectTo);
       Console.ReadLine();
     }
 
@@ -58,7 +60,7 @@ namespace TwitchBot.src
     private static void BuildSettingsConfing(IConfigurationBuilder builder)
     {
       builder.SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+        .AddJsonFile("appsettings.json", false, true);
     }
   }
 }

@@ -1,14 +1,14 @@
 ﻿using Newtonsoft.Json;
 
-namespace TwitchBot.src.Models
+namespace TwitchBot.Models
 {
-  class Credentials
+  internal class Credentials
   {
     [JsonProperty("username")]
     public string Username { get; set; }
 
     [JsonProperty("client_id")]
-    public string ClientID { get; set; }
+    public string ClientId { get; set; }
 
     [JsonProperty("secret")]
     public string Secret { get; set; }

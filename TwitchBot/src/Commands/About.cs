@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TwitchBot.src.Enums;
-using TwitchBot.src.Models;
-using TwitchBot.src.Interfaces;
+using TwitchBot.Enums;
+using TwitchBot.Interfaces;
+using TwitchBot.Models;
 
-namespace TwitchBot.src.Commands
+namespace TwitchBot.Commands
 {
-  class About : ICommand
+  internal class About : ICommand
   {
     public string Name { get; } = nameof(About);
     public string AboutCommand { get; } = "Napíše základní informace o botovi";
@@ -24,12 +22,13 @@ namespace TwitchBot.src.Commands
     public int TimesUsedSinceRestart { get; set; }
     public int? TimesUsedTotal { get; set; }
 
-    public async Task UseCommandAsync(ChatMessageModel message)
+    public Task UseCommandAsync(ChatMessageModel message)
     {
       var sb = new StringBuilder("@");
       sb.Append(message.Username)
         .Append(" Tento bot byl vytvořený původně jakožto maturitní práce. Pro seznam příkazů napiš $commands. Pro pomoc s jednotlivým příkazem napiš $help a název příkazu.");
       Bot.WriteMessage(sb.ToString(), message.Channel);
+      return Task.CompletedTask;
     }
   }
 }

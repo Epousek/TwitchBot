@@ -1,4 +1,4 @@
-﻿namespace TwitchBot.src.Enums
+﻿namespace TwitchBot.Enums
 {
   public enum Permission
   {

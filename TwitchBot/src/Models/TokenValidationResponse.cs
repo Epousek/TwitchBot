@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace TwitchBot.src.Models
+namespace TwitchBot.Models
 {
   public class TokenValidationResponse
   {

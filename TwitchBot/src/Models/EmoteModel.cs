@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace TwitchBot.src.Models
+namespace TwitchBot.Models
 {
   public class EmoteModel
   {
@@ -9,7 +9,7 @@ namespace TwitchBot.src.Models
     public string Name { get; set; }
 
     [JsonProperty("code")]
-    private string Code { set { Name = value; } }
+    private string Code { set => Name = value; }
     public string Service { get; set; }
     public DateTime? Added { get; set; }
     public DateTime? Removed { get; set; }

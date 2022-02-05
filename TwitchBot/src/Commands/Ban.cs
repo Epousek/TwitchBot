@@ -1,15 +1,11 @@
-﻿using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Threading.Tasks;
-using TwitchBot.src.Connections;
-using TwitchBot.src.Enums;
-using TwitchBot.src.Interfaces;
-using TwitchBot.src.Models;
+using TwitchBot.Connections;
+using TwitchBot.Enums;
+using TwitchBot.Interfaces;
+using TwitchBot.Models;
 
-namespace TwitchBot.src.Commands
+namespace TwitchBot.Commands
 {
   internal class Ban : ICommand
   {
@@ -30,7 +26,7 @@ namespace TwitchBot.src.Commands
     {
       var comArgs = new CommandArguments(message);
       var args = comArgs.GetOneArgument();
-      Permission? perms = await DatabaseConnections.GetPermission(message.Channel, args[0]).ConfigureAwait(false);
+      var perms = await DatabaseConnections.GetPermission(message.Channel, args[0]).ConfigureAwait(false);
 
       if (perms != null && perms != Permission.Regular)
       {

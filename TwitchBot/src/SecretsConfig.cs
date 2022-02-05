@@ -1,15 +1,13 @@
-﻿using System;
-using System.IO;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json.Linq;
-using TwitchBot.src.Models;
+﻿using System.IO;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Serilog;
+using TwitchBot.Models;
 
-namespace TwitchBot.src
+namespace TwitchBot
 {
-  static class SecretsConfig
+  internal static class SecretsConfig
   {
     [JsonProperty("Credentials")]
     public static Credentials Credentials { get; set; }

@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using TwitchBot.src.Connections;
-using TwitchBot.src.Enums;
-using TwitchBot.src.Interfaces;
-using TwitchBot.src.Models;
+using TwitchBot.Connections;
+using TwitchBot.Enums;
+using TwitchBot.Interfaces;
+using TwitchBot.Models;
 
-namespace TwitchBot.src.Commands
+namespace TwitchBot.Commands
 {
   internal class Optout : ICommand
   {
@@ -35,7 +33,8 @@ namespace TwitchBot.src.Commands
         Bot.WriteMessage($"@{message.Username} Zadej příkaz ze kterého se chceš optoutnout.", message.Channel);
         return;
       }
-      else if (Bot.cg.commandInstances.Any(x => string.Equals(args[0], x.Key, StringComparison.OrdinalIgnoreCase) && x.Value.Optoutable))
+
+      if (Bot.Cg.CommandInstances.Any(x => string.Equals(args[0], x.Key, StringComparison.OrdinalIgnoreCase) && x.Value.Optoutable))
       {
         if (!await DatabaseConnections.IsInUsers(message.Channel, message.Username).ConfigureAwait(false))
           await DatabaseConnections.WriteToUsers(message.Channel, message.Username).ConfigureAwait(false);

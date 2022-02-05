@@ -1,69 +1,64 @@
-﻿using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using TwitchBot.src.Models;
-using TwitchBot.src.Interfaces;
-using TwitchBot.src.Connections;
+using Serilog;
+using TwitchBot.Connections;
+using TwitchBot.Interfaces;
+using TwitchBot.Models;
 
-namespace TwitchBot.src.Commands
+namespace TwitchBot.Commands
 {
   public class CommandGetter
   {
-    public Dictionary<string, ICommand> commandInstances = new();
+    public readonly Dictionary<string, ICommand> CommandInstances = new();
 
     public CommandGetter()
     {
-      commandInstances.Clear();
-      commandInstances.Add("Emotes", new Emotes());
-      commandInstances.Add("Removed", new Removed());
-      commandInstances.Add("Remind", new Remind());
-      commandInstances.Add("Afk", new Afk());
-      commandInstances.Add("Suggest", new Suggest());
-      commandInstances.Add("Help", new Help());
-      commandInstances.Add("Commands", new Commands());
-      commandInstances.Add("Info", new Info());
-      commandInstances.Add("About", new About());
-      commandInstances.Add("Ban", new Ban());
-      commandInstances.Add("Unban", new Unban());
-      commandInstances.Add("Admin", new Admin());
-      commandInstances.Add("Unadmin", new Unadmin());
-      commandInstances.Add("Optout", new Optout());
-      commandInstances.Add("Optin", new Optin());
+      CommandInstances.Clear();
+      CommandInstances.Add("Emotes", new Emotes());
+      CommandInstances.Add("Removed", new Removed());
+      CommandInstances.Add("Remind", new Remind());
+      CommandInstances.Add("Afk", new Afk());
+      CommandInstances.Add("Suggest", new Suggest());
+      CommandInstances.Add("Help", new Help());
+      CommandInstances.Add("Commands", new Commands());
+      CommandInstances.Add("Info", new Info());
+      CommandInstances.Add("About", new About());
+      CommandInstances.Add("Ban", new Ban());
+      CommandInstances.Add("Unban", new Unban());
+      CommandInstances.Add("Admin", new Admin());
+      CommandInstances.Add("Unadmin", new Unadmin());
+      CommandInstances.Add("Optout", new Optout());
+      CommandInstances.Add("Optin", new Optin());
     }
 
     public async Task CheckIfCommandAsync(ChatMessageModel message)
     {
-      message.Message = Bot.prefix == "$" ? message.Message[1..] : message.Message[2..];
+      message.Message = Bot.Prefix == "$" ? message.Message[1..] : message.Message[2..];
 
       ICommand command;
-      IEnumerable<KeyValuePair<string, ICommand>> commands = commandInstances.Where(c => message.Message.StartsWith(c.Key, StringComparison.OrdinalIgnoreCase));
+      var commands = CommandInstances.Where(c => message.Message.StartsWith(c.Key, StringComparison.OrdinalIgnoreCase));
 
-      if (commands?.Any() == true)
+      var commandList = commands.ToList();
+      if (commandList.Any())
       {
-        command = commands.First().Value;
+        command = commandList.First().Value;
         await TryToUseCommand(command, message).ConfigureAwait(false);
       }
       else
       {
-        commands = commandInstances.Where(c =>
+        commands = CommandInstances.Where(c =>
         {
-          if (c.Value.Aliases.Length > 0)
-          {
-            foreach (string alias in c.Value.Aliases)
-            {
-              if (message.Message.StartsWith(alias, StringComparison.OrdinalIgnoreCase))
-                return true;
-            }
-          }
-          return false;
+          return c.Value.Aliases.Length > 0 &&
+                 c.Value.Aliases.Any(alias => message.Message.StartsWith(alias,
+                   StringComparison.OrdinalIgnoreCase));
         });
 
-        if (commands?.Any() == true)
+        commandList = commands.ToList();
+        if (commandList.Any())
         {
-          command = commands.First().Value;
+          command = commandList.First().Value;
           await TryToUseCommand(command, message).ConfigureAwait(false);
         }
         else
@@ -73,7 +68,7 @@ namespace TwitchBot.src.Commands
       }
     }
 
-    private async Task TryToUseCommand(ICommand command, ChatMessageModel message)
+    private static async Task TryToUseCommand(ICommand command, ChatMessageModel message)
     {
       if (command.Permission <= await DatabaseConnections.GetPermission(message.Channel, message.Username).ConfigureAwait(false))
       {
@@ -82,11 +77,8 @@ namespace TwitchBot.src.Commands
           if (!IsOnCooldown(command))
           {
             await command.UseCommandAsync(message).ConfigureAwait(false);
-            command.LastUsed = DateTime.Now;
-            command.TimesUsedSinceRestart++;
-            BotInfo.CommandsUsedSinceStart++;
+            await IncrementCommand(command, message);
           }
-          return;
         }
       }
       else
@@ -95,25 +87,33 @@ namespace TwitchBot.src.Commands
       }
     }
 
-    private async Task<bool> UsableBan(ICommand command, ChatMessageModel message)
+    private static async Task<bool> UsableBan(ICommand command, ChatMessageModel message)
     {
-      if (command.UsableByBanned) { return true; }
-      else
-      {
-        if (!await DatabaseConnections.IsInUsers(message.Channel, message.Username))
-        {
-          return true;
-        }
-        else if (!await DatabaseConnections.IsBanned(message.Channel, message.Username))
-        {
-          return true;
-        }
-        else
-        {
-          Bot.WriteMessage($"@{message.Username} Bohužel máš zakázáno používat příkazy :/ Pokud si myslíš, žes byl zabanovanej neprávem/omylem, napiš whisp @epousek", message.Channel);
-          return false;
-        }
-      }
+      if (command.UsableByBanned) 
+        return true;
+      if (!await DatabaseConnections.IsInUsers(message.Channel, message.Username))
+        return true;
+      if (!await DatabaseConnections.IsBanned(message.Channel, message.Username))
+        return true;
+      
+      Bot.WriteMessage($"@{message.Username} Bohužel máš zakázáno používat příkazy :/ Pokud si myslíš, žes byl zabanovanej neprávem/omylem, napiš whisp @epousek", message.Channel);
+      return false;
+    }
+
+    private static async Task IncrementCommand(ICommand command, ChatMessageModel message)
+    {
+      command.LastUsed = DateTime.Now;
+      command.TimesUsedSinceRestart++;
+      BotInfo.CommandsUsedSinceStart++;
+
+      var isInCommandsInfo = await DatabaseConnections.IsInCommandsInfo(command.Name).ConfigureAwait(false);
+      
+      if (isInCommandsInfo == null)
+        return;
+      if (!(bool)isInCommandsInfo)
+        await DatabaseConnections.AddToCommandsInfo(command.Name).ConfigureAwait(false);
+
+      await DatabaseConnections.UpdateCommandsInfo(command.Name, message);
     }
 
     private static bool IsOnCooldown(ICommand command)

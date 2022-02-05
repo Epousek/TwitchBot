@@ -1,42 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using TwitchBot.src.Models;
+using TwitchBot.Models;
 
-namespace TwitchBot.src.Commands
+namespace TwitchBot.Commands
 {
   public class CommandArguments
   {
-    readonly private string message;
+    private readonly string _message;
 
     public CommandArguments(ChatMessageModel m)
     {
       if (m.Message.Contains(' '))
       {
-        message = m.Message.Remove(0, m.Message.IndexOf(' ') + 1); //remove the command
-        message = message.TrimStart();
+        _message = m.Message.Remove(0, m.Message.IndexOf(' ') + 1); //remove the command
+        _message = _message.TrimStart();
       }
       else
       {
-        message = string.Empty;
+        _message = string.Empty;
       }
     }
 
     public List<string> GetOneArgument()
-    {
-      if (string.IsNullOrEmpty(message))
-        return new List<string>();
-      else
-        return new List<string>() { message };
-    }
+      => string.IsNullOrEmpty(_message) ? new List<string>() : new List<string> { _message };
 
     public List<string> GetXArguments(int argCount)
     {
-      var args = new List<string>(Regex.Split(message, "(?= )"));
-      int count = args.Count;
+      var args = new List<string>(Regex.Split(_message, "(?= )"));
+      var count = args.Count;
       //if (count < argCount)
       //  return new List<string>();
       for (int i = argCount; i < count; i++)
@@ -50,7 +41,7 @@ namespace TwitchBot.src.Commands
       }
       while (args.Count < argCount)
       {
-        args.Add(String.Empty);
+        args.Add(string.Empty);
       }
       return args;
     }

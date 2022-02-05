@@ -1,36 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Octokit;
 
-namespace TwitchBot.src.Connections
+namespace TwitchBot.Connections
 {
   public static class GitHub
   {
-    private const long repoID = 407855144;
-    private static ApiOptions options = new ApiOptions
+    private const long  RepoId = 407855144;
+    private static readonly ApiOptions options = new ApiOptions
     {
       PageCount = 1,
       PageSize = 1
     };
-    private static GitHubClient client;
+    private static GitHubClient _client;
 
     public static void Init()
     {
-      client = new GitHubClient(new ProductHeaderValue("twitch-bot"));
+      _client = new GitHubClient(new ProductHeaderValue("twitch-bot"));
     }
 
     public static async Task<GitHubCommit> GetLastCommitAsync()
     {
-      var allCommits = await client.Repository.Commit.GetAll(repoID, options);
+      var allCommits = await _client.Repository.Commit.GetAll(RepoId, options);
       return allCommits[0];
     }
 
     public static async Task<Release> GetLastReleaseAsync()
     {
-      return await client.Repository.Release.GetLatest(repoID);
+      return await _client.Repository.Release.GetLatest(RepoId);
     }
   }
 }

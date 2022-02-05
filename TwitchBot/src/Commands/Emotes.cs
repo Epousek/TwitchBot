@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
-using TwitchBot.src.Connections;
-using TwitchBot.src.Models;
-using TwitchBot.src.Enums;
-using TwitchBot.src.Interfaces;
 using Humanizer;
 using Humanizer.Localisation;
+using TwitchBot.Connections;
+using TwitchBot.Enums;
+using TwitchBot.Interfaces;
+using TwitchBot.Models;
 
-namespace TwitchBot.src.Commands
+namespace TwitchBot.Commands
 {
-  class Emotes : ICommand
+  internal class Emotes : ICommand
   {
     public string Name { get; } = nameof(Emotes);
     public string AboutCommand { get; } = "Vypíše naposledy přidané emoty";
@@ -29,9 +28,8 @@ namespace TwitchBot.src.Commands
 
     public async Task UseCommandAsync(ChatMessageModel message)
     {
-      TimeSpan sinceAddition;
-      List<EmoteModel> emotes = await DatabaseConnections.GetLastAddedEmotes(message.Channel);
-      StringBuilder builder = new("@");
+      var emotes = await DatabaseConnections.GetLastAddedEmotes(message.Channel);
+      var builder = new StringBuilder("@");
       builder.Append(message.Username);
       if (emotes.Count == 0)
       {
@@ -43,15 +41,17 @@ namespace TwitchBot.src.Commands
 
       for (int i = 0; i < emotes.Count; i++)
       {
-        sinceAddition = (TimeSpan)(DateTime.Now - emotes[i].Added);
+        var dateTime = emotes[i].Added;
+        if (dateTime == null)
+          continue;
+
+        var sinceAddition = (TimeSpan)(DateTime.Now - dateTime);
 
         builder.Append(emotes[i].Name);
         builder.Append(" (");
-        builder.Append(sinceAddition.Humanize(3, minUnit: TimeUnit.Minute, culture: new("cs-CS")));
-        if (i != emotes.Count - 1)
-          builder.Append("), ");
-        else
-          builder.Append(").");
+        builder.Append(sinceAddition.Humanize(3, minUnit: TimeUnit.Minute, culture: new CultureInfo("cs-CS")));
+        builder.Append(i != emotes.Count - 1 ? "), " : ").");
+
       }
 
       Bot.WriteMessage(builder.ToString(), message.Channel);

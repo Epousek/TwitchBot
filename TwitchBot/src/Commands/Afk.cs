@@ -1,18 +1,15 @@
-﻿using Humanizer;
-using Humanizer.Localisation;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using TwitchBot.src.Connections;
-using TwitchBot.src.Enums;
-using TwitchBot.src.Interfaces;
-using TwitchBot.src.Models;
+using Humanizer;
+using Humanizer.Localisation;
+using TwitchBot.Connections;
+using TwitchBot.Enums;
+using TwitchBot.Interfaces;
+using TwitchBot.Models;
+// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 
-namespace TwitchBot.src.Commands
+namespace TwitchBot.Commands
 {
   internal class Afk : ICommand
   {
@@ -40,7 +37,7 @@ namespace TwitchBot.src.Commands
       var comArgs = new CommandArguments(message);
       var args = comArgs.GetOneArgument();
 
-      var afk = new AfkModel()
+      var afk = new AfkModel
       {
         Channel = message.Channel,
         Username = message.Username,
@@ -71,7 +68,7 @@ namespace TwitchBot.src.Commands
 
     public static async Task CheckAfk(ChatMessageModel message)
     {
-      if (message.Message.StartsWith($"{Bot.prefix}afk", StringComparison.OrdinalIgnoreCase))
+      if (message.Message.StartsWith($"{Bot.Prefix}afk", StringComparison.OrdinalIgnoreCase))
         return;
 
       if (await DatabaseConnections.IsAfk(message.Channel, message.Username))
