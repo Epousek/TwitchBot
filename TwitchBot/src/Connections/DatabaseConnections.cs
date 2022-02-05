@@ -628,7 +628,11 @@ namespace TwitchBot.Connections
           try
           {
             var result = await com.ExecuteScalarAsync().ConfigureAwait(false);
-            return (Permission)Enum.Parse(typeof(Permission), Convert.ToString(result) ?? "Regular");
+            if (result == null)
+              return Permission.Regular;
+            if (Enum.TryParse(Convert.ToString(result), out bool _))
+              return (Permission)Enum.Parse(typeof(Credentials), Convert.ToString(result)!);
+            return Permission.Regular;
           }
           catch (Exception e)
           {
