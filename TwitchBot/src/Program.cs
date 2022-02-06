@@ -15,6 +15,7 @@ namespace TwitchBot
   internal static class Program
   {
     private static List<string> _channelsToConnectTo;
+    public static Bot bot;
 
     private static async Task Main()
     {
@@ -50,10 +51,12 @@ namespace TwitchBot
       remindersThread.Start();
       reconnectThread.Start();
 
-      var bot = new Bot(_channelsToConnectTo);
+      bot = new Bot(_channelsToConnectTo);
       Console.ReadLine();
     }
 
+    
+    
     private static async Task<List<string>> SetChannelsToConnectToAsync()
       => await DatabaseConnections.GetConnectedChannels().ConfigureAwait(false);
 
