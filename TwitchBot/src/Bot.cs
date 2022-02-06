@@ -66,11 +66,6 @@ namespace TwitchBot
       }).ConfigureAwait(false);
     }
 
-    public static void Disconnect()
-    {
-      _client.Disconnect();
-    }
-
     private void Client_OnConnected(object sender, TwitchLib.Client.Events.OnConnectedArgs e)
     {
       Log.Information("{username} connected.", e.BotUsername);
