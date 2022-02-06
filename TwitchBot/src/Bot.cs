@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
@@ -63,6 +64,11 @@ namespace TwitchBot
           _client.Reconnect();
         }
       }).ConfigureAwait(false);
+    }
+
+    public static void Disconnect()
+    {
+      _client.Disconnect();
     }
 
     private void Client_OnConnected(object sender, TwitchLib.Client.Events.OnConnectedArgs e)
