@@ -27,7 +27,7 @@ namespace TwitchBot.Commands
     {
       var comArgs = new CommandArguments(message);
       var args = comArgs.GetOneArgument();
-      var commandInstances = Bot.Cg.CommandInstances;
+      var commandInstances = Bot.CmdGetter.CommandInstances;
       if (args.Count > 0)
         args[0] = Helpers.FirstToUpper(args[0]);
 

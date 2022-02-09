@@ -32,7 +32,7 @@ namespace TwitchBot.Commands
       {
         Bot.WriteMessage($"@{message.Username} Zadej příkaz. :)", message.Channel);
       }
-      else if (Bot.Cg.CommandInstances.Any(x => string.Equals(args[0], x.Key, StringComparison.OrdinalIgnoreCase) && x.Value.Optoutable))
+      else if (Bot.CmdGetter.CommandInstances.Any(x => string.Equals(args[0], x.Key, StringComparison.OrdinalIgnoreCase) && x.Value.Optoutable))
       {
         if (!await DatabaseConnections.IsInUsers(message.Channel, message.Username).ConfigureAwait(false))
           await DatabaseConnections.WriteToUsers(message.Channel, message.Username).ConfigureAwait(false);

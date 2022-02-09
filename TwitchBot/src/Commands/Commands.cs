@@ -27,7 +27,7 @@ namespace TwitchBot.Commands
       var builder = new StringBuilder("@");
       builder.Append(message.Username)
         .Append(" seznam všech příkazů: ");
-      foreach (var command in Bot.Cg.CommandInstances)
+      foreach (var command in Bot.CmdGetter.CommandInstances)
       {
         builder.Append(command.Key.ToLower())
           .Append(", ");
