@@ -40,12 +40,12 @@ namespace TwitchBot
       Log.Information($"Bot starting in {(Debugger.IsAttached ? "debug" : "production")} mode");
 
       GitHub.Init();
-      _channelsToConnectTo = await SetChannelsToConnectToAsync().ConfigureAwait(false);
+      _channelsToConnectTo = await GetChannelsToConnectToAsync().ConfigureAwait(false);
 
       var emotesThread = new Thread(async () => await Emotes.UpdateEmotes.StartUpdatingEmotes(_channelsToConnectTo).ConfigureAwait(false));
       var authThread = new Thread(async () => await Authentication.StartValidatingTokenAsync().ConfigureAwait(false));
       var remindersThread = new Thread(async () => await Remind.StartCheckingReminders().ConfigureAwait(false));
-      var reconnectThread = new Thread(async () => await Bot.StartReconnecting().ConfigureAwait(false));
+      var reconnectThread = new Thread(async () => await StartReconnecting().ConfigureAwait(false));
       emotesThread.Start();
       authThread.Start();
       remindersThread.Start();
@@ -55,9 +55,19 @@ namespace TwitchBot
       Console.ReadLine();
     }
 
-    
-    
-    private static async Task<List<string>> SetChannelsToConnectToAsync()
+    public static async Task StartReconnecting()
+    {
+      await Task.Run(async () =>
+      {
+        while (true)
+        {
+          Thread.Sleep(TimeSpan.FromSeconds(20));
+          bot = new Bot(await GetChannelsToConnectToAsync().ConfigureAwait(false));
+        }
+      }).ConfigureAwait(false);
+    }
+
+    private static async Task<List<string>> GetChannelsToConnectToAsync()
       => await DatabaseConnections.GetConnectedChannels().ConfigureAwait(false);
 
     private static void BuildSettingsConfing(IConfigurationBuilder builder)

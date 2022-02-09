@@ -17,18 +17,26 @@ namespace TwitchBot
 {
   internal class Bot
   {
-    public static CommandGetter Cg;
+    public static CommandGetter CmdGetter;
     public static string Prefix;
     private static TwitchClient _client;
-    private readonly List<string> _channels;
+    private static bool _firstInit = true;
     private bool _reconnect;
 
     public Bot(List<string> channelsToConnectTo)
     {
-      Prefix = Debugger.IsAttached ? "$$" : "$";
-
-      Cg = new CommandGetter();
-      _channels = channelsToConnectTo;
+      if (_firstInit)
+      {
+        Log.Information("First Bot.cs initialization");
+        Prefix = Debugger.IsAttached ? "$$" : "$";
+        CmdGetter = new CommandGetter();
+        _firstInit = false;
+      }
+      else
+      {
+        _client?.Disconnect();
+        Thread.Sleep(100);
+      }
 
       var creds = new ConnectionCredentials(SecretsConfig.Credentials.Username, SecretsConfig.Credentials.AccessToken);
       var clientOptions = new ClientOptions
@@ -54,27 +62,27 @@ namespace TwitchBot
     public static void WriteMessage(string message, string channel)
       => _client.SendMessage(channel, message);
 
-    public static async Task StartReconnecting()
-    {
-      await Task.Run(() =>
-      {
-        while (true)
-        {
-          Thread.Sleep(TimeSpan.FromDays(1));
-          _client.Reconnect();
-        }
-      }).ConfigureAwait(false);
-    }
+    // public static async Task StartReconnecting()
+    // {
+    //   await Task.Run(() =>
+    //   {
+    //     while (true)
+    //     {
+    //       Thread.Sleep(TimeSpan.FromDays(1));
+    //       _client.Reconnect();
+    //     }
+    //   }).ConfigureAwait(false);
+    // }
 
     private void Client_OnConnected(object sender, TwitchLib.Client.Events.OnConnectedArgs e)
     {
       Log.Information("{username} connected.", e.BotUsername);
-      if (_client.JoinedChannels.Count != 0) 
-        return;
-      foreach (var channel in _channels)
-      {
-        _client.JoinChannel(channel);
-      }
+      // if (_client.JoinedChannels.Count != 0) 
+      //   return;
+      // foreach (var channel in _channels)
+      // {
+      //   _client.JoinChannel(channel);
+      // }
     }
 
     private void Client_OnJoinedChannel(object sender, TwitchLib.Client.Events.OnJoinedChannelArgs e)
@@ -102,33 +110,33 @@ namespace TwitchBot
       await Afk.CheckAfk(message).ConfigureAwait(false);
 
       if (e.ChatMessage.Message.StartsWith(Prefix))
-        await Cg.CheckIfCommandAsync(message).ConfigureAwait(false);
+        await CmdGetter.CheckIfCommandAsync(message).ConfigureAwait(false);
     }
 
     private async void Client_OnDisconnected(object sender, TwitchLib.Communication.Events.OnDisconnectedEventArgs e)
     {
-      if (_reconnect) 
-        return;
-      _reconnect = true;
+      // if (_reconnect) 
+      //   return;
+      // _reconnect = true;
 
       Log.Warning("Twitch client disconnected.");
 
-      while (true)
-      {
-        try
-        {
-          if (!_client.IsConnected)
-            _client.Connect();
-          break;
-        }
-        catch (Exception ex)
-        {
-          Log.Debug("Can't reconnect: {error}", ex.Message);
-        }
-        await Task.Delay(5000);
-        Log.Debug("{bool}", _client.IsConnected);
-      }
-      _reconnect = false;
+      // while (true)
+      // {
+      //   try
+      //   {
+      //     if (!_client.IsConnected)
+      //       _client.Connect();
+      //     break;
+      //   }
+      //   catch (Exception ex)
+      //   {
+      //     Log.Debug("Can't reconnect: {error}", ex.Message);
+      //   }
+      //   await Task.Delay(5000);
+      //   Log.Debug("{bool}", _client.IsConnected);
+      // }
+      // _reconnect = false;
     }
 
     private void Client_OnError(object sender, TwitchLib.Communication.Events.OnErrorEventArgs e)
