@@ -55,13 +55,13 @@ namespace TwitchBot
       Console.ReadLine();
     }
 
-    public static async Task StartReconnecting()
+    private static async Task StartReconnecting()
     {
       await Task.Run(async () =>
       {
         while (true)
         {
-          Thread.Sleep(TimeSpan.FromSeconds(20));
+          Thread.Sleep(TimeSpan.FromDays(1));
           bot = new Bot(await GetChannelsToConnectToAsync().ConfigureAwait(false));
         }
       }).ConfigureAwait(false);
