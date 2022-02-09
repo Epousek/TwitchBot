@@ -34,7 +34,7 @@ namespace TwitchBot.Commands
         return;
       }
 
-      if (Bot.Cg.CommandInstances.Any(x => string.Equals(args[0], x.Key, StringComparison.OrdinalIgnoreCase) && x.Value.Optoutable))
+      if (Bot.CmdGetter.CommandInstances.Any(x => string.Equals(args[0], x.Key, StringComparison.OrdinalIgnoreCase) && x.Value.Optoutable))
       {
         if (!await DatabaseConnections.IsInUsers(message.Channel, message.Username).ConfigureAwait(false))
           await DatabaseConnections.WriteToUsers(message.Channel, message.Username).ConfigureAwait(false);
