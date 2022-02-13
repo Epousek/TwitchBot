@@ -6,6 +6,7 @@ using Serilog;
 using TwitchBot.Connections;
 using TwitchBot.Interfaces;
 using TwitchBot.Models;
+using TwitchBot.Commands.Status;
 
 namespace TwitchBot.Commands
 {
@@ -20,6 +21,10 @@ namespace TwitchBot.Commands
       CommandInstances.Add("Removed", new Removed());
       CommandInstances.Add("Remind", new Remind());
       CommandInstances.Add("Afk", new Afk());
+      CommandInstances.Add("Gn", new Gn());
+      CommandInstances.Add("Food", new Food());
+      CommandInstances.Add("School", new School());
+      CommandInstances.Add("Status", new CheckStatus());
       CommandInstances.Add("Suggest", new Suggest());
       CommandInstances.Add("Help", new Help());
       CommandInstances.Add("Commands", new Commands());
