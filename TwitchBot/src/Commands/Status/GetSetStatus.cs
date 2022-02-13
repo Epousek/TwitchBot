@@ -15,7 +15,8 @@ namespace TwitchBot.Commands.Status
     public static async Task CheckStatus(ChatMessageModel message)
     {
       var status = await DatabaseConnections.GetUserStatus(message.Channel, message.Username).ConfigureAwait(false);
-
+      if (status == null)
+        return;
       if (status.Status == Enums.Status.None)
         return;
       if (message.Message.StartsWith(Bot.Prefix + status.Status.ToString().ToLower()))
