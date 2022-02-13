@@ -29,7 +29,7 @@ namespace TwitchBot.Commands.Status
     {
       if (await DatabaseConnections.GetStatusEnumOnly(message.Channel, message.Username).ConfigureAwait(false) == Enums.Status.Afk)
       {
-        Bot.WriteMessage($"@{message.Username} už jsi afk.", message.Channel);
+        Bot.WriteMessage($"@{message.Username} už jsi afk.", message.Channel); //TODO: update status
         return;
       }
 
