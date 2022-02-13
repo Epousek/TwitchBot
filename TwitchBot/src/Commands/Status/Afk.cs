@@ -37,11 +37,11 @@ namespace TwitchBot.Commands
       var comArgs = new CommandArguments(message);
       var args = comArgs.GetOneArgument();
 
-      var afk = new AfkModel
+      var afk = new StatusModel
       {
         Channel = message.Channel,
         Username = message.Username,
-        AfkSince = DateTime.Now,
+        StatusSince = DateTime.Now,
         IsAfk = true
       };
 
@@ -76,9 +76,9 @@ namespace TwitchBot.Commands
         var afk = await DatabaseConnections.GetAfkUser(message.Channel, message.Username).ConfigureAwait(false);
 
         if (string.IsNullOrEmpty(afk.Message))
-          Bot.WriteMessage($"{afk.Username} už není afk! ({(DateTime.Now - afk.AfkSince).Humanize(3, minUnit: TimeUnit.Second, culture: new CultureInfo("cs-CS"))})", afk.Channel);
+          Bot.WriteMessage($"{afk.Username} už není afk! ({(DateTime.Now - afk.StatusSince).Humanize(3, minUnit: TimeUnit.Second, culture: new CultureInfo("cs-CS"))})", afk.Channel);
         else
-          Bot.WriteMessage($"{afk.Username} už není afk: {afk.Message} ({(DateTime.Now - afk.AfkSince).Humanize(3, minUnit: TimeUnit.Second, culture: new CultureInfo("cs-CS"))})", afk.Channel);
+          Bot.WriteMessage($"{afk.Username} už není afk: {afk.Message} ({(DateTime.Now - afk.StatusSince).Humanize(3, minUnit: TimeUnit.Second, culture: new CultureInfo("cs-CS"))})", afk.Channel);
 
         afk.IsAfk = false;
         await DatabaseConnections.UpdateAfkUser(afk).ConfigureAwait(false);
