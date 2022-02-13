@@ -3,7 +3,7 @@ using TwitchBot.Enums;
 
 namespace TwitchBot.Models
 {
-  public class AfkModel
+  public class StatusModel
   {
     public string Channel { get; init; }
     public string Username { get; init; }
