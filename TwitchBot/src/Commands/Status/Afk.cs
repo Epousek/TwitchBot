@@ -7,9 +7,8 @@ using TwitchBot.Connections;
 using TwitchBot.Enums;
 using TwitchBot.Interfaces;
 using TwitchBot.Models;
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 
-namespace TwitchBot.Commands
+namespace TwitchBot.Commands.Status
 {
   internal class Afk : ICommand
   {
@@ -28,7 +27,7 @@ namespace TwitchBot.Commands
 
     public async Task UseCommandAsync(ChatMessageModel message)
     {
-      if (await DatabaseConnections.IsAfk(message.Channel, message.Username).ConfigureAwait(false))
+      if (await DatabaseConnections.GetStatusEnumOnly(message.Channel, message.Username).ConfigureAwait(false) == Enums.Status.Afk)
       {
         Bot.WriteMessage($"@{message.Username} už jsi afk.", message.Channel);
         return;
@@ -37,52 +36,29 @@ namespace TwitchBot.Commands
       var comArgs = new CommandArguments(message);
       var args = comArgs.GetOneArgument();
 
-      var afk = new StatusModel
+      var status = new StatusModel
       {
         Channel = message.Channel,
         Username = message.Username,
         StatusSince = DateTime.Now,
-        IsAfk = true
+        Status = Enums.Status.Afk
       };
 
       if (args.Count == 0)
       {
-        afk.Message = "";
+        status.Message = "";
         Bot.WriteMessage($"@{message.Username} je nyní afk.", message.Channel);
       }
       else
       {
-        afk.Message = args[0];
+        status.Message = args[0];
         Bot.WriteMessage($"@{message.Username} je nyní afk: {args[0]}", message.Channel);
       }
 
-      if (await DatabaseConnections.IsInAfkUsers(message.Channel, message.Username).ConfigureAwait(false))
-      {
-        await DatabaseConnections.UpdateAfkUser(afk).ConfigureAwait(false);
-      }
+      if (await DatabaseConnections.IsInUserStatuses(message.Channel, message.Username).ConfigureAwait(false))
+        await DatabaseConnections.UpdateUserStatus(status).ConfigureAwait(false);
       else
-      {
-        await DatabaseConnections.AddAfkUser(afk).ConfigureAwait(false);
-      }
-    }
-
-    public static async Task CheckAfk(ChatMessageModel message)
-    {
-      if (message.Message.StartsWith($"{Bot.Prefix}afk", StringComparison.OrdinalIgnoreCase))
-        return;
-
-      if (await DatabaseConnections.IsAfk(message.Channel, message.Username))
-      {
-        var afk = await DatabaseConnections.GetAfkUser(message.Channel, message.Username).ConfigureAwait(false);
-
-        if (string.IsNullOrEmpty(afk.Message))
-          Bot.WriteMessage($"{afk.Username} už není afk! ({(DateTime.Now - afk.StatusSince).Humanize(3, minUnit: TimeUnit.Second, culture: new CultureInfo("cs-CS"))})", afk.Channel);
-        else
-          Bot.WriteMessage($"{afk.Username} už není afk: {afk.Message} ({(DateTime.Now - afk.StatusSince).Humanize(3, minUnit: TimeUnit.Second, culture: new CultureInfo("cs-CS"))})", afk.Channel);
-
-        afk.IsAfk = false;
-        await DatabaseConnections.UpdateAfkUser(afk).ConfigureAwait(false);
-      }
+        await DatabaseConnections.AddUserStatus(status).ConfigureAwait(false);
     }
   }
 }
