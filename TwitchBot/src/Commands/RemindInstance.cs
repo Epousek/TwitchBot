@@ -33,12 +33,14 @@ namespace TwitchBot.Commands
         if (args[1] == "in")
         {   //TIMED REMIND
           args = comArgs.GetXArguments(4);
-                    CheckTime(args, message, out var reminder);
+          CheckTime(args, message, out var reminder);
           if (reminder == null) 
             return;
+          if (args[0].StartsWith('@'))
+            args[0] = args[0].Replace("@", "");
           reminder.IsTimed = true;
           reminder.From = message.Username;
-          reminder.For = string.Equals(args[0], "me") ? reminder.From : args[0];
+          reminder.For = string.Equals(args[0], "me", StringComparison.OrdinalIgnoreCase) ? reminder.From : args[0];
           reminder.Channel = message.Channel;
           reminder.Message = string.IsNullOrEmpty(args[3]) ? string.Empty : args[3];
 

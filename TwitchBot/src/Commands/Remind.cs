@@ -136,7 +136,9 @@ namespace TwitchBot.Commands
         var reminders = await DatabaseConnections.GetActiveUntimedReminders().ConfigureAwait(false);
         if (reminders.Any(x => string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase)))
         {
-          reminders = reminders.Where(x => string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase)).ToList();
+          reminders = reminders.Where(x => 
+            string.Equals(x.For, message.Username, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(x.Channel, message.Channel) ).ToList();
           foreach (var reminder in reminders)
           {
             var builder = new StringBuilder("@");
