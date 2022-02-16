@@ -110,16 +110,16 @@ namespace TwitchBot.Connections
       }
     }
     
-    public static async Task<bool> IsInAfkUsers(string channel, string username)
+    public static async Task<bool> IsInUserStatuses(string channel, string username)
     {
       await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        await using (var com = new MySqlCommand("sp_IsInAfkUsers", con))
+        await using (var com = new MySqlCommand("sp_IsInUserStatuses", con))
         {
           com.CommandType = CommandType.StoredProcedure;
-          com.Parameters.AddWithValue("afkChannel", channel);
-          com.Parameters.AddWithValue("afkUsername", username);
+          com.Parameters.AddWithValue("statusChannel", channel);
+          com.Parameters.AddWithValue("statusUsername", username);
 
           try
           {
@@ -128,26 +128,27 @@ namespace TwitchBot.Connections
           }
           catch (Exception e)
           {
-            Log.Error("sp_IsInAfkUsers exception: {ex}", e);
+            Log.Error("sp_IsInUserStatuses exception: {ex}", e);
             return false;
           }
         }
       }
     }
 
-    public static async Task AddAfkUser(AfkModel afk)
+    public static async Task AddUserStatus(StatusModel status)
     {
       await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        await using (var com = new MySqlCommand("sp_AddAfkUser", con))
+        await using (var com = new MySqlCommand("sp_AddUserStatus", con))
         {
           com.CommandType = CommandType.StoredProcedure;
 
-          com.Parameters.AddWithValue("afkChannel", afk.Channel);
-          com.Parameters.AddWithValue("afkUsername", afk.Username);
-          com.Parameters.AddWithValue("afkMessage", afk.Message);
-          com.Parameters.AddWithValue("afkSince", afk.AfkSince);
+          com.Parameters.AddWithValue("statusChannel", status.Channel);
+          com.Parameters.AddWithValue("statusUsername", status.Username);
+          com.Parameters.AddWithValue("statusMessage", status.Message);
+          com.Parameters.AddWithValue("statusSince", status.StatusSince);
+          com.Parameters.AddWithValue("whatStatus", status.Status.ToString());
 
           try
           {
@@ -155,26 +156,26 @@ namespace TwitchBot.Connections
           }
           catch (Exception e)
           {
-            Log.Error("sp_AddAfkUser exception: {ex}", e);
+            Log.Error("sp_AddUserStatus exception: {ex}", e);
           }
         }
       }
     }
 
-    public static async Task UpdateAfkUser(AfkModel afk)
+    public static async Task UpdateUserStatus(StatusModel status)
     {
       await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        await using (var com = new MySqlCommand("sp_UpdateAfkUser", con))
+        await using (var com = new MySqlCommand("sp_UpdateUserStatus", con))
         {
           com.CommandType = CommandType.StoredProcedure;
 
-          com.Parameters.AddWithValue("afkChannel", afk.Channel);
-          com.Parameters.AddWithValue("afkUsername", afk.Username);
-          com.Parameters.AddWithValue("afkMessage", afk.Message);
-          com.Parameters.AddWithValue("afkSince", afk.AfkSince);
-          com.Parameters.AddWithValue("isAfk", afk.IsAfk);
+          com.Parameters.AddWithValue("statusChannel", status.Channel);
+          com.Parameters.AddWithValue("statusUsername", status.Username);
+          com.Parameters.AddWithValue("statusMessage", status.Message);
+          com.Parameters.AddWithValue("statusSince", status.StatusSince);
+          com.Parameters.AddWithValue("whatStatus", status.Status.ToString());
 
           try
           {
@@ -182,50 +183,50 @@ namespace TwitchBot.Connections
           }
           catch (Exception e)
           {
-            Log.Error("sp_UpdateAfkUser exception: {ex}", e);
+            Log.Error("sp_UpdateUserStatus exception: {ex}", e);
           }
         }
       }
     }
 
-    public static async Task<bool> IsAfk(string channel, string username)
+    public static async Task<Enums.Status> GetStatusEnumOnly(string channel, string username) //TODO
     {
       await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
-        con.Open();
-        await using (var com = new MySqlCommand("sp_IsAfk", con))
+        con.Open(); 
+        await using (var com = new MySqlCommand("sp_GetStatus", con))
         {
           com.CommandType = CommandType.StoredProcedure;
-          com.Parameters.AddWithValue("afkChannel", channel);
-          com.Parameters.AddWithValue("afkUsername", username);
+          com.Parameters.AddWithValue("statusChannel", channel);
+          com.Parameters.AddWithValue("statusUsername", username);
 
           try
           {
             var result = await com.ExecuteScalarAsync().ConfigureAwait(false);
-            if (result != null)
-              return (bool)result;
-            return false;
+            if (result != null && Enum.IsDefined(typeof(Status), result))
+              return Enum.Parse<Status>((string)result);
+            return Enums.Status.None;
 
           }
           catch (Exception e)
           {
-            Log.Error("sp_IsAfk exception: {ex}", e);
-            return false;
+            Log.Error("sp_GetStatus exception: {ex}", e);
+            return Enums.Status.None;
           }
         }
       }
     }
 
-    public static async Task<AfkModel> GetAfkUser(string channel, string username)
+    public static async Task<StatusModel> GetUserStatus(string channel, string username)
     {
       await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
       {
         con.Open();
-        await using (var com = new MySqlCommand("sp_GetAfkUser", con))
+        await using (var com = new MySqlCommand("sp_GetStatusFull", con))
         {
           com.CommandType = CommandType.StoredProcedure;
-          com.Parameters.AddWithValue("afkChannel", channel);
-          com.Parameters.AddWithValue("afkUsername", username);
+          com.Parameters.AddWithValue("statusChannel", channel);
+          com.Parameters.AddWithValue("statusUsername", username);
 
           try
           {
@@ -234,19 +235,18 @@ namespace TwitchBot.Connections
               return null;
 
             await reader.ReadAsync();
-            return new AfkModel
+            return new StatusModel()
             {
               Channel = reader.GetString(0),
               Username = reader.GetString(1),
               Message = reader.GetString(2),
-              AfkSince = reader.GetDateTime(3),
-              IsAfk = reader.GetBoolean(4)
+              StatusSince = reader.GetDateTime(3),
+              Status = Enum.Parse<Status>(Helpers.FirstToUpper(reader.GetString(4))) 
             };
-
           }
           catch (Exception e)
           {
-            Log.Error("sp_GetAfkUser exception: {ex}", e);
+            Log.Error("sp_GetStatusFull exception: {ex}", e);
             return null;
           }
         }

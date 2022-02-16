@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
 using TwitchBot.Commands;
+using TwitchBot.Commands.Status;
 using TwitchBot.Connections;
 using TwitchBot.Models;
 using TwitchLib.Client;
@@ -107,7 +108,7 @@ namespace TwitchBot
       await DatabaseConnections.WriteMessage(message).ConfigureAwait(false);
 
       await Remind.CheckForReminder(message).ConfigureAwait(false);
-      await Afk.CheckAfk(message).ConfigureAwait(false);
+      await GetSetStatus.CheckStatus(message).ConfigureAwait(false);
 
       if (e.ChatMessage.Message.StartsWith(Prefix))
         await CmdGetter.CheckIfCommandAsync(message).ConfigureAwait(false);

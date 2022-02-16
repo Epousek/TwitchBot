@@ -1,13 +1,14 @@
 ﻿using System;
+using TwitchBot.Enums;
 
 namespace TwitchBot.Models
 {
-  public class AfkModel
+  public class StatusModel
   {
     public string Channel { get; init; }
     public string Username { get; init; }
     public string Message { get; set; }
-    public DateTime AfkSince { get; set; }
-    public bool? IsAfk { get; set; }
+    public DateTime StatusSince { get; set; }
+    public Status Status { get; set; }
   }
 }
