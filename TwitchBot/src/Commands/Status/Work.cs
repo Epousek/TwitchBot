@@ -24,32 +24,26 @@ namespace TwitchBot.Commands.Status
 
     public async Task UseCommandAsync(ChatMessageModel message)
     {
-      if (await DatabaseConnections.GetStatusEnumOnly(message.Channel, message.Username).ConfigureAwait(false) == Enums.Status.Afk)
+      
+      var statusEnum = await DatabaseConnections.GetStatusEnumOnly(message.Channel, message.Username).ConfigureAwait(false);
+      StatusModel status;
+      
+      switch (statusEnum)
       {
-        Bot.WriteMessage($"@{message.Username} už jsi afk.", message.Channel);
-        return;
-      }
-
-      var comArgs = new CommandArguments(message);
-      var args = comArgs.GetOneArgument();
-
-      var status = new StatusModel
-      {
-        Channel = message.Channel,
-        Username = message.Username,
-        StatusSince = DateTime.Now,
-        Status = Enums.Status.Work
-      };
-
-      if (args.Count == 0)
-      {
-        status.Message = "";
-        Bot.WriteMessage($"@{message.Username} začal pracovat.", message.Channel);
-      }
-      else
-      {
-        status.Message = args[0];
-        Bot.WriteMessage($"@{message.Username} začal pracovat: {args[0]}", message.Channel);
+        case Enums.Status.None:
+          status = GetSetStatus.CreateStatus(message, Enums.Status.Work);
+          Bot.WriteMessage(
+            string.IsNullOrEmpty(status.Message)
+              ? $"@{message.Username} jde pracovat."
+              : $"@{message.Username} jde pracovat: {status.Message}", message.Channel);
+          break;
+        case Enums.Status.Work:
+          Bot.WriteMessage($"@{message.Username} už pracuješ.", message.Channel); //TODO: update status
+          return;
+        default:
+          status = GetSetStatus.CreateStatus(message, Enums.Status.Work);
+          Bot.WriteMessage(GetSetStatus.StatusChange(message.Username, statusEnum, Enums.Status.Work), message.Channel);
+          break;
       }
 
       if (await DatabaseConnections.IsInUserStatuses(message.Channel, message.Username).ConfigureAwait(false))

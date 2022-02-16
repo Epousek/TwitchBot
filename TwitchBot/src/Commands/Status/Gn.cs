@@ -24,32 +24,25 @@ namespace TwitchBot.Commands.Status
 
     public async Task UseCommandAsync(ChatMessageModel message)
     {
-      if (await DatabaseConnections.GetStatusEnumOnly(message.Channel, message.Username).ConfigureAwait(false) == Enums.Status.Gn)
+      var statusEnum = await DatabaseConnections.GetStatusEnumOnly(message.Channel, message.Username).ConfigureAwait(false);
+      StatusModel status;
+      
+      switch (statusEnum)
       {
-        Bot.WriteMessage($"@{message.Username} už spíš.", message.Channel); //TODO: update status
-        return;
-      }
-
-      var comArgs = new CommandArguments(message);
-      var args = comArgs.GetOneArgument();
-
-      var status = new StatusModel
-      {
-        Channel = message.Channel,
-        Username = message.Username,
-        StatusSince = DateTime.Now,
-        Status = Enums.Status.Gn
-      };
-
-      if (args.Count == 0)
-      {
-        status.Message = "";
-        Bot.WriteMessage($"@{message.Username} jde spát.", message.Channel);
-      }
-      else
-      {
-        status.Message = args[0];
-        Bot.WriteMessage($"@{message.Username} jde spát: {args[0]}", message.Channel);
+        case Enums.Status.None:
+          status = GetSetStatus.CreateStatus(message, Enums.Status.Gn);
+          Bot.WriteMessage(
+            string.IsNullOrEmpty(status.Message)
+              ? $"{message.Username} jde spát."
+              : $"{message.Username} jde spát: {status.Message}", message.Channel);
+          break;
+        case Enums.Status.Gn:
+          Bot.WriteMessage($"@{message.Username} už spíš.", message.Channel); //TODO: update status
+          return;
+        default:
+          status = GetSetStatus.CreateStatus(message, Enums.Status.Gn);
+          Bot.WriteMessage(GetSetStatus.StatusChange(message.Username, statusEnum, Enums.Status.Gn), message.Channel);
+          break;
       }
 
       if (await DatabaseConnections.IsInUserStatuses(message.Channel, message.Username).ConfigureAwait(false))

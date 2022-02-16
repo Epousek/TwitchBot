@@ -24,32 +24,26 @@ namespace TwitchBot.Commands.Status
 
     public async Task UseCommandAsync(ChatMessageModel message)
     {
-      if (await DatabaseConnections.GetStatusEnumOnly(message.Channel, message.Username).ConfigureAwait(false) == Enums.Status.Afk)
+      
+      var statusEnum = await DatabaseConnections.GetStatusEnumOnly(message.Channel, message.Username).ConfigureAwait(false);
+      StatusModel status;
+      
+      switch (statusEnum)
       {
-        Bot.WriteMessage($"@{message.Username} už jsi afk.", message.Channel);
-        return;
-      }
-
-      var comArgs = new CommandArguments(message);
-      var args = comArgs.GetOneArgument();
-
-      var status = new StatusModel
-      {
-        Channel = message.Channel,
-        Username = message.Username,
-        StatusSince = DateTime.Now,
-        Status = Enums.Status.School
-      };
-
-      if (args.Count == 0)
-      {
-        status.Message = "";
-        Bot.WriteMessage($"@{message.Username} jde do školy.", message.Channel);
-      }
-      else
-      {
-        status.Message = args[0];
-        Bot.WriteMessage($"@{message.Username} jde do školy: {args[0]}", message.Channel);
+        case Enums.Status.None:
+          status = GetSetStatus.CreateStatus(message, Enums.Status.School);
+          Bot.WriteMessage(
+            string.IsNullOrEmpty(status.Message)
+              ? $"{message.Username} se jde učit."
+              : $"{message.Username} se jde učit: {status.Message}", message.Channel);
+          break;
+        case Enums.Status.School:
+          Bot.WriteMessage($"@{message.Username} už se učíš.", message.Channel); //TODO: update status
+          return;
+        default:
+          status = GetSetStatus.CreateStatus(message, Enums.Status.School);
+          Bot.WriteMessage(GetSetStatus.StatusChange(message.Username, statusEnum, Enums.Status.School), message.Channel);
+          break;
       }
 
       if (await DatabaseConnections.IsInUserStatuses(message.Channel, message.Username).ConfigureAwait(false))
