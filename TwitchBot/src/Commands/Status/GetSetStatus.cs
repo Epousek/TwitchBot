@@ -13,7 +13,7 @@ namespace TwitchBot.Commands.Status
   public static class GetSetStatus
   {
     public static string StatusChange(string username, Enums.Status from, Enums.Status to)
-      => $"@{username} změnil(a) svůj status z {from.ToString().ToLower()} na {to.ToString().ToLower()}";
+      => $"{username} změnil(a) svůj status z {from.ToString().ToLower()} na {to.ToString().ToLower()}";
 
     public static StatusModel CreateStatus(ChatMessageModel message, Enums.Status status)
     {
