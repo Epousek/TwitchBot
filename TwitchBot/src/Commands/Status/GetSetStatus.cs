@@ -12,6 +12,24 @@ namespace TwitchBot.Commands.Status
 {
   public static class GetSetStatus
   {
+    public static string StatusChange(string username, Enums.Status from, Enums.Status to)
+      => $"@{username} změnil(a) svůj status z {from.ToString().ToLower()} na {to.ToString().ToLower()}";
+
+    public static StatusModel CreateStatus(ChatMessageModel message, Enums.Status status)
+    {
+      var comArgs = new CommandArguments(message);
+      var args = comArgs.GetOneArgument();
+
+      return new StatusModel
+      {
+        Channel = message.Channel,
+        Username = message.Username,
+        StatusSince = DateTime.Now,
+        Status = status,
+        Message = args.Count == 0 ? "" : args[0]
+      };
+    }
+
     public static async Task CheckStatus(ChatMessageModel message)
     {
       var status = await DatabaseConnections.GetUserStatus(message.Channel, message.Username).ConfigureAwait(false);
@@ -19,22 +37,12 @@ namespace TwitchBot.Commands.Status
         return;
       if (status.Status == Enums.Status.None)
         return;
-      if (message.Message.StartsWith(Bot.Prefix + status.Status.ToString().ToLower()))
+      if (Enum.GetNames(typeof(Enums.Status)).Any(x => message.Message.StartsWith(Bot.Prefix + x.ToLower())))
         return; //TODO: update status
 
-      //TODO: changing from one status to another
-      // Enums.Status foundStatus;
-      // foreach (var s in Enum.GetNames(typeof(Enums.Status)))
-      // {
-      //   if (message.Message.StartsWith(Bot.Prefix + s))
-      //   {
-      //     foundStatus = Enum.Parse<Enums.Status>(s);
-      //     return;
-      //   }
-      // }
-      
       var builder = new StringBuilder();
-      builder.Append(message.Username)
+      builder
+        .Append(message.Username)
         .Append(' ');
       switch (status.Status)
       {
@@ -67,7 +75,7 @@ namespace TwitchBot.Commands.Status
             builder.Append($": {status.Message} ({(DateTime.Now - status.StatusSince).Humanize(3, minUnit: TimeUnit.Second, culture: new CultureInfo("cs-CS"))})");
           break;
         case Enums.Status.School:
-          builder.Append("už není ve škole");
+          builder.Append("se už určitě naučil vše co potřeboval");
           if (string.IsNullOrEmpty(status.Message))
             builder.Append($"! ({(DateTime.Now - status.StatusSince).Humanize(3, minUnit: TimeUnit.Second, culture: new CultureInfo("cs-CS"))})");
           else
@@ -75,9 +83,9 @@ namespace TwitchBot.Commands.Status
           break;
       }
 
-        Bot.WriteMessage(builder.ToString(), message.Channel);
-        status.Status = Enums.Status.None;
-        await DatabaseConnections.UpdateUserStatus(status).ConfigureAwait(false);
+      Bot.WriteMessage(builder.ToString(), message.Channel);
+      status.Status = Enums.Status.None;
+      await DatabaseConnections.UpdateUserStatus(status).ConfigureAwait(false);
     }
   }
 }
