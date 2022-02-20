@@ -20,9 +20,11 @@ namespace TwitchBot
   {
     public static CommandGetter CmdGetter;
     public static string Prefix;
-    private static TwitchClient _client;
+    public bool Reconnecting;
+    public static TwitchClient _client;
     private static bool _firstInit = true;
-    private bool _reconnect;
+    private static DateTime _lastMessageSent;
+    private static string _lastMessageChannel;
 
     public Bot(List<string> channelsToConnectTo)
     {
@@ -31,6 +33,8 @@ namespace TwitchBot
         Log.Information("First Bot.cs initialization");
         Prefix = Debugger.IsAttached ? "$$" : "$";
         CmdGetter = new CommandGetter();
+        _lastMessageChannel = string.Empty;
+        _lastMessageSent = DateTime.Now;
         _firstInit = false;
       }
       else
@@ -61,7 +65,13 @@ namespace TwitchBot
     }
 
     public static void WriteMessage(string message, string channel)
-      => _client.SendMessage(channel, message);
+    {
+      if((DateTime.Now - _lastMessageSent) < TimeSpan.FromMilliseconds(500) && _lastMessageChannel == channel) //not working
+        Thread.Sleep(500);
+      _client.SendMessage(channel, message);
+      _lastMessageChannel = channel;
+      _lastMessageSent = DateTime.Now;
+    }
 
     // public static async Task StartReconnecting()
     // {
@@ -116,11 +126,35 @@ namespace TwitchBot
 
     private async void Client_OnDisconnected(object sender, TwitchLib.Communication.Events.OnDisconnectedEventArgs e)
     {
-      // if (_reconnect) 
-      //   return;
-      // _reconnect = true;
+      if (Reconnecting)
+      {
+        Log.Information("Intentionally disconnected.");
+        Reconnecting = false;
+        return;
+      }
 
       Log.Warning("Twitch client disconnected.");
+
+      while (!_client.IsConnected)
+      {
+        try
+        {
+          _client.Connect();
+          if (_client.JoinedChannels.Count != 0) 
+            continue;
+          Thread.Sleep(500);
+          foreach (var channel in await DatabaseConnections.GetConnectedChannels().ConfigureAwait(false))
+          {
+            _client.JoinChannel(channel);
+          }
+
+          break;
+        }
+        catch (Exception ex)
+        {
+          Log.Error("Couldn't reconnect: {ex}", ex);
+        }
+      }
 
       // while (true)
       // {
