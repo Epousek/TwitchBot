@@ -21,5 +21,8 @@ namespace TwitchBot.Models
 
     [JsonProperty("connection_string")]
     public string ConnectionString { get; set; }
+
+    [JsonProperty("deepl_key")] 
+    public string DeeplKey { get; set; }
   }
 }
