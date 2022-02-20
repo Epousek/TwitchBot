@@ -134,6 +134,7 @@ namespace TwitchBot
       }
 
       Log.Warning("Twitch client disconnected.");
+      var timeToWait = 500;
 
       while (!_client.IsConnected)
       {
@@ -153,6 +154,17 @@ namespace TwitchBot
         catch (Exception ex)
         {
           Log.Error("Couldn't reconnect: {ex}", ex);
+        }
+
+        if (timeToWait < 60000)
+        {
+          Thread.Sleep(timeToWait);
+          timeToWait = timeToWait * 2;
+        }
+        else
+        {
+          Log.Fatal("Couldn't reconnect even after trying a lot :/");
+          break;
         }
       }
 
