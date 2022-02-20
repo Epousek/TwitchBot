@@ -12,6 +12,41 @@ namespace TwitchBot.Connections
 {
   public static class DatabaseConnections
   {
+    public static async Task<ChatMessageModel> GetRandomLine(string channel, string username = null)
+    {
+      var spName = string.IsNullOrEmpty(username) ? "sp_RandomLine" : "sp_RandomLineSpecific";
+      await using (var con = new MySqlConnector.MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        await using (var com = new MySqlConnector.MySqlCommand(spName, con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("tableName", Helpers.FirstToUpper(channel));
+          if (!string.IsNullOrEmpty(username))
+            com.Parameters.AddWithValue("username", username);
+
+          try
+          {
+            var reader = await com.ExecuteReaderAsync().ConfigureAwait(false);
+            await reader.ReadAsync();
+
+            return new ChatMessageModel()
+            {
+              Channel = channel,
+              Username = reader.GetString(0),
+              Message = reader.GetString(1),
+              TimeStamp = reader.GetDateTime(2)
+            };
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_RandomLine(Specific) exception: {e}", e);
+            return null;
+          }
+        }
+      }
+    }
+
     public static async Task<bool?> IsInCommandsInfo(string commandName)
     {
       await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
