@@ -9,6 +9,7 @@ namespace TwitchBot.Models
     public string Username { get; init; }
     public string Message { get; set; }
     public DateTime StatusSince { get; set; }
-    public Status Status { get; set; }
+    public Status CurrentStatus { get; set; }
+    public Status LastStatus { get; set; }
   }
 }
