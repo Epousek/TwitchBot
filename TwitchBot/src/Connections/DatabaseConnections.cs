@@ -168,32 +168,7 @@ namespace TwitchBot.Connections
         }
       }
     }
-    
-    public static async Task<Status> GetLastStatus(string channel, string username)
-    {
-      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
-      {
-        con.Open();
-        await using (var com = new MySqlCommand("sp_GetLastStatus", con))
-        {
-          com.CommandType = CommandType.StoredProcedure;
-          com.Parameters.AddWithValue("username", username);
-          com.Parameters.AddWithValue("channel", channel);
 
-          try
-          {
-            var result = await com.ExecuteScalarAsync().ConfigureAwait(false);
-            return result == null ? Status.None : Enum.Parse<Status>((string)result);
-          }
-          catch (Exception e)
-          {
-            Log.Error("sp_GetLastStatus exception: {ex}", e);
-            return Status.None;
-          }
-        }
-      }
-    }
-    
     public static async Task<bool> IsInUserStatuses(string channel, string username)
     {
       await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
@@ -232,7 +207,7 @@ namespace TwitchBot.Connections
           com.Parameters.AddWithValue("statusUsername", status.Username);
           com.Parameters.AddWithValue("statusMessage", status.Message);
           com.Parameters.AddWithValue("statusSince", status.StatusSince);
-          com.Parameters.AddWithValue("whatStatus", status.Status.ToString());
+          com.Parameters.AddWithValue("whatStatus", status.CurrentStatus.ToString());
 
           try
           {
@@ -259,7 +234,7 @@ namespace TwitchBot.Connections
           com.Parameters.AddWithValue("statusUsername", status.Username);
           com.Parameters.AddWithValue("statusMessage", status.Message);
           com.Parameters.AddWithValue("statusSince", status.StatusSince);
-          com.Parameters.AddWithValue("whatStatus", status.Status.ToString());
+          com.Parameters.AddWithValue("whatStatus", status.CurrentStatus.ToString());
 
           try
           {
@@ -325,7 +300,8 @@ namespace TwitchBot.Connections
               Username = reader.GetString(1),
               Message = reader.GetString(2),
               StatusSince = reader.GetDateTime(3),
-              Status = Enum.Parse<Status>(Helpers.FirstToUpper(reader.GetString(4))) 
+              CurrentStatus = Enum.Parse<Status>(Helpers.FirstToUpper(reader.GetString(4))),
+              LastStatus = Enum.Parse<Status>(Helpers.FirstToUpper(reader.GetString(5)))
             };
           }
           catch (Exception e)
