@@ -336,7 +336,6 @@ namespace TwitchBot.Connections
           }
           catch (Exception e)
           {
-            Log.Error("sp_CheckOptout exception: {ex}", e);
             return false;
           }
         }
