@@ -25,7 +25,7 @@ namespace TwitchBot.Commands.Status
         Channel = message.Channel,
         Username = message.Username,
         StatusSince = DateTime.Now,
-        Status = status,
+        CurrentStatus = status,
         Message = args.Count == 0 ? "" : args[0]
       };
     }
@@ -35,16 +35,18 @@ namespace TwitchBot.Commands.Status
       var status = await DatabaseConnections.GetUserStatus(message.Channel, message.Username).ConfigureAwait(false);
       if (status == null)
         return;
-      if (status.Status == Enums.Status.None)
+      if (status.CurrentStatus == Enums.Status.None)
         return;
       if (Enum.GetNames(typeof(Enums.Status)).Any(x => message.Message.StartsWith(Bot.Prefix + x.ToLower())))
         return; //TODO: update status
+      if (string.Equals(message.Message, Bot.Prefix + "rafk") || string.Equals(message.Message, Bot.Prefix + "cafk"))
+        return; //TODO: check dynamically
 
       var builder = new StringBuilder();
       builder
         .Append(message.Username)
         .Append(' ');
-      switch (status.Status)
+      switch (status.CurrentStatus)
       {
         case Enums.Status.Afk: 
           builder.Append("už není afk");
@@ -84,7 +86,7 @@ namespace TwitchBot.Commands.Status
       }
 
       Bot.WriteMessage(builder.ToString(), message.Channel);
-      status.Status = Enums.Status.None;
+      status.CurrentStatus = Enums.Status.None;
       await DatabaseConnections.UpdateUserStatus(status).ConfigureAwait(false);
     }
   }

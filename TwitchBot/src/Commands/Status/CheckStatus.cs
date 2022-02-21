@@ -42,11 +42,11 @@ namespace TwitchBot.Commands.Status
       {
         Bot.WriteMessage($"@{message.Username} tohoto uživatele nemám v databázi :/", message.Channel);
       }
-      else if (status.Status == Enums.Status.None)
+      else if (status.CurrentStatus == Enums.Status.None)
       {
         Bot.WriteMessage($"@{message.Username} tento uživatel nemá žádný status.", message.Channel);
       }
-      else if (status.Status == Enums.Status.Afk)
+      else if (status.CurrentStatus == Enums.Status.Afk)
       {
         var builder = new StringBuilder();
         builder
@@ -59,7 +59,7 @@ namespace TwitchBot.Commands.Status
           .Append(')');
         Bot.WriteMessage(builder.ToString(), message.Channel);
       }
-      else if (status.Status == Enums.Status.Gn)
+      else if (status.CurrentStatus == Enums.Status.Gn)
       {
         var builder = new StringBuilder();
         builder
@@ -72,7 +72,7 @@ namespace TwitchBot.Commands.Status
           .Append(')');
         Bot.WriteMessage(builder.ToString(), message.Channel);
       }
-      else if (status.Status == Enums.Status.Food)
+      else if (status.CurrentStatus == Enums.Status.Food)
       {
         var builder = new StringBuilder();
         builder
@@ -85,7 +85,7 @@ namespace TwitchBot.Commands.Status
           .Append(')');
         Bot.WriteMessage(builder.ToString(), message.Channel);
       }
-      else if (status.Status == Enums.Status.School)
+      else if (status.CurrentStatus == Enums.Status.School)
       {
         var builder = new StringBuilder();
         builder
@@ -98,7 +98,7 @@ namespace TwitchBot.Commands.Status
           .Append(')');
         Bot.WriteMessage(builder.ToString(), message.Channel);
       }
-      else if (status.Status == Enums.Status.Work)
+      else if (status.CurrentStatus == Enums.Status.Work)
       {
         var builder = new StringBuilder();
         builder
