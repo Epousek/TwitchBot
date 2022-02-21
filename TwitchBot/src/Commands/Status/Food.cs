@@ -37,7 +37,7 @@ namespace TwitchBot.Commands.Status
               : $"{message.Username} jde jíst: {status.Message}", message.Channel);
           break;
         case Enums.Status.Food:
-          Bot.WriteMessage($"@{message.Username} už jíš.", message.Channel); //TODO: update status
+          Bot.WriteMessage($"@{message.Username} Už jíš.", message.Channel); //TODO: update status
           return;
         default:
           status = GetSetStatus.CreateStatus(message, Enums.Status.Food);
@@ -49,6 +49,7 @@ namespace TwitchBot.Commands.Status
         await DatabaseConnections.UpdateUserStatus(status).ConfigureAwait(false);
       else
         await DatabaseConnections.AddUserStatus(status).ConfigureAwait(false);
+      await DatabaseConnections.SetLastStatus(status.Channel, status.Username, Enums.Status.Food);
     }
   }
 }

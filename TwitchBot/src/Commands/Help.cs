@@ -33,12 +33,12 @@ namespace TwitchBot.Commands
 
       if (args.Count != 1)
       {
-        Bot.WriteMessage($"@{message.Username} pro pomoc s příkazem napiš $help *příkaz*. Pro seznam příkazů napiš $commands.", message.Channel);
+        Bot.WriteMessage($"@{message.Username} Pro pomoc s příkazem napiš $help *příkaz*. Pro seznam příkazů napiš $commands.", message.Channel);
         return Task.CompletedTask;
       }
       if (args[0].Contains(' '))
       {
-        Bot.WriteMessage($"@{message.Username} napiš jenom název příkazu. :)", message.Channel);
+        Bot.WriteMessage($"@{message.Username} Napiš jenom název příkazu. :)", message.Channel);
         return Task.CompletedTask;
       }
       if (commandInstances.ContainsKey(args[0]))
@@ -120,7 +120,7 @@ namespace TwitchBot.Commands
         }
         else
         {
-          Bot.WriteMessage($"@{message.Username} tento příkaz buď neexistuje, nebo jsi ho napsal špatně, nebo epousek něco posral", message.Channel);
+          Bot.WriteMessage($"@{message.Username} Tento příkaz buď neexistuje, nebo jsi ho napsal špatně, nebo epousek něco posral", message.Channel);
         }
       }
 

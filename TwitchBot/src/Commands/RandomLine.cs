@@ -32,7 +32,7 @@ public class RandomLine : ICommand
       var randomLine = await DatabaseConnections.GetRandomLine(message.Channel, args[0]);
       Bot.WriteMessage(
         randomLine == null
-          ? $"@{message.Username} uživatel nebyl nalezen. :/"
+          ? $"@{message.Username} Uživatel nebyl nalezen. :/"
           : $"@{message.Username} {randomLine.Username}: {randomLine.Message} ({randomLine.TimeStamp})",
         message.Channel);
     }
@@ -41,7 +41,7 @@ public class RandomLine : ICommand
       var randomLine = await DatabaseConnections.GetRandomLine(message.Channel).ConfigureAwait(false);
       Bot.WriteMessage(
         randomLine == null
-          ? $"@{message.Username} nastala chyba při komunikaci s databází. :/ (@epousek)"
+          ? $"@{message.Username} Nastala chyba při komunikaci s databází. :/ (@epousek)"
           : $"@{message.Username} {randomLine.Username}: {randomLine.Message} ({randomLine.TimeStamp})",
         message.Channel);
     }

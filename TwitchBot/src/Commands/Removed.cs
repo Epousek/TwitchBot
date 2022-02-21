@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Humanizer;
@@ -31,7 +32,7 @@ namespace TwitchBot.Commands
       var emotes = await DatabaseConnections.GetLastRemovedEmotes(message.Channel);
       StringBuilder builder = new("@");
       builder.Append(message.Username);
-      if (emotes.Count == 0)
+      if (emotes.All(e => e.Removed == null))
       {
         builder.Append(" Od doby co jsem na tomto kanále nebyly odebrány žádné emoty");
         Bot.WriteMessage(builder.ToString(), message.Channel);

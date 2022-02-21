@@ -144,7 +144,31 @@ namespace TwitchBot.Connections
         }
       }
     }
-    
+
+    public static async Task SetLastStatus(string channel, string username, Status status)
+    {
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        await using (var com = new MySqlCommand("sp_SetLastStatus", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("username", username);
+          com.Parameters.AddWithValue("channel", channel);
+          com.Parameters.AddWithValue("status", status);
+
+          try
+          {
+            await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_SetLastStatus exception: {ex}", e);
+          }
+        }
+      }
+    }
+
     public static async Task<bool> IsInUserStatuses(string channel, string username)
     {
       await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
@@ -183,7 +207,7 @@ namespace TwitchBot.Connections
           com.Parameters.AddWithValue("statusUsername", status.Username);
           com.Parameters.AddWithValue("statusMessage", status.Message);
           com.Parameters.AddWithValue("statusSince", status.StatusSince);
-          com.Parameters.AddWithValue("whatStatus", status.Status.ToString());
+          com.Parameters.AddWithValue("whatStatus", status.CurrentStatus.ToString());
 
           try
           {
@@ -210,7 +234,7 @@ namespace TwitchBot.Connections
           com.Parameters.AddWithValue("statusUsername", status.Username);
           com.Parameters.AddWithValue("statusMessage", status.Message);
           com.Parameters.AddWithValue("statusSince", status.StatusSince);
-          com.Parameters.AddWithValue("whatStatus", status.Status.ToString());
+          com.Parameters.AddWithValue("whatStatus", status.CurrentStatus.ToString());
 
           try
           {
@@ -276,7 +300,8 @@ namespace TwitchBot.Connections
               Username = reader.GetString(1),
               Message = reader.GetString(2),
               StatusSince = reader.GetDateTime(3),
-              Status = Enum.Parse<Status>(Helpers.FirstToUpper(reader.GetString(4))) 
+              CurrentStatus = Enum.Parse<Status>(Helpers.FirstToUpper(reader.GetString(4))),
+              LastStatus = Enum.Parse<Status>(Helpers.FirstToUpper(reader.GetString(5)))
             };
           }
           catch (Exception e)
@@ -336,7 +361,6 @@ namespace TwitchBot.Connections
           }
           catch (Exception e)
           {
-            Log.Error("sp_CheckOptout exception: {ex}", e);
             return false;
           }
         }

@@ -38,7 +38,7 @@ namespace TwitchBot.Commands.Status
               : $"{message.Username} se jde učit: {status.Message}", message.Channel);
           break;
         case Enums.Status.School:
-          Bot.WriteMessage($"@{message.Username} už se učíš.", message.Channel); //TODO: update status
+          Bot.WriteMessage($"@{message.Username} Už se učíš.", message.Channel); //TODO: update status
           return;
         default:
           status = GetSetStatus.CreateStatus(message, Enums.Status.School);
@@ -50,6 +50,7 @@ namespace TwitchBot.Commands.Status
         await DatabaseConnections.UpdateUserStatus(status).ConfigureAwait(false);
       else
         await DatabaseConnections.AddUserStatus(status).ConfigureAwait(false);
+      await DatabaseConnections.SetLastStatus(status.Channel, status.Username, Enums.Status.School);
     }
   }
 }

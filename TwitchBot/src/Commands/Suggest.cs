@@ -26,7 +26,7 @@ namespace TwitchBot.Commands
     {
       message.Message = message.Message[message.Message.IndexOf(' ')..];
       await DatabaseConnections.WriteSuggestion(message);
-      Bot.WriteMessage($"@{message.Username} díky za návrh!", message.Channel);
+      Bot.WriteMessage($"@{message.Username} Díky za návrh!", message.Channel);
     }
   }
 }

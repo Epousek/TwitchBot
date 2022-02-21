@@ -66,8 +66,8 @@ namespace TwitchBot
 
     public static void WriteMessage(string message, string channel)
     {
-      if((DateTime.Now - _lastMessageSent) < TimeSpan.FromMilliseconds(500) && _lastMessageChannel == channel) //not working
-        Thread.Sleep(500);
+      if((DateTime.Now - _lastMessageSent) < TimeSpan.FromMilliseconds(1000) && _lastMessageChannel == channel) //not working
+        Thread.Sleep(1000); //TODO: this is not working :/
       _client.SendMessage(channel, message);
       _lastMessageChannel = channel;
       _lastMessageSent = DateTime.Now;

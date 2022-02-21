@@ -41,7 +41,7 @@ namespace TwitchBot.Commands.Status
               : $"{message.Username} je nyní afk: {status.Message}", message.Channel);
           break;
         case Enums.Status.Afk:
-          Bot.WriteMessage($"@{message.Username} už jsi afk.", message.Channel); //TODO: update status
+          Bot.WriteMessage($"@{message.Username} Už jsi afk.", message.Channel); //TODO: update status
           return;
         default:
           status = GetSetStatus.CreateStatus(message, Enums.Status.Afk);
@@ -53,6 +53,7 @@ namespace TwitchBot.Commands.Status
         await DatabaseConnections.UpdateUserStatus(status).ConfigureAwait(false);
       else
         await DatabaseConnections.AddUserStatus(status).ConfigureAwait(false);
+      await DatabaseConnections.SetLastStatus(status.Channel, status.Username, Enums.Status.Afk);
     }
   }
 }
