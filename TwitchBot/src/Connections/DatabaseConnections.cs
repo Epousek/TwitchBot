@@ -144,6 +144,55 @@ namespace TwitchBot.Connections
         }
       }
     }
+
+    public static async Task SetLastStatus(string channel, string username, Status status)
+    {
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        await using (var com = new MySqlCommand("sp_SetLastStatus", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("username", username);
+          com.Parameters.AddWithValue("channel", channel);
+          com.Parameters.AddWithValue("status", status);
+
+          try
+          {
+            await com.ExecuteNonQueryAsync().ConfigureAwait(false);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_SetLastStatus exception: {ex}", e);
+          }
+        }
+      }
+    }
+    
+    public static async Task<Status> GetLastStatus(string channel, string username)
+    {
+      await using (var con = new MySqlConnection(SecretsConfig.Credentials.ConnectionString))
+      {
+        con.Open();
+        await using (var com = new MySqlCommand("sp_GetLastStatus", con))
+        {
+          com.CommandType = CommandType.StoredProcedure;
+          com.Parameters.AddWithValue("username", username);
+          com.Parameters.AddWithValue("channel", channel);
+
+          try
+          {
+            var result = await com.ExecuteScalarAsync().ConfigureAwait(false);
+            return result == null ? Status.None : Enum.Parse<Status>((string)result);
+          }
+          catch (Exception e)
+          {
+            Log.Error("sp_GetLastStatus exception: {ex}", e);
+            return Status.None;
+          }
+        }
+      }
+    }
     
     public static async Task<bool> IsInUserStatuses(string channel, string username)
     {
