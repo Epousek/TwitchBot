@@ -31,7 +31,7 @@ namespace TwitchBot
         .Enrich.FromLogContext()
         .WriteTo.MariaDB(
         SecretsConfig.Credentials.ConnectionString,
-        restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information,
+        restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Warning,
         autoCreateTable: true,
         tableName: "Logs"
         )
