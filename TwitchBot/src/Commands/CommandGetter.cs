@@ -26,6 +26,7 @@ namespace TwitchBot.Commands
       CommandInstances.Add("School", new School());
       CommandInstances.Add("Work", new Work());
       CommandInstances.Add("Status", new CheckStatus());
+      CommandInstances.Add("Rafk", new Rafk());
       CommandInstances.Add("Translate", new Translate());
       CommandInstances.Add("Randomline", new RandomLine());
       CommandInstances.Add("Suggest", new Suggest());
