@@ -37,7 +37,7 @@ namespace TwitchBot.Commands.Status
               : $"{message.Username} jde spát: {status.Message}", message.Channel);
           break;
         case Enums.Status.Gn:
-          Bot.WriteMessage($"@{message.Username} už spíš.", message.Channel); //TODO: update status
+          Bot.WriteMessage($"@{message.Username} Už spíš.", message.Channel); //TODO: update status
           return;
         default:
           status = GetSetStatus.CreateStatus(message, Enums.Status.Gn);

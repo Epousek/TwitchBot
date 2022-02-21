@@ -35,11 +35,11 @@ public class Translate : ICommand
     
     if (args[0].StartsWith('"'))
     {
-      Bot.WriteMessage($"@{message.Username} zadej prosím jazyk do kterého chceš text přeložit (jazyky: https://pastebin.com/25PUFnKu )", message.Channel);
+      Bot.WriteMessage($"@{message.Username} Zadej prosím jazyk do kterého chceš text přeložit (jazyky: https://pastebin.com/25PUFnKu )", message.Channel);
     }
     else if (string.IsNullOrEmpty(args[1]))
     {
-      Bot.WriteMessage($"@{message.Username} zadej prosím text který chceš přeložit.", message.Channel);
+      Bot.WriteMessage($"@{message.Username} Zadej prosím text který chceš přeložit.", message.Channel);
     }
     else
     {
@@ -51,17 +51,17 @@ public class Translate : ICommand
       }
       catch (ArgumentException e)
       {
-        Bot.WriteMessage($"@{message.Username} jazyk nebyl nalezen - špatný kód/nejde do něj překládat. (jazyky: https://pastebin.com/25PUFnKu )", message.Channel);
+        Bot.WriteMessage($"@{message.Username} Jazyk nebyl nalezen - špatný kód/nejde do něj překládat. (jazyky: https://pastebin.com/25PUFnKu )", message.Channel);
       }
       catch (DeepLException e)
       {
         if (e.Message.Contains("target_lang"))
         {
-          Bot.WriteMessage($"@{message.Username} jazyk nebyl nalezen - špatný kód/nejde do něj překládat. (jazyky: https://pastebin.com/25PUFnKu )", message.Channel);
+          Bot.WriteMessage($"@{message.Username} Jazyk nebyl nalezen - špatný kód/nejde do něj překládat. (jazyky: https://pastebin.com/25PUFnKu )", message.Channel);
         }
         else
         {
-          Bot.WriteMessage($"@{message.Username} chyba při komunikaci s DeepL API. :/ (@epousek)", message.Channel);
+          Bot.WriteMessage($"@{message.Username} Chyba při komunikaci s DeepL API. :/ (@epousek)", message.Channel);
           Log.Error("Chyba při komunikaci s DeepL API: {e}", e);
         }
       }

@@ -145,7 +145,7 @@ namespace TwitchBot.Commands
             builder.Append(reminder.For);
             if (string.Equals(reminder.For, reminder.From, StringComparison.OrdinalIgnoreCase))
             {
-              builder.Append(" upozornění od tebe");
+              builder.Append(" Upozornění od tebe");
             }
             else
             {

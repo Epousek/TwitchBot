@@ -62,7 +62,7 @@ namespace TwitchBot.Commands
           if (string.Equals(reminder.For, reminder.From, StringComparison.OrdinalIgnoreCase))
           {
             builder
-              .Append("budeš upozorněn(a) za ")
+              .Append("Budeš upozorněn(a) za ")
               .Append(reminder.Length.Value.Humanize(3, new CultureInfo("cs-CS"), minUnit: TimeUnit.Second));
           }
           else
@@ -162,7 +162,7 @@ namespace TwitchBot.Commands
       if (string.IsNullOrEmpty(args[2]))
       {     //NO TIME ARG
         reminder = null;
-        Bot.WriteMessage($"@{message.Username} musíš zadat čas, za jak dlouho mám uživatele upozornit (např. 30s; 5m; 1h...)", message.Channel);
+        Bot.WriteMessage($"@{message.Username} Musíš zadat čas, za jak dlouho mám uživatele upozornit (např. 30s; 5m; 1h...)", message.Channel);
       }
       else
       {
@@ -207,7 +207,7 @@ namespace TwitchBot.Commands
           else
           {
             reminder = null;
-            Bot.WriteMessage($"@{message.Username} musíš napsat čas ve formátu *číslo**jednotka* (např. 30s; 5m; 1h...)", message.Channel);
+            Bot.WriteMessage($"@{message.Username} Musíš napsat čas ve formátu *číslo**jednotka* (např. 30s; 5m; 1h...)", message.Channel);
           }
         }
       }

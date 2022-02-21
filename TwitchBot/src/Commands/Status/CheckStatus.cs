@@ -31,7 +31,7 @@ namespace TwitchBot.Commands.Status
       var comArgs = new CommandArguments(message);
       if((comArgs.GetOneArgument().Count == 0) || string.IsNullOrEmpty(message.Message))
       {
-        Bot.WriteMessage($"@{message.Username} musíš zadat username uživatele.", message.Channel);
+        Bot.WriteMessage($"@{message.Username} Musíš zadat username uživatele.", message.Channel);
         return;
       }
 
@@ -40,11 +40,11 @@ namespace TwitchBot.Commands.Status
 
       if (status == null)
       {
-        Bot.WriteMessage($"@{message.Username} tohoto uživatele nemám v databázi :/", message.Channel);
+        Bot.WriteMessage($"@{message.Username} Tohoto uživatele nemám v databázi :/", message.Channel);
       }
       else if (status.CurrentStatus == Enums.Status.None)
       {
-        Bot.WriteMessage($"@{message.Username} tento uživatel nemá žádný status.", message.Channel);
+        Bot.WriteMessage($"@{message.Username} Tento uživatel nemá žádný status.", message.Channel);
       }
       else if (status.CurrentStatus == Enums.Status.Afk)
       {
@@ -52,7 +52,7 @@ namespace TwitchBot.Commands.Status
         builder
           .Append('@')
           .Append(message.Username)
-          .Append(" tento uživatel je momentálně afk")
+          .Append(" Tento uživatel je momentálně afk")
           .Append(string.IsNullOrEmpty(status.Message) ? ". " : $": {status.Message} ")
           .Append('(')
           .Append((DateTime.Now - status.StatusSince).Humanize(3, minUnit: TimeUnit.Second, culture: new CultureInfo("cs-CS")))
@@ -65,7 +65,7 @@ namespace TwitchBot.Commands.Status
         builder
           .Append('@')
           .Append(message.Username)
-          .Append(" tento uživatel momentálně spí")
+          .Append(" Tento uživatel momentálně spí")
           .Append(string.IsNullOrEmpty(status.Message) ? ". " : $": {status.Message} ")
           .Append('(')
           .Append((DateTime.Now - status.StatusSince).Humanize(3, minUnit: TimeUnit.Second, culture: new CultureInfo("cs-CS")))
@@ -78,7 +78,7 @@ namespace TwitchBot.Commands.Status
         builder
           .Append('@')
           .Append(message.Username)
-          .Append(" tento uživatel momentálně jí")
+          .Append(" Tento uživatel momentálně jí")
           .Append(string.IsNullOrEmpty(status.Message) ? ". " : $": {status.Message} ")
           .Append('(')
           .Append((DateTime.Now - status.StatusSince).Humanize(3, minUnit: TimeUnit.Second, culture: new CultureInfo("cs-CS")))
@@ -91,7 +91,7 @@ namespace TwitchBot.Commands.Status
         builder
           .Append('@')
           .Append(message.Username)
-          .Append(" tento uživatel se momentálně učí")
+          .Append(" Tento uživatel se momentálně učí")
           .Append(string.IsNullOrEmpty(status.Message) ? ". " : $": {status.Message} ")
           .Append('(')
           .Append((DateTime.Now - status.StatusSince).Humanize(3, minUnit: TimeUnit.Second, culture: new CultureInfo("cs-CS")))
@@ -104,7 +104,7 @@ namespace TwitchBot.Commands.Status
         builder
           .Append('@')
           .Append(message.Username)
-          .Append(" tento uživatel momentálně pracuje")
+          .Append(" Tento uživatel momentálně pracuje")
           .Append(string.IsNullOrEmpty(status.Message) ? ". " : $": {status.Message} ")
           .Append('(')
           .Append((DateTime.Now - status.StatusSince).Humanize(3, minUnit: TimeUnit.Second, culture: new CultureInfo("cs-CS")))
