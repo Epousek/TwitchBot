@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
 using Humanizer.Localisation;
+using Serilog;
 using TwitchBot.Connections;
 using TwitchBot.Models;
 
@@ -22,7 +23,18 @@ namespace TwitchBot.Commands
       var comArgs = new CommandArguments(message);
       var args = comArgs.GetXArguments(3);
 
-      if (args != null && await DatabaseConnections.CheckOptout(message.Channel, args[0], "remind").ConfigureAwait(false))
+      if (args == null)
+      {
+        Bot.WriteMessage($"@{message.Username} musíš zadat alespoň uživatele kterého chceš upozornit.", message.Channel);
+        return;
+      }
+
+      if (args[0] == "me")
+        args[0] = message.Username;
+
+      args[0] = args[0].ToLower();
+
+      if (await DatabaseConnections.CheckOptout(message.Channel, args[0], "remind").ConfigureAwait(false))
       {
         Bot.WriteMessage($"@{message.Username} tomuto uživateli nelze poslat připomenutí. :/", message.Channel);
         return;
@@ -34,7 +46,7 @@ namespace TwitchBot.Commands
         {   //TIMED REMIND
           args = comArgs.GetXArguments(4);
           CheckTime(args, message, out var reminder);
-          if (reminder == null) 
+          if (reminder == null)
             return;
           if (args[0].StartsWith('@'))
             args[0] = args[0].Replace("@", "");
