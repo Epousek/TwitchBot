@@ -38,7 +38,7 @@ Na programování budu používat čistě Visual Studio. Na úpravu např. json 
  - Databáze:
     - MySQL      - rychlejší - Méně funkcí - větší komunita
     - PostgreSQL - pomalejší - více funkcí - menší komunita\
-Vybral jsem si PostgreSQL hlavně kvůli rychlosti. Od databáze nepotřebuji nic složitého/náročného, takže mi nevadí, že toho o ní tolik nenajdu na internetu.
+Vybral jsem si MySQL hlavně kvůli rychlosti. Od databáze nepotřebuji nic složitého/náročného, takže mi nevadí, že toho o ní tolik nenajdu na internetu.
 
  - Správa databáze:
 Na správu databáze budu používat MySQL Workbench, protože je dělaný přímo pro MySQL, a navíc nepotřebuji od toho programu nic složitého, a nemá tak cenu používat jiný program.
